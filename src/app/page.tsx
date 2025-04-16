@@ -174,6 +174,37 @@ export default function Home() {
     }
   };
 
+  // Placeholder function for registering the user and sending OTP
+  const registerUserAndSendOTP = async () => {
+    if (source && destination && mobileNumber) {
+      // Simulate registering the user and sending OTP
+      console.log(`Registering user with mobile number: ${mobileNumber}`);
+      toast({
+        title: "Registration initiated",
+        description: `OTP sent to ${mobileNumber}.`,
+      });
+    } else {
+      toast({
+        title: "Registration Error",
+        description: "Please ensure all fields are filled.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBookCabClick = () => {
+    if (source && destination) {
+      // Proceed to register the user
+      registerUserAndSendOTP();
+    } else {
+      toast({
+        title: "Booking Error",
+        description: "Please select both source and destination.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
@@ -306,11 +337,10 @@ export default function Home() {
                 />
               </div>
             )}
-            <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber }>Book Cab <Map className="ml-2"/></Button>
+            <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber }>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
       </main>
     </div>
   );
 }
-
