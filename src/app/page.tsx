@@ -163,7 +163,7 @@ export default function Home() {
         console.log(`Simulating sending notification to ${mobileNumber}`);
         toast({
             title: "Cab Booked!",
-            description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare.toFixed(2) : 0} in a ${vehicleType}. A notification has been sent to ${mobileNumber}.`,
+            description: `[SIMULATION] Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare.toFixed(2) : 0} in a ${vehicleType}. A notification has been sent to ${mobileNumber}.`,
         });
     } else {
         toast({
@@ -181,7 +181,7 @@ export default function Home() {
       console.log(`Registering user with mobile number: ${mobileNumber}`);
       toast({
         title: "Registration initiated",
-        description: `OTP sent to ${mobileNumber}.`,
+        description: `[SIMULATION] OTP sent to ${mobileNumber}.`,
       });
     } else {
       toast({
@@ -344,3 +344,4 @@ export default function Home() {
     </div>
   );
 }
+
