@@ -194,8 +194,9 @@ export default function AdminDashboard() {
     
       
         
-          <CardTitle>Let'sGo Rides Admin Dashboard</CardTitle>
-        
+          
+            Let'sGo Rides Admin Dashboard
+          
           
           <Link href="/">
             <Button variant="secondary">
@@ -475,4 +476,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
 
