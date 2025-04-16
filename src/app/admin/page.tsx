@@ -265,15 +265,12 @@ export default function Admin() {
                         <TableCell className="text-right font-medium">
                           <Button variant="ghost" size="sm" onClick={() => editCab(cab.id)}>
                             <Edit className="mr-2 h-4 w-4"/>
-                            Edit
                           </Button>
                           <Button variant="ghost" size="sm" onClick={() => deleteCab(cab.id)}>
                             <Trash className="mr-2 h-4 w-4"/>
-                            Delete
                           </Button>
                           <Button variant="ghost" size="sm">
                             <Eye className="mr-2 h-4 w-4"/>
-                            View
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -392,3 +389,4 @@ export default function Admin() {
     </div>
   );
 }
+
