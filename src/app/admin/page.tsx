@@ -274,7 +274,7 @@ export default function Admin() {
       
         
           
-            Let&#39;sGo Rides Admin Dashboard
+            Let'sGo Rides Admin Dashboard
           
           <Link href="/">
             <Button variant="secondary">
@@ -802,4 +802,5 @@ export default function Admin() {
     
   );
 }
+
 
