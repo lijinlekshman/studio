@@ -195,7 +195,7 @@ export default function AdminDashboard() {
       
         
           
-            Let'sGo Rides Admin Dashboard
+            {"Let'sGo Rides Admin Dashboard"}
           
           
           <Link href="/">
@@ -476,5 +476,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-
