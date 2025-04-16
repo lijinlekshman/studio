@@ -271,33 +271,39 @@ export default function Admin() {
 
   return (
     
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">
+      
+        
+          
             Let&apos;sGo Rides Admin Dashboard
-          </h1>
+          
           <Link href="/">
             <Button variant="secondary">
               <ArrowLeft className="mr-2"/>
               Back to Home
             </Button>
           </Link>
-        </div>
-      </header>
+        
+      
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+        
           {/* Left Panel: Management Cards */}
-          <div className="md:col-span-2 space-y-6">
+          
             {/* Add New Cab Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Add New Cab</CardTitle>
-                <CardDescription>Add a new cab to the system.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="cabId">Cab ID</label>
+            
+              
+                
+                  Add New Cab
+                
+                
+                  Add a new cab to the system.
+                
+              
+              
+                
+                  
+                    Cab ID
+                  
                   <Input
                     type="text"
                     id="cabId"
@@ -305,9 +311,11 @@ export default function Admin() {
                     value={cabId}
                     onChange={(e) => setCabId(e.target.value)}
                   />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="cabModel">Cab Model</label>
+                
+                
+                  
+                    Cab Model
+                  
                   <Input
                     type="text"
                     id="cabModel"
@@ -315,9 +323,11 @@ export default function Admin() {
                     value={cabModel}
                     onChange={(e) => setCabModel(e.target.value)}
                   />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="city">City</label>
+                
+                
+                  
+                    City
+                  
                   <Input
                     type="text"
                     id="city"
@@ -325,59 +335,73 @@ export default function Admin() {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                   />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="cabType">Cab Type</label>
+                
+                
+                  
+                    Cab Type
+                  
                   <Select onValueChange={setCabType}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select cab type"/>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Type</SelectLabel>
+                      
+                        
+                          Type
+                        
                         <SelectItem value="sedan">Sedan</SelectItem>
                         <SelectItem value="suv">SUV</SelectItem>
                         <SelectItem value="mini">Mini</SelectItem>
-                      </SelectGroup>
+                      
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="cabStatus">Cab Status</label>
+                
+                
+                  
+                    Cab Status
+                  
                   <Select onValueChange={setCabStatus}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select status"/>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Status</SelectLabel>
+                      
+                        
+                          Status
+                        
                         <SelectItem value="available">Available</SelectItem>
                         <SelectItem value="on-trip">On Trip</SelectItem>
                         <SelectItem value="maintenance">Maintenance</SelectItem>
-                      </SelectGroup>
+                      
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="additionalNotes">Additional Notes</label>
+                
+                
+                  
+                    Additional Notes
+                  
                   <Textarea
                     id="additionalNotes"
                     placeholder="Enter any additional notes"
                     value={additionalNotes}
                     onChange={(e) => setAdditionalNotes(e.target.value)}
                   />
-                </div>
+                
                 <Button onClick={addCab}>Add Cab</Button>
-              </CardContent>
-            </Card>
+              
+            
 
             {/* Added Cabs Listing */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Added Cabs</CardTitle>
-                <CardDescription>Manage existing cabs in the system.</CardDescription>
-              </CardHeader>
-              <CardContent>
+            
+              
+                
+                  Added Cabs
+                
+                
+                  Manage existing cabs in the system.
+                
+              
+              
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -415,17 +439,23 @@ export default function Admin() {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
+              
+            
             {/* Fare Management Section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Update Fare</CardTitle>
-                <CardDescription>Update the fare for a specific city.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="city">City</label>
+            
+              
+                
+                  Update Fare
+                
+                
+                  Update the fare for a specific city.
+                
+              
+              
+                
+                  
+                    City
+                  
                   <Input
                     type="text"
                     id="city"
@@ -433,9 +463,11 @@ export default function Admin() {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                   />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="fare">Fare</label>
+                
+                
+                  
+                    Fare
+                  
                   <Input
                     type="text"
                     id="fare"
@@ -443,18 +475,22 @@ export default function Admin() {
                     value={fare}
                     onChange={(e) => setFare(e.target.value)}
                   />
-                </div>
+                
                 <Button onClick={updateFareForCity}>Update Fare</Button>
-              </CardContent>
-            </Card>
+              
+            
 
             {/* Fare Listing */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Fare Listing</CardTitle>
-                <CardDescription>Manage fares for different cities.</CardDescription>
-              </CardHeader>
-              <CardContent>
+            
+              
+                
+                  Fare Listing
+                
+                
+                  Manage fares for different cities.
+                
+              
+              
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -499,21 +535,27 @@ export default function Admin() {
                     ))}
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </div>
+              
+            
+          
 
           {/* Right Panel: Analytics and Additional Info */}
-          <div className="md:col-span-1 space-y-6">
+          
             {/* Cab Status Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Cab Status</CardTitle>
-                <CardDescription>View and modify the status of cabs.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="cabId">Cab ID</label>
+            
+              
+                
+                  Cab Status
+                
+                
+                  View and modify the status of cabs.
+                
+              
+              
+                
+                  
+                    Cab ID
+                  
                   <Input
                     type="text"
                     id="cabId"
@@ -521,45 +563,55 @@ export default function Admin() {
                     value={cabId}
                     onChange={(e) => setCabId(e.target.value)}
                   />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="cabStatus">Cab Status</label>
+                
+                
+                  
+                    Cab Status
+                  
                   <Select onValueChange={setCabStatus}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select status"/>
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Status</SelectLabel>
+                      
+                        
+                          Status
+                        
                         <SelectItem value="available">Available</SelectItem>
                         <SelectItem value="on-trip">On Trip</SelectItem>
                         <SelectItem value="maintenance">Maintenance</SelectItem>
-                      </SelectGroup>
+                      
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="additionalNotes">Additional Notes</label>
+                
+                
+                  
+                    Additional Notes
+                  
                   <Textarea
                     id="additionalNotes"
                     placeholder="Enter any additional notes"
                     value={additionalNotes}
                     onChange={(e) => setAdditionalNotes(e.target.value)}
                   />
-                </div>
+                
                 <Button onClick={() => toast({title: "Status Updated", description: `Cab ${cabId} status updated`})}>
                   Update Status
                 </Button>
-              </CardContent>
-            </Card>
+              
+            
 
             {/* Analytics Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Monthly Analytics</CardTitle>
-                <CardDescription>Monthly overview of cabs and fares.</CardDescription>
-              </CardHeader>
-              <CardContent>
+            
+              
+                
+                  Monthly Analytics
+                
+                
+                  Monthly overview of cabs and fares.
+                
+              
+              
                 <ResponsiveContainer width="100%" height={250}>
                   <ComposedChart data={data} margin={{top: 5, right: 20, bottom: 5, left: 0}}>
                     <CartesianGrid stroke="#ccc" strokeDasharray="5 5"/>
@@ -572,28 +624,42 @@ export default function Admin() {
                     <Scatter dataKey="fares" fill="red"/>
                   </ComposedChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
+              
+            
              {/* Booking Details Accordion */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Booking Details</CardTitle>
-                                <CardDescription>View details of all bookings.</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {isBookingDataAvailable ? (
-                                    <Accordion type="single" collapsible>
-                                        {bookings.map((booking) => (
-                                            <AccordionItem key={booking.id} value={booking.id}>
-                                                <AccordionTrigger>
+                        
+                            
+                                Booking Details
+                            
+                            
+                                View details of all bookings.
+                            
+                        
+                        
+                            {isBookingDataAvailable ? (
+                                
+                                    {bookings.map((booking) => (
+                                        
+                                            
+                                                
                                                     Booking ID: {booking.id}
-                                                </AccordionTrigger>
-                                                <AccordionContent>
-                                                    <p><strong>Source:</strong> {booking.source}</p>
-                                                    <p><strong>Destination:</strong> {booking.destination}</p>
-                                                    <p><strong>Fare:</strong> {booking.fare}</p>
-                                                    <p><strong>Cab ID:</strong> {booking.cabId}</p>
-                                                    <p><strong>Mobile Number:</strong> {booking.mobileNumber}</p>
+                                                
+                                                
+                                                    
+                                                        <strong>Source:</strong> {booking.source}
+                                                    
+                                                    
+                                                        <strong>Destination:</strong> {booking.destination}
+                                                    
+                                                    
+                                                        <strong>Fare:</strong> {booking.fare}
+                                                    
+                                                    
+                                                        <strong>Cab ID:</strong> {booking.cabId}
+                                                    
+                                                    
+                                                        <strong>Mobile Number:</strong> {booking.mobileNumber}
+                                                    
 													{/* Add Track Cab Button */}
 													<Button variant="ghost" size="sm" onClick={() => {
 														const cab = cabs.find(c => c.id === booking.cabId);
@@ -610,47 +676,62 @@ export default function Admin() {
 														<Locate className="mr-2 h-4 w-4"/>
 														Track Cab
 													</Button>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        ))}
-                                    </Accordion>
-                                ) : (
-                                    <p>No booking data available.</p>
-                                )}
-                            </CardContent>
-                        </Card>
+                                                
+                                            
+                                        
+                                    ))}
+                                
+                            ) : (
+                                
+                                    No booking data available.
+                                
+                            )}
+                        
+              
               {/* Cab Tracking Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Cab Tracking</CardTitle>
-                  <CardDescription>Track the current location of cabs.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4">
+              
+                
+                  
+                    Cab Tracking
+                  
+                  
+                    Track the current location of cabs.
+                  
+                
+                
+                  
                     {cabs.map((cab) => (
-                      <div key={cab.id} className="border rounded-md p-4">
-                        <h3 className="font-semibold">{cab.model} ({cab.id})</h3>
-                        <p>Status: {cab.status}</p>
-                        {/* Map Integration */}
-                        <div className="mt-2">
-                          <iframe
-                            width="100%"
-                            height="200"
-                            style={{ border: 0 }}
-                            loading="lazy"
-                            allowFullScreen
-                            src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cab.location.lat},${cab.location.lng}`}
-                          ></iframe>
-                        </div>
-                        <p>Location: Lat: {cab.location.lat}, Lng: {cab.location.lng}</p>
-                      </div>
+                      
+                        
+                          
+                            {cab.model} ({cab.id})
+                          
+                          
+                            Status: {cab.status}
+                          
+                          {/* Map Integration */}
+                          
+                            <iframe
+                              width="100%"
+                              height="200"
+                              style={{ border: 0 }}
+                              loading="lazy"
+                              allowFullScreen
+                              src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cab.location.lat},${cab.location.lng}`}
+                            ></iframe>
+                          
+                          
+                            Location: Lat: {cab.location.lat}, Lng: {cab.location.lng}
+                          
+                        
+                      
                     ))}
-                  </div>
-                </CardContent>
-              </Card>
-          </div>
-        </div>
-      </main>
+                  
+                
+              
+          
+        
+      
        <AlertDialog open={openPreview} onOpenChange={setOpenPreview}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -660,16 +741,32 @@ export default function Admin() {
             <AlertDialogDescription>
               {previewCab ? (
                 <>
-                  <p><strong>Model:</strong> {previewCab.model}</p>
-                  <p><strong>City:</strong> {previewCab.city}</p>
-                  <p><strong>Type:</strong> {previewCab.type}</p>
-                  <p><strong>Status:</strong> {previewCab.status}</p>
-                  <p><strong>Notes:</strong> {previewCab.notes}</p>
-				  <p><strong>Vehicle Number:</strong> {previewCab.vehicleNumber}</p>
-				  <p><strong>Driver Name:</strong> {previewCab.driverDetails.name}</p>
-				  <p><strong>Driver Mobile:</strong> {previewCab.driverDetails.mobile}</p>
                   
-                                    <div className="mt-2">
+                    <strong>Model:</strong> {previewCab.model}
+                  
+                  
+                    <strong>City:</strong> {previewCab.city}
+                  
+                  
+                    <strong>Type:</strong> {previewCab.type}
+                  
+                  
+                    <strong>Status:</strong> {previewCab.status}
+                  
+                  
+                    <strong>Notes:</strong> {previewCab.notes}
+                  
+				  
+					<strong>Vehicle Number:</strong> {previewCab.vehicleNumber}
+				  
+				  
+					<strong>Driver Name:</strong> {previewCab.driverDetails.name}
+				  
+				  
+					<strong>Driver Mobile:</strong> {previewCab.driverDetails.mobile}
+				  
+                  
+                                    
                                         <iframe
                                             width="100%"
                                             height="200"
@@ -678,12 +775,16 @@ export default function Admin() {
                                             allowFullScreen
                                             src={mapURL}
                                         ></iframe>
-                                    </div>
+                                    
                 </>
               ) : previewFare ? (
                 <>
-                  <p><strong>City:</strong> {previewFare.city}</p>
-                  <p><strong>Fare:</strong> {previewFare.fare}</p>
+                  
+                    <strong>City:</strong> {previewFare.city}
+                  
+                  
+                    <strong>Fare:</strong> {previewFare.fare}
+                  
                 </>
               ) : (
                 'No details to display.'
@@ -700,8 +801,7 @@ export default function Admin() {
             </AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </main>
+      
     
   );
 }
-
