@@ -34,8 +34,8 @@ export interface Address {
 export async function getCurrentLocation(): Promise<Coordinate> {
   // TODO: Implement this by calling an API.
   return {
-    lat: 34.052235,
-    lng: -118.243683,
+    lat: 8.5241,
+    lng: 76.9366,
   };
 }
 
@@ -50,6 +50,6 @@ export async function getAddressForCoordinate(coordinate: Coordinate): Promise<A
 
   return {
     coordinate: coordinate,
-    formattedAddress: '123 Main St, Anytown, CA 91234',
+    formattedAddress: 'Thiruvananthapuram, Kerala, India',
   };
 }

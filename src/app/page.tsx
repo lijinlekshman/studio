@@ -7,6 +7,8 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Map} from 'lucide-react';
+import {suggestDestinations} from '@/ai/flows/suggest-destinations';
+import {useToast} from "@/hooks/use-toast";
 
 const INR_CONVERSION_RATE = 83;
 
@@ -16,6 +18,8 @@ export default function Home() {
   const [fare, setFare] = useState<number | null>(null);
   const [sourceAddress, setSourceAddress] = useState<Address | null>(null);
   const [destinationAddress, setDestinationAddress] = useState<Address | null>(null);
+  const [suggestedDestinations, setSuggestedDestinations] = useState<any[]>([]);
+  const {toast} = useToast();
 
   useEffect(() => {
     const fetchCurrentLocation = async () => {
@@ -37,10 +41,30 @@ export default function Home() {
     fetchSourceAddress();
   }, [source]);
 
+  useEffect(() => {
+    const fetchSuggestedDestinations = async () => {
+      if (source) {
+        try {
+          const destinations = await suggestDestinations({currentLocation: source, pastRideHistory: []});
+          setSuggestedDestinations(destinations);
+        } catch (error: any) {
+          toast({
+            title: "Error fetching destinations",
+            description: error.message,
+            variant: "destructive",
+          });
+          console.error('Error fetching destinations:', error);
+        }
+      }
+    };
+
+    fetchSuggestedDestinations();
+  }, [source, toast]);
+
   const handleDestinationChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const destinationName = event.target.value;
     // Placeholder: Geocode the destination name to coordinates
-    const newDestination: Coordinate = {lat: 34.062235, lng: -118.253683};
+    const newDestination: Coordinate = {lat: 8.5241, lng: 76.9366};
     setDestination(newDestination);
 
     const destinationAddress = await getAddressForCoordinate(newDestination);
@@ -60,7 +84,10 @@ export default function Home() {
 
   const bookCab = () => {
     if (source && destination) {
-      alert(`Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare * INR_CONVERSION_RATE : 0}`);
+      toast({
+        title: "Cab Booked!",
+        description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare * INR_CONVERSION_RATE : 0}`,
+      });
     }
   };
 
@@ -85,7 +112,7 @@ export default function Home() {
                 value={sourceAddress ? sourceAddress.formattedAddress : 'Fetching current location...'}
                 disabled
               />
-              <img src="https://picsum.photos/400/300" alt="Indian Map" className="rounded-md shadow-md"/>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/India_Kerala_locator_map.svg/500px-India_Kerala_locator_map.svg.png" alt="Kerala Map" className="rounded-md shadow-md"/>
             </div>
             <div className="grid gap-2">
               <label htmlFor="destination">Destination</label>
@@ -108,6 +135,16 @@ export default function Home() {
               </div>
             )}
             <Button onClick={bookCab}>Book Cab <Map className="ml-2"/></Button>
+            {suggestedDestinations.length > 0 && (
+              <div className="grid gap-2">
+                <label>Suggested Destinations</label>
+                <ul>
+                  {suggestedDestinations.map((dest, index) => (
+                    <li key={index}>{dest.name}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </CardContent>
         </Card>
       </main>
