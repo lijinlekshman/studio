@@ -193,10 +193,9 @@ export default function AdminDashboard() {
   return (
     
       
-        <div>
-          
-            {"Let'sGo Rides Admin Dashboard"}
-       
+        
+          {"Let'sGo Rides Admin Dashboard"}
+        
           <div className="flex justify-end">
           <Link href="/">
             <Button variant="secondary">
@@ -206,7 +205,6 @@ export default function AdminDashboard() {
           </Link>
           </div>
         
-      
 
       
         
