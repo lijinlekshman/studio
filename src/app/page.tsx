@@ -23,8 +23,10 @@ export default function Home() {
   const {toast} = useToast();
   const [destinationInput, setDestinationInput] = useState('');
 
-  const fetchSuggestedDestinations = useCallback(async (location: Coordinate) => {
+  const fetchSuggestedDestinations = useCallback(async (destinationName: string) => {
     try {
+      if (!destinationName) return;
+      const location = await getCurrentLocation(); // Use current location as a fallback
       const destinations = await suggestDestinations({currentLocation: location, pastRideHistory: []});
       setSuggestedDestinations(destinations);
     } catch (error: any) {
@@ -60,6 +62,7 @@ export default function Home() {
   const handleDestinationChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const destinationName = event.target.value;
     setDestinationInput(destinationName);
+    fetchSuggestedDestinations(destinationName);
 
     if (source) {
       // Placeholder: Geocode the destination name to coordinates
@@ -68,8 +71,6 @@ export default function Home() {
 
       const destinationAddress = await getAddressForCoordinate(newDestination);
       setDestinationAddress(destinationAddress);
-
-      fetchSuggestedDestinations(source);
     }
   };
 
@@ -95,7 +96,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center">
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center relative">
+        <div className="absolute top-4 right-4">
+          <Link href="/admin">
+            <Button variant="secondary" size="sm">
+              Admin Portal
+            </Button>
+          </Link>
+        </div>
         <h1 className="text-6xl font-bold">
           Let&apos;sGo Rides
         </h1>
@@ -146,9 +154,6 @@ export default function Home() {
             <Button onClick={bookCab}>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
-        <Link href="/admin">
-          <Button>Admin Portal</Button>
-        </Link>
       </main>
     </div>
   );
