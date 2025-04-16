@@ -176,7 +176,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center relative">
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
         <div className="absolute top-4 right-4 flex items-center space-x-2">
 
           <DropdownMenu>
