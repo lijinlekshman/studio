@@ -9,6 +9,7 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/compo
 import {Map} from 'lucide-react';
 import {suggestDestinations} from '@/ai/flows/suggest-destinations';
 import {useToast} from "@/hooks/use-toast";
+import Link from "next/link";
 
 const INR_CONVERSION_RATE = 83;
 
@@ -147,7 +148,12 @@ export default function Home() {
             )}
           </CardContent>
         </Card>
+        <Link href="/admin">
+          <Button>Admin Portal</Button>
+        </Link>
       </main>
     </div>
   );
 }
+
+    

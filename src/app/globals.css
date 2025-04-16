@@ -4,7 +4,7 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-image: url('https://images.unsplash.com/photo-1616471919434-d8398f741961?q=80&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Replace with your image URL */
+  background-image: url('https://t4.ftcdn.net/jpg/02/86/75/24/360_F_286752452_Eq9Zq1SyEjUmNcGC0gF8uY8f9Um7dbwz.jpg'); /* Replace with your image URL */
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -12,34 +12,34 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* White */
+    --background: 60 100% 98%; /* Light Yellow */
     --foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --card: 0 0% 100%; /* White */
+    --card: 60 100% 98%; /* Light Yellow */
     --card-foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --popover: 0 0% 100%; /* White */
+    --popover: 60 100% 98%; /* Light Yellow */
     --popover-foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --primary: 211 100% 40%; /* Blue */
+    --primary: 47 98.2% 57.3%; /* Yellow */
     --primary-foreground: 0 0% 100%; /* White */
     --secondary: 0 0% 96%; /* Light Gray */
     --secondary-foreground: 24 7.7% 9.8%; /* Dark Gray */
     --muted: 0 0% 96%; /* Light Gray */
     --muted-foreground: 25 5.3% 44.7%; /* Medium Gray */
-    --accent: 142 52% 49%; /* Green */
+    --accent: 49 99.4% 50.6%; /* Yellow */
     --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 20 5.9% 90%; /* Light Gray */
     --input: 0 0% 96%; /* Light Gray */
-    --ring: 211 100% 40%; /* Blue */
+    --ring: 47 98.2% 57.3%; /* Yellow */
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 96%;
+    --sidebar-background: 60 100% 98%;
     --sidebar-foreground: 24 7.7% 9.8%;
-    --sidebar-primary: 211 100% 40%;
+    --sidebar-primary: 47 98.2% 57.3%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 142 52% 49%;
+    --sidebar-accent: 49 99.4% 50.6%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 20 5.9% 90%;
-    --sidebar-ring: 211 100% 40%;
+    --sidebar-ring: 47 98.2% 57.3%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -49,32 +49,32 @@ body {
 
   .dark {
     --background: 24 7.7% 9.8%; /* Dark Gray */
-    --foreground: 0 0% 98%; /* White */
+    --foreground: 60 100% 98%; /* Light Yellow */
     --card: 24 7.7% 9.8%; /* Dark Gray */
-    --card-foreground: 0 0% 98%; /* White */
+    --card-foreground: 60 100% 98%; /* Light Yellow */
     --popover: 24 7.7% 9.8%; /* Dark Gray */
-    --popover-foreground: 0 0% 98%; /* White */
-    --primary: 211 100% 40%; /* Blue */
+    --popover-foreground: 60 100% 98%; /* Light Yellow */
+    --primary: 47 98.2% 57.3%; /* Yellow */
     --primary-foreground: 0 0% 100%; /* White */
     --secondary: 25 5.3% 24.7%; /* Darker Gray */
-    --secondary-foreground: 0 0% 98%; /* White */
+    --secondary-foreground: 60 100% 98%; /* Light Yellow */
     --muted: 25 5.3% 24.7%; /* Darker Gray */
     --muted-foreground: 0 0% 63.9%; /* Light Gray */
-    --accent: 142 52% 49%; /* Green */
+    --accent: 49 99.4% 50.6%; /* Yellow */
     --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 25 5.3% 24.7%; /* Darker Gray */
     --input: 25 5.3% 24.7%; /* Darker Gray */
-    --ring: 211 100% 40%; /* Blue */
+    --ring: 47 98.2% 57.3%; /* Yellow */
     --sidebar-background: 25 5.3% 24.7%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 211 100% 40%;
+    --sidebar-foreground: 60 100% 98%;
+    --sidebar-primary: 47 98.2% 57.3%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 142 52% 49%;
+    --sidebar-accent: 49 99.4% 50.6%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 25 5.3% 24.7%;
-    --sidebar-ring: 211 100% 40%;
+    --sidebar-ring: 47 98.2% 57.3%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -91,3 +91,5 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+    

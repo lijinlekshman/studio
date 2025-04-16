@@ -4,13 +4,26 @@ import {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {useToast} from "@/hooks/use-toast";
 
 export default function Admin() {
   const [cabId, setCabId] = useState('');
   const [city, setCity] = useState('');
+  const [fare, setFare] = useState('');
+  const {toast} = useToast();
 
   const addCab = () => {
-    alert(`Cab ${cabId} added to ${city}`);
+    toast({
+      title: "Cab Added!",
+      description: `Cab ${cabId} added to ${city}`,
+    });
+  };
+
+  const updateFare = () => {
+    toast({
+      title: "Fare Updated!",
+      description: `Fare updated to ${fare}`,
+    });
   };
 
   return (
@@ -49,8 +62,31 @@ export default function Admin() {
             <Button onClick={addCab}>Add Cab</Button>
           </CardContent>
         </Card>
+
+        <Card className="w-full max-w-md mt-10">
+          <CardHeader>
+            <CardTitle>Edit Fare</CardTitle>
+            <CardDescription>Enter the new fare to update it in the system.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <label htmlFor="fare">Fare</label>
+              <Input
+                type="text"
+                id="fare"
+                placeholder="Enter Fare"
+                value={fare}
+                onChange={(e) => setFare(e.target.value)}
+              />
+            </div>
+            <Button onClick={updateFare}>Update Fare</Button>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
 }
 /
+
+
+    
