@@ -58,7 +58,7 @@ const prompt = ai.definePrompt({
       name: z.string().describe('The name of the suggested destination')
     })).describe('A list of suggested destinations with their coordinates.'),
   },
-  prompt: `You are a ride assistant specializing in destinations within Kerala and India. Given the user's current location and past ride history, suggest popular destinations within Kerala and India.
+  prompt: `You are a ride assistant specializing in destinations within Kerala, India. Given the user's current location and past ride history, suggest popular destinations within Kerala.
 
 Current Location: {{{currentLocation.lat}}}, {{{currentLocation.lng}}}.
 
@@ -86,3 +86,4 @@ const suggestDestinationsFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
+
