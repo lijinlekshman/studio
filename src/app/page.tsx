@@ -44,9 +44,7 @@ export default function Home() {
   const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
   const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
   const [countryCode, setCountryCode] = useState('+91'); // Default country code
-    const [otpSent, setOtpSent] = useState(false); // OTP sent state
-    const [otp, setOtp] = useState('');
-    const [otpVerified, setOtpVerified] = useState(false);
+    
 
   const fetchSuggestedSources = useCallback(async () => {
     try {
@@ -157,33 +155,7 @@ export default function Home() {
     setDestinationAddress(address);
   };
 
-    const handleSendOtp = () => {
-        // Simulate sending OTP
-        console.log(`Simulating sending OTP to ${countryCode}${mobileNumber}`);
-        toast({
-            title: "OTP Sent!",
-            description: "Please enter the OTP sent to your mobile number.",
-        });
-        setOtpSent(true);
-    };
-
-    const handleVerifyOtp = () => {
-        // Simulate verifying OTP
-        if (otp === "123456") { // Replace with actual OTP verification logic
-            console.log("OTP Verified!");
-            toast({
-                title: "OTP Verified!",
-                description: "Your mobile number has been verified.",
-            });
-            setOtpVerified(true);
-        } else {
-            toast({
-                title: "OTP Verification Failed!",
-                description: "Invalid OTP. Please try again.",
-                variant: "destructive",
-            });
-        }
-    };
+    
 
   const bookCab = () => {
     if (source && destination ) {
@@ -237,24 +209,7 @@ export default function Home() {
             <CardDescription>Enter your source and destination to book a cab.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-           {/* <div className="grid gap-2">
-                    <label htmlFor="countryCode">Country Code</label>
-                    <Select onValueChange={setCountryCode} defaultValue={countryCode}>
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select Country Code" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Country</SelectLabel>
-                                {countryCodes.map((code) => (
-                                    <SelectItem key={code.value} value={code.value}>
-                                        {code.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
-                </div>*/}
+           
             <div className="grid gap-2">
               <label htmlFor="mobileNumber">Mobile Number</label>
               <Input
@@ -266,29 +221,7 @@ export default function Home() {
                 required
               />
             </div>
-             {/*{!otpSent && (
-                        <Button onClick={handleSendOtp} disabled={!mobileNumber}>
-                            Send OTP
-                        </Button>
-                    )}
-
-                    {otpSent && !otpVerified && (
-                        <>
-                            <div className="grid gap-2">
-                                <label htmlFor="otp">Enter OTP</label>
-                                <Input
-                                    type="text"
-                                    id="otp"
-                                    placeholder="Enter OTP"
-                                    value={otp}
-                                    onChange={(e) => setOtp(e.target.value)}
-                                />
-                            </div>
-                            <Button onClick={handleVerifyOtp} disabled={!otp}>
-                                Verify OTP
-                            </Button>
-                        </>
-                    )}*/}
+           
            <div className="grid gap-2">
                 <label htmlFor="source">Source</label>
                 <Select onValueChange={(value) => {
@@ -380,3 +313,4 @@ export default function Home() {
     </div>
   );
 }
+
