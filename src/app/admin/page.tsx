@@ -5,7 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useToast} from "@/hooks/use-toast";
-import {ArrowLeft, Edit, Trash, Eye} from "lucide-react";
+import {ArrowLeft, Edit, Trash, Eye, Save} from "lucide-react";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {
@@ -106,6 +106,11 @@ export default function Admin() {
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [cabs, setCabs] = useState(initialCabs); // State for cabs
   const [fares, setFares] = useState(initialFares); // State for fares
+  const [editingFareCity, setEditingFareCity] = useState<string | null>(null); // State to manage editing city
+  const [editedFareValue, setEditedFareValue] = useState(''); // State to hold edited fare value
+  const [isEditingCab, setIsEditingCab] = useState(false);
+  const [isEditingFare, setIsEditingFare] = useState(false);
+
 
   const addCab = () => {
     const newCab = {
@@ -156,12 +161,22 @@ export default function Admin() {
     });
   };
 
-  const editFare = (city: string) => {
-    // Logic to edit fare details
+  const handleEditFare = (city: string, currentFare: string) => {
+    setEditingFareCity(city);
+    setEditedFareValue(currentFare);
+    setIsEditingFare(true);
+  };
+  const handleSaveFare = (city: string) => {
+    const updatedFares = fares.map(fare =>
+      fare.city === city ? { ...fare, fare: editedFareValue } : fare
+    );
+    setFares(updatedFares);
+    setEditingFareCity(null);
     toast({
-      title: "Fare Edited!",
-      description: `Fare for ${city} updated.`,
+      title: "Fare Updated!",
+      description: `Fare for ${city} updated to ${editedFareValue}`,
     });
+    setIsEditingFare(false);
   };
 
   const deleteFare = (city: string) => {
@@ -301,10 +316,10 @@ export default function Admin() {
                         <TableCell>{cab.type}</TableCell>
                         <TableCell>{cab.status}</TableCell>
                         <TableCell className="text-right font-medium">
-                          <Button variant="ghost" size="sm" onClick={() => editCab(cab.id)}>
+                          <Button variant="ghost" size="sm" onClick={() => editCab(cab.id)} disabled={isEditingCab}>
                             <Edit className="mr-2 h-4 w-4"/>
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => deleteCab(cab.id)}>
+                          <Button variant="ghost" size="sm" onClick={() => deleteCab(cab.id)} disabled={isEditingCab}>
                             <Trash className="mr-2 h-4 w-4"/>
                           </Button>
                           <Button variant="ghost" size="sm">
@@ -367,12 +382,28 @@ export default function Admin() {
                     {fares.map((fare) => (
                       <TableRow key={fare.city}>
                         <TableCell>{fare.city}</TableCell>
-                        <TableCell>{fare.fare}</TableCell>
+                         <TableCell>
+                            {editingFareCity === fare.city ? (
+                              <Input
+                                type="text"
+                                value={editedFareValue}
+                                onChange={(e) => setEditedFareValue(e.target.value)}
+                              />
+                            ) : (
+                              fare.fare
+                            )}
+                          </TableCell>
                         <TableCell className="text-right font-medium">
-                          <Button variant="ghost" size="sm" onClick={() => editFare(fare.city)}>
-                            <Edit className="mr-2 h-4 w-4"/>
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => deleteFare(fare.city)}>
+                           {editingFareCity === fare.city ? (
+                              <Button variant="ghost" size="sm" onClick={() => handleSaveFare(fare.city)}>
+                                <Save className="mr-2 h-4 w-4"/>
+                              </Button>
+                            ) : (
+                              <Button variant="ghost" size="sm" onClick={() => handleEditFare(fare.city, fare.fare)} disabled={isEditingCab}>
+                                <Edit className="mr-2 h-4 w-4"/>
+                              </Button>
+                            )}
+                          <Button variant="ghost" size="sm" onClick={() => deleteFare(fare.city)} disabled={isEditingCab || isEditingFare}>
                             <Trash className="mr-2 h-4 w-4"/>
                           </Button>
                         </TableCell>
@@ -461,3 +492,4 @@ export default function Admin() {
     </div>
   );
 }
+
