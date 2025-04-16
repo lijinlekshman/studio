@@ -195,7 +195,7 @@ export default function AdminDashboard() {
       
         
           
-            {"Let'sGo Rides Admin Dashboard"}
+            <CardTitle>Let'sGo Rides Admin Dashboard</CardTitle>
           
           
           <Link href="/">
