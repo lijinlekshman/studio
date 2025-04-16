@@ -248,11 +248,13 @@ export default function AdminDashboard() {
   ];
 
   return (
-    
-      <>
+    <>
+      
         
           
-            <CardTitle>Let&#39;sGo Rides Admin Dashboard</CardTitle>
+            
+              Let'sGo Rides Admin Dashboard
+            
             <Link href="/">
               <Button variant="secondary">
                 <ArrowLeft className="mr-2" />
@@ -261,9 +263,11 @@ export default function AdminDashboard() {
             </Link>
           
   
+
         
          
       
+
         
             {/* Left Panel: Management Cards & Charts */}
             
@@ -272,28 +276,36 @@ export default function AdminDashboard() {
                     {/* Add New Cab Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Manage Cabs</CardTitle>
-                            <CardDescription>Add, edit, or remove cabs from the system.</CardDescription>
+                            
+                                Manage Cabs
+                            
+                            
+                                Add, edit, or remove cabs from the system.
+                            
                         </CardHeader>
                         <CardContent>
                             <Button onClick={() => setIsAddCabDialogOpen(true)}><Plus className="mr-2" /> Add New Cab</Button>
                             <Dialog open={isAddCabDialogOpen} onOpenChange={setIsAddCabDialogOpen}>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>Add New Cab</DialogTitle>
-                                        <DialogDescription>Enter the details for the new cab.</DialogDescription>
+                                        
+                                            Add New Cab
+                                        
+                                        
+                                            Enter the details for the new cab.
+                                        
                                     </DialogHeader>
                                     
                                         
-                                            <Label htmlFor="model" className="text-right">
+                                            
                                                 Model
-                                            </Label>
+                                            
                                             <Input id="model" value={newCabModel} onChange={(e) => setNewCabModel(e.target.value)} className="col-span-3" required />
                                         
                                         
-                                            <Label htmlFor="licensePlate" className="text-right">
+                                            
                                                 License Plate
-                                            </Label>
+                                            
                                             <Input id="licensePlate" value={newCabLicensePlate} onChange={(e) => setNewCabLicensePlate(e.target.value)} className="col-span-3" required />
                                         
                                     
@@ -308,34 +320,42 @@ export default function AdminDashboard() {
                     {/* Update Fare Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>Manage Fares</CardTitle>
-                            <CardDescription>Update base fares and per kilometer rates for different vehicle types.</CardDescription>
+                            
+                                Manage Fares
+                            
+                            
+                                Update base fares and per kilometer rates for different vehicle types.
+                            
                         </CardHeader>
                         <CardContent>
                             <Button onClick={() => setIsAddFareDialogOpen(true)}><Plus className="mr-2" /> Add New Fare</Button>
                             <Dialog open={isAddFareDialogOpen} onOpenChange={setIsAddFareDialogOpen}>
                                 <DialogContent>
                                     <DialogHeader>
-                                        <DialogTitle>Add New Fare</DialogTitle>
-                                        <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
+                                        
+                                            Add New Fare
+                                        
+                                        
+                                            Enter the fare details for the new vehicle type.
+                                        
                                     </DialogHeader>
                                     
                                         
-                                            <Label htmlFor="vehicleType" className="text-right">
+                                            
                                                 Vehicle Type
-                                            </Label>
+                                            
                                             <Input id="vehicleType" value={newFareVehicleType} onChange={(e) => setNewFareVehicleType(e.target.value)} className="col-span-3" required />
                                         
                                         
-                                            <Label htmlFor="baseFare" className="text-right">
+                                            
                                                 Base Fare
-                                            </Label>
+                                            
                                             <Input id="baseFare" type="number" value={newFareBaseFare} onChange={(e) => setNewFareBaseFare(e.target.value)} className="col-span-3" required />
                                         
                                         
-                                            <Label htmlFor="perKmRate" className="text-right">
+                                            
                                                 Per KM Rate
-                                            </Label>
+                                            
                                             <Input id="perKmRate" type="number" value={newFarePerKmRate} onChange={(e) => setNewFarePerKmRate(e.target.value)} className="col-span-3" required />
                                         
                                     
@@ -351,8 +371,12 @@ export default function AdminDashboard() {
                 {/* Booking Summary Chart */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Booking Summary</CardTitle>
-                        <CardDescription>A summary of bookings by vehicle type.</CardDescription>
+                        
+                            Booking Summary
+                        
+                        
+                            A summary of bookings by vehicle type.
+                        
                     </CardHeader>
                     <CardContent>
                         <BarChart width={500} height={300} data={bookingData}>
@@ -372,8 +396,12 @@ export default function AdminDashboard() {
             {/* Added Cabs Table */}
             <Card>
               <CardHeader>
-                <CardTitle>Added Cabs</CardTitle>
-                <CardDescription>List of all cabs currently in the system.</CardDescription>
+                
+                  Added Cabs
+                
+                
+                  List of all cabs currently in the system.
+                
               </CardHeader>
               <CardContent>
                 <ScrollArea>
@@ -438,8 +466,12 @@ export default function AdminDashboard() {
             {/* Updated Fare Table */}
             <Card>
               <CardHeader>
-                <CardTitle>Updated Fares</CardTitle>
-                <CardDescription>Current fare rates for each vehicle type.</CardDescription>
+                
+                  Updated Fares
+                
+                
+                  Current fare rates for each vehicle type.
+                
               </CardHeader>
               <CardContent>
                 <ScrollArea>
@@ -508,8 +540,12 @@ export default function AdminDashboard() {
              {/* Bookings Table */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Bookings</CardTitle>
-                                <CardDescription>List of all current bookings.</CardDescription>
+                                
+                                    Bookings
+                                
+                                
+                                    List of all current bookings.
+                                
                             </CardHeader>
                             <CardContent>
                                 <ScrollArea>
@@ -547,10 +583,13 @@ export default function AdminDashboard() {
           
         
       
+
       <Dialog open={isPreviewDialogOpen} onOpenChange={() => setIsPreviewDialogOpen(false)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Cab Details</DialogTitle>
+            
+              Cab Details
+            
           </DialogHeader>
           {selectedCab && (
             <>
@@ -564,7 +603,9 @@ export default function AdminDashboard() {
        <Dialog open={isBookingDialogOpen} onOpenChange={() => setIsBookingDialogOpen(false)}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Booking Details</DialogTitle>
+                        
+                            Booking Details
+                        
                     </DialogHeader>
                     {selectedBooking && (
                         <>
