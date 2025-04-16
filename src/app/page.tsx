@@ -48,7 +48,7 @@ export default function Home() {
       });
       console.error('Error fetching sources:', error);
     }
-  }, [suggestDestinations, toast]);
+  }, [toast]);
 
     const fetchSuggestedDestinations = useCallback(async (destinationName: string) => {
     try {
@@ -64,7 +64,7 @@ export default function Home() {
       });
       console.error('Error fetching destinations:', error);
     }
-  }, [suggestDestinations, toast]);
+  }, [toast]);
 
   useEffect(() => {
     const fetchCurrentLocation = async () => {
@@ -90,37 +90,17 @@ export default function Home() {
     const sourceName = event.target.value;
     setSourceInput(sourceName);
     fetchSuggestedSources(sourceName);
-
-    // if (source) {
-    //   // Placeholder: Geocode the destination name to coordinates
-    //   const newSource: Coordinate = {lat: 8.5241, lng: 76.9366};
-    //   setSource(newSource);
-
-    //   const sourceAddress = await getAddressForCoordinate(newSource);
-    //   setSourceAddress(sourceAddress);
-    // }
   };
 
   const handleDestinationChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const destinationName = event.target.value;
     setDestinationInput(destinationName);
     fetchSuggestedDestinations(destinationName);
-
-    // if (source) {
-    //   // Placeholder: Geocode the destination name to coordinates
-    //   const newDestination: Coordinate = {lat: 8.5241, lng: 76.9366};
-    //   setDestination(newDestination);
-
-    //   const destinationAddress = await getAddressForCoordinate(newDestination);
-    //   setDestinationAddress(destinationAddress);
-    // }
   };
 
   useEffect(() => {
     const estimateFare = async () => {
       if (source && destination) {
-        // const estimatedFare = await getFare(source, destination);
-        // setFare(estimatedFare);
         try {
           const fareDetails = await calculateFare({
             sourceLat: source.lat,
@@ -281,3 +261,4 @@ export default function Home() {
     </div>
   );
 }
+
