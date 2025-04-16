@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
@@ -33,6 +33,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion";
 
 const data = [
   {
@@ -105,6 +106,27 @@ const initialFares = [
   }
 ];
 
+// Dummy data for bookings
+const initialBookings = [
+  {
+    id: 'BOOK001',
+    source: 'Punalur',
+    destination: 'Kollam',
+    fare: '250',
+    cabId: 'CAB001',
+    mobileNumber: '+919876543210'
+  },
+  {
+    id: 'BOOK002',
+    source: 'Kochi',
+    destination: 'Aluva',
+    fare: '300',
+    cabId: 'CAB002',
+    mobileNumber: '+918765432109'
+  }
+];
+
+
 export default function Admin() {
   const [cabId, setCabId] = useState('');
   const [cabModel, setCabModel] = useState('');
@@ -116,6 +138,7 @@ export default function Admin() {
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [cabs, setCabs] = useState(initialCabs); // State for cabs
   const [fares, setFares] = useState(initialFares); // State for fares
+  const [bookings, setBookings] = useState(initialBookings); // State for bookings
   const [editingFareCity, setEditingFareCity] = useState<string | null>(null); // State to manage editing city
   const [editedFareValue, setEditedFareValue] = useState(''); // State to hold edited fare value
   const [isEditingCab, setIsEditingCab] = useState(false);
@@ -123,6 +146,7 @@ export default function Admin() {
   const [previewCab, setPreviewCab] = useState<any>(null);
   const [previewFare, setPreviewFare] = useState<any>(null);
   const [openPreview, setOpenPreview] = useState(false);
+  const [isBookingDataAvailable, setIsBookingDataAvailable] = useState(false);
 
 
   const addCab = () => {
@@ -209,6 +233,14 @@ export default function Admin() {
     setPreviewFare(fare);
     setOpenPreview(true);
   };
+
+    useEffect(() => {
+        if (bookings && bookings.length > 0) {
+            setIsBookingDataAvailable(true);
+        } else {
+            setIsBookingDataAvailable(false);
+        }
+    }, [bookings]);
 
 
   return (
@@ -513,6 +545,35 @@ export default function Admin() {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+             {/* Booking Details Accordion */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Booking Details</CardTitle>
+                                <CardDescription>View details of all bookings.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                {isBookingDataAvailable ? (
+                                    <Accordion type="single" collapsible>
+                                        {bookings.map((booking) => (
+                                            <AccordionItem key={booking.id} value={booking.id}>
+                                                <AccordionTrigger>
+                                                    Booking ID: {booking.id}
+                                                </AccordionTrigger>
+                                                <AccordionContent>
+                                                    <p><strong>Source:</strong> {booking.source}</p>
+                                                    <p><strong>Destination:</strong> {booking.destination}</p>
+                                                    <p><strong>Fare:</strong> {booking.fare}</p>
+                                                    <p><strong>Cab ID:</strong> {booking.cabId}</p>
+                                                    <p><strong>Mobile Number:</strong> {booking.mobileNumber}</p>
+                                                </AccordionContent>
+                                            </AccordionItem>
+                                        ))}
+                                    </Accordion>
+                                ) : (
+                                    <p>No booking data available.</p>
+                                )}
+                            </CardContent>
+                        </Card>
           </div>
         </div>
       </main>
@@ -555,6 +616,3 @@ export default function Admin() {
     </div>
   );
 }
-
-
-
