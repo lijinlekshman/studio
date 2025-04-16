@@ -83,6 +83,18 @@ const initialCabs = [
   }
 ];
 
+// Dummy data for fares
+const initialFares = [
+  {
+    city: 'Thiruvananthapuram',
+    fare: '250'
+  },
+  {
+    city: 'Kochi',
+    fare: '300'
+  }
+];
+
 export default function Admin() {
   const [cabId, setCabId] = useState('');
   const [cabModel, setCabModel] = useState('');
@@ -93,6 +105,7 @@ export default function Admin() {
   const [cabStatus, setCabStatus] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [cabs, setCabs] = useState(initialCabs); // State for cabs
+  const [fares, setFares] = useState(initialFares); // State for fares
 
   const addCab = () => {
     const newCab = {
@@ -126,11 +139,36 @@ export default function Admin() {
     });
   };
 
-
-  const updateFare = () => {
+  const updateFareForCity = () => {
+    const existingFareIndex = fares.findIndex(f => f.city === city);
+    if (existingFareIndex > -1) {
+      // Update existing fare
+      const updatedFares = [...fares];
+      updatedFares[existingFareIndex] = { city: city, fare: fare };
+      setFares(updatedFares);
+    } else {
+      // Add new fare
+      setFares([...fares, { city: city, fare: fare }]);
+    }
     toast({
       title: "Fare Updated!",
-      description: `Fare updated to ${fare}`,
+      description: `Fare for ${city} updated to ${fare}`,
+    });
+  };
+
+  const editFare = (city: string) => {
+    // Logic to edit fare details
+    toast({
+      title: "Fare Edited!",
+      description: `Fare for ${city} updated.`,
+    });
+  };
+
+  const deleteFare = (city: string) => {
+    setFares(fares.filter(fare => fare.city !== city));
+    toast({
+      title: "Fare Deleted!",
+      description: `Fare for ${city} deleted.`,
     });
   };
 
@@ -279,8 +317,7 @@ export default function Admin() {
                 </Table>
               </CardContent>
             </Card>
-
-            {/* Update Fare Card */}
+            {/* Fare Management Section */}
             <Card>
               <CardHeader>
                 <CardTitle>Update Fare</CardTitle>
@@ -307,7 +344,42 @@ export default function Admin() {
                     onChange={(e) => setFare(e.target.value)}
                   />
                 </div>
-                <Button onClick={updateFare}>Update Fare</Button>
+                <Button onClick={updateFareForCity}>Update Fare</Button>
+              </CardContent>
+            </Card>
+
+            {/* Fare Listing */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Fare Listing</CardTitle>
+                <CardDescription>Manage fares for different cities.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>City</TableHead>
+                      <TableHead>Fare</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {fares.map((fare) => (
+                      <TableRow key={fare.city}>
+                        <TableCell>{fare.city}</TableCell>
+                        <TableCell>{fare.fare}</TableCell>
+                        <TableCell className="text-right font-medium">
+                          <Button variant="ghost" size="sm" onClick={() => editFare(fare.city)}>
+                            <Edit className="mr-2 h-4 w-4"/>
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => deleteFare(fare.city)}>
+                            <Trash className="mr-2 h-4 w-4"/>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </div>
@@ -389,4 +461,3 @@ export default function Admin() {
     </div>
   );
 }
-
