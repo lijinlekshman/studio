@@ -10,6 +10,13 @@ import {Map} from 'lucide-react';
 import {suggestDestinations} from '@/ai/flows/suggest-destinations';
 import {useToast} from "@/hooks/use-toast";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 
 const INR_CONVERSION_RATE = 83;
 
@@ -97,12 +104,31 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center relative">
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex items-center space-x-2">
           <Link href="/admin">
             <Button variant="secondary" size="sm">
               Admin Portal
             </Button>
           </Link>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <Avatar>
+                  <AvatarImage src="https://picsum.photos/id/11/50/50" alt="@shadcn" />
+                  <AvatarFallback>SC</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuItem>
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <h1 className="text-6xl font-bold">
           Let&apos;sGo Rides
@@ -157,3 +183,4 @@ export default function Home() {
     </div>
   );
 }
+
