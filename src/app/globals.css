@@ -4,6 +4,10 @@
 
 body {
   font-family: Arial, Helvetica, sans-serif;
+  background-image: url('https://images.unsplash.com/photo-1616471919434-d8398f741961?q=80&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Replace with your image URL */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 @layer base {
@@ -14,28 +18,28 @@ body {
     --card-foreground: 24 7.7% 9.8%; /* Dark Gray */
     --popover: 0 0% 100%; /* White */
     --popover-foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --primary: 47 91.8% 58.4%; /* Vibrant Yellow */
-    --primary-foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --secondary: 60 4.8% 95.9%; /* Light Yellow */
+    --primary: 211 100% 40%; /* Blue */
+    --primary-foreground: 0 0% 100%; /* White */
+    --secondary: 0 0% 96%; /* Light Gray */
     --secondary-foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --muted: 60 4.8% 95.9%; /* Light Yellow */
+    --muted: 0 0% 96%; /* Light Gray */
     --muted-foreground: 25 5.3% 44.7%; /* Medium Gray */
-    --accent: 48 95.7% 85.1%; /* Soft Yellow */
-    --accent-foreground: 24 7.7% 9.8%; /* Dark Gray */
+    --accent: 142 52% 49%; /* Green */
+    --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 20 5.9% 90%; /* Light Gray */
-    --input: 60 4.8% 95.9%; /* Light Yellow */
-    --ring: 47 91.8% 58.4%; /* Vibrant Yellow */
+    --input: 0 0% 96%; /* Light Gray */
+    --ring: 211 100% 40%; /* Blue */
     --radius: 0.5rem;
-    --sidebar-background: 60 4.8% 95.9%;
+    --sidebar-background: 0 0% 96%;
     --sidebar-foreground: 24 7.7% 9.8%;
-    --sidebar-primary: 47 91.8% 58.4%;
-    --sidebar-primary-foreground: 24 7.7% 9.8%;
-    --sidebar-accent: 48 95.7% 85.1%;
-    --sidebar-accent-foreground: 24 7.7% 9.8%;
+    --sidebar-primary: 211 100% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 52% 49%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 20 5.9% 90%;
-    --sidebar-ring: 47 91.8% 58.4%;
+    --sidebar-ring: 211 100% 40%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -50,27 +54,27 @@ body {
     --card-foreground: 0 0% 98%; /* White */
     --popover: 24 7.7% 9.8%; /* Dark Gray */
     --popover-foreground: 0 0% 98%; /* White */
-    --primary: 47 91.8% 58.4%; /* Vibrant Yellow */
-    --primary-foreground: 24 7.7% 9.8%; /* Dark Gray */
+    --primary: 211 100% 40%; /* Blue */
+    --primary-foreground: 0 0% 100%; /* White */
     --secondary: 25 5.3% 24.7%; /* Darker Gray */
     --secondary-foreground: 0 0% 98%; /* White */
     --muted: 25 5.3% 24.7%; /* Darker Gray */
     --muted-foreground: 0 0% 63.9%; /* Light Gray */
-    --accent: 48 95.7% 85.1%; /* Soft Yellow */
-    --accent-foreground: 24 7.7% 9.8%; /* Dark Gray */
+    --accent: 142 52% 49%; /* Green */
+    --accent-foreground: 0 0% 100%; /* White */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 25 5.3% 24.7%; /* Darker Gray */
     --input: 25 5.3% 24.7%; /* Darker Gray */
-    --ring: 47 91.8% 58.4%; /* Vibrant Yellow */
+    --ring: 211 100% 40%; /* Blue */
     --sidebar-background: 25 5.3% 24.7%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 47 91.8% 58.4%;
-    --sidebar-primary-foreground: 24 7.7% 9.8%;
-    --sidebar-accent: 48 95.7% 85.1%;
-    --sidebar-accent-foreground: 24 7.7% 9.8%;
+    --sidebar-primary: 211 100% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 52% 49%;
+    --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 25 5.3% 24.7%;
-    --sidebar-ring: 47 91.8% 58.4%;
+    --sidebar-ring: 211 100% 40%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
