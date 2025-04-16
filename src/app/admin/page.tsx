@@ -22,7 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from 'next/image';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ChartTooltip, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useRouter } from 'next/navigation';
 
 // Placeholder data for cabs and fares
@@ -193,10 +193,10 @@ export default function AdminDashboard() {
   return (
     
       
-        
+        <div>
           
             {"Let'sGo Rides Admin Dashboard"}
-          
+       
           <Link href="/">
             <Button variant="secondary">
               <ArrowLeft className="mr-2" />
@@ -302,7 +302,7 @@ export default function AdminDashboard() {
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
                             <YAxis />
-                            <ChartTooltip />
+                            <Tooltip />
                             <Legend />
                             <Bar dataKey="bookings" fill="#3498db" />
                         </BarChart>
@@ -448,11 +448,11 @@ export default function AdminDashboard() {
             <DialogTitle>Cab Details</DialogTitle>
           </DialogHeader>
           {selectedCab && (
-            
+            <>
               <p>Model: {selectedCab.model}</p>
               <p>License Plate: {selectedCab.licensePlate}</p>
               <p>Status: {selectedCab.status}</p>
-            
+              </>
           )}
         </DialogContent>
       </Dialog>
@@ -462,17 +462,18 @@ export default function AdminDashboard() {
                         <DialogTitle>Booking Details</DialogTitle>
                     </DialogHeader>
                     {selectedBooking && (
-                        
+                        <>
                             <p>User ID: {selectedBooking.userId}</p>
                             <p>Source: {selectedBooking.source}</p>
                             <p>Destination: {selectedBooking.destination}</p>
                             <p>Fare: {selectedBooking.fare}</p>
                             <p>Cab Model: {selectedBooking.cabModel}</p>
                             <p>Driver Name: {selectedBooking.driverName}</p>
-                        
+                            </>
                     )}
                 </DialogContent>
             </Dialog>
-    
+    </div>
   );
 }
+
