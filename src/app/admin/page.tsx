@@ -5,7 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useToast} from "@/hooks/use-toast";
-import {ArrowLeft, Edit, Trash, Eye, Save} from "lucide-react";
+import {ArrowLeft, Edit, Trash, Eye, Save, Car} from "lucide-react";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {
@@ -82,7 +82,8 @@ const initialCabs = [
     city: 'Thiruvananthapuram',
     type: 'Sedan',
     status: 'available',
-    notes: 'Good condition'
+    notes: 'Good condition',
+    location: { lat: 8.5241, lng: 76.9366 } // Dummy location
   },
   {
     id: 'CAB002',
@@ -90,7 +91,8 @@ const initialCabs = [
     city: 'Kochi',
     type: 'SUV',
     status: 'on-trip',
-    notes: 'Driver on break'
+    notes: 'Driver on break',
+    location: { lat: 9.9312, lng: 76.2673 } // Dummy location
   }
 ];
 
@@ -147,7 +149,7 @@ export default function Admin() {
   const [previewFare, setPreviewFare] = useState<any>(null);
   const [openPreview, setOpenPreview] = useState(false);
   const [isBookingDataAvailable, setIsBookingDataAvailable] = useState(false);
-
+    const [mapURL, setMapURL] = useState('');
 
   const addCab = () => {
     const newCab = {
@@ -226,6 +228,12 @@ export default function Admin() {
 
   const handlePreviewCab = (cab: any) => {
     setPreviewCab(cab);
+        // Generate the Google Maps URL
+        const lat = cab.location.lat;
+        const lng = cab.location.lng;
+        const zoom = 14; // You can adjust the zoom level as needed
+        const mapUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=${zoom}&output=embed`;
+        setMapURL(mapUrl);
     setOpenPreview(true);
   };
 
@@ -574,6 +582,35 @@ export default function Admin() {
                                 )}
                             </CardContent>
                         </Card>
+              {/* Cab Tracking Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Cab Tracking</CardTitle>
+                  <CardDescription>Track the current location of cabs.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4">
+                    {cabs.map((cab) => (
+                      <div key={cab.id} className="border rounded-md p-4">
+                        <h3 className="font-semibold">{cab.model} ({cab.id})</h3>
+                        <p>Status: {cab.status}</p>
+                        {/* Map Integration */}
+                        <div className="mt-2">
+                          <iframe
+                            width="100%"
+                            height="200"
+                            style={{ border: 0 }}
+                            loading="lazy"
+                            allowFullScreen
+                            src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${cab.location.lat},${cab.location.lng}`}
+                          ></iframe>
+                        </div>
+                        <p>Location: Lat: {cab.location.lat}, Lng: {cab.location.lng}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
           </div>
         </div>
       </main>
@@ -591,6 +628,16 @@ export default function Admin() {
                   <p><strong>Type:</strong> {previewCab.type}</p>
                   <p><strong>Status:</strong> {previewCab.status}</p>
                   <p><strong>Notes:</strong> {previewCab.notes}</p>
+                                    <div className="mt-2">
+                                        <iframe
+                                            width="100%"
+                                            height="200"
+                                            style={{ border: 0 }}
+                                            loading="lazy"
+                                            allowFullScreen
+                                            src={mapURL}
+                                        ></iframe>
+                                    </div>
                 </>
               ) : previewFare ? (
                 <>
