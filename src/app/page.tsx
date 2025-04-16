@@ -255,8 +255,7 @@ export default function Home() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuItem>
-                <Link href="/admin">Admin Portal</Link>
-              </DropdownMenuItem>
+                <Link href="/admin">Admin Portal</Link></DropdownMenuItem>
               <DropdownMenuItem>
                 Profile
               </DropdownMenuItem>
