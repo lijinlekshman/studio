@@ -195,7 +195,7 @@ export default function AdminDashboard() {
       
         
           
-            <CardTitle>Let'sGo Rides Admin Dashboard</CardTitle>
+            <CardTitle>Let&#39;sGo Rides Admin Dashboard</CardTitle>
           
           
           <Link href="/">
@@ -476,4 +476,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
