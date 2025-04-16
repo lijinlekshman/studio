@@ -263,7 +263,7 @@ export default function Home() {
                 placeholder="Enter your mobile number"
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
-               
+                required
               />
             </div>
              {/*{!otpSent && (
@@ -296,7 +296,7 @@ export default function Home() {
                     if (selectedSource) {
                         handleSourceSelect(selectedSource);
                     }
-                }}>
+                }} required>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select source" />
                     </SelectTrigger>
@@ -319,7 +319,7 @@ export default function Home() {
                     if (selectedDestination) {
                         handleDestinationSelect(selectedDestination);
                     }
-                }}>
+                }} required>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select destination" />
                     </SelectTrigger>
