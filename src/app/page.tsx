@@ -85,6 +85,7 @@ export default function Home() {
                 value={sourceAddress ? sourceAddress.formattedAddress : 'Fetching current location...'}
                 disabled
               />
+              <img src="https://picsum.photos/400/300" alt="Indian Map" className="rounded-md shadow-md"/>
             </div>
             <div className="grid gap-2">
               <label htmlFor="destination">Destination</label>
