@@ -129,7 +129,7 @@ export default function Home() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <Image src="/letsgo-logo.png" width={400} height={100} alt="Let'sGo Rides"/>
+        <Image src="/assets/letsgo-logo.png" width={400} height={100} alt="Let'sGo Rides"/>
 
         <Card className="w-full max-w-md mt-10">
           <CardHeader>
