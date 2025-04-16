@@ -5,7 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useToast} from "@/hooks/use-toast";
-import {Trash} from "lucide-react";
+import {ArrowLeft, Trash} from "lucide-react";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {
@@ -21,6 +21,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
+import Link from "next/link";
 
 const data = [
   {
@@ -103,10 +104,16 @@ export default function Admin() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">
             Let&apos;sGo Rides Admin Dashboard
           </h1>
+          <Link href="/">
+            <Button variant="secondary">
+              <ArrowLeft className="mr-2"/>
+              Back to Home
+            </Button>
+          </Link>
         </div>
       </header>
 
