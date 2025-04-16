@@ -35,6 +35,7 @@ export default function Home() {
   const [sourceInput, setSourceInput] = useState('');
   const [destinationInput, setDestinationInput] = useState('');
   const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
+  const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
 
   const fetchSuggestedSources = useCallback(async () => {
     try {
@@ -147,10 +148,18 @@ export default function Home() {
 
   const bookCab = () => {
     if (source && destination) {
-      toast({
-        title: "Cab Booked!",
-        description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare.toFixed(2) : 0} in a ${vehicleType}.`,
-      });
+        // Placeholder: Simulate sending notification to user's mobile
+        console.log(`Sending notification to ${mobileNumber}`);
+        toast({
+            title: "Cab Booked!",
+            description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare.toFixed(2) : 0} in a ${vehicleType}. A notification has been sent to ${mobileNumber}.`,
+        });
+    } else {
+        toast({
+            title: "Error Booking Cab",
+            description: "Please select both source and destination.",
+            variant: "destructive",
+        });
     }
   };
 
@@ -189,6 +198,16 @@ export default function Home() {
             <CardDescription>Enter your source and destination to book a cab.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
+            <div className="grid gap-2">
+              <label htmlFor="mobileNumber">Mobile Number</label>
+              <Input
+                type="tel"
+                id="mobileNumber"
+                placeholder="Enter your mobile number"
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value)}
+              />
+            </div>
            <div className="grid gap-2">
                 <label htmlFor="source">Source</label>
                 <Select onValueChange={(value) => {
@@ -273,7 +292,7 @@ export default function Home() {
                 />
               </div>
             )}
-            <Button onClick={bookCab} disabled={!source || !destination}>Book Cab <Map className="ml-2"/></Button>
+            <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber}>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
       </main>
