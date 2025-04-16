@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash, Map, Plus, Car, User } from 'lucide-react';
+import { ArrowLeft, Edit, Trash, Map, Plus, Car, User, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -60,6 +60,9 @@ export default function AdminDashboard() {
     const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
    const router = useRouter();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [editingCabId, setEditingCabId] = useState(null);
+    const [editedCabModel, setEditedCabModel] = useState('');
+    const [editedCabLicensePlate, setEditedCabLicensePlate] = useState('');
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -112,8 +115,10 @@ export default function AdminDashboard() {
 
   // Function to handle editing a cab
   const handleEditCab = (cab: any) => {
-    setSelectedCab(cab);
-  };
+        setEditingCabId(cab.id);
+        setEditedCabModel(cab.model);
+        setEditedCabLicensePlate(cab.licensePlate);
+    };
 
   // Function to handle updating cab status (placeholder)
   const handleUpdateCabStatus = (id: string, status: string) => {
@@ -123,6 +128,17 @@ export default function AdminDashboard() {
       description: `Cab status updated to ${status}.`,
     });
   };
+
+    const handleSaveCab = (id: string) => {
+        setCabs(cabs.map(cab =>
+            cab.id === id ? { ...cab, model: editedCabModel, licensePlate: editedCabLicensePlate } : cab
+        ));
+        setEditingCabId(null);
+        toast({
+            title: "Cab Updated",
+            description: "Cab details updated successfully.",
+        });
+    };
 
   // Function to handle adding a new fare
   const handleAddFare = () => {
@@ -192,12 +208,12 @@ export default function AdminDashboard() {
 
   return (
     
-      
+      <>
         
           
             <CardTitle>Let&#39;sGo Rides Admin Dashboard</CardTitle>
           
-          
+  
           <Link href="/">
             <Button variant="secondary">
               <ArrowLeft className="mr-2" />
@@ -205,7 +221,7 @@ export default function AdminDashboard() {
             </Button>
           </Link>
         
-
+         
       
         
             {/* Left Panel: Management Cards & Charts */}
@@ -331,22 +347,46 @@ export default function AdminDashboard() {
                     <TableBody>
                       {cabs.map((cab) => (
                         <TableRow key={cab.id}>
-                          <TableCell>{cab.model}</TableCell>
-                          <TableCell>{cab.licensePlate}</TableCell>
-                          <TableCell className="text-right">
-                            
-                              <Button variant="ghost" size="icon" onClick={() => handleEditCab(cab)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteCab(cab.id)}>
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="icon" onClick={() => handlePreview(cab)}>
-                                <Car className="h-4 w-4" />
-                              </Button>
-                            
-                          </TableCell>
-                        </TableRow>
+                                {editingCabId === cab.id ? (
+                                    <>
+                                        <TableCell>
+                                            <Input
+                                                value={editedCabModel}
+                                                onChange={(e) => setEditedCabModel(e.target.value)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
+                                                value={editedCabLicensePlate}
+                                                onChange={(e) => setEditedCabLicensePlate(e.target.value)}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="ghost" size="icon" onClick={() => handleSaveCab(cab.id)}>
+                                                <Save className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TableCell>{cab.model}</TableCell>
+                                        <TableCell>{cab.licensePlate}</TableCell>
+                                        <TableCell className="text-right">
+                                            
+                                                <Button variant="ghost" size="icon" onClick={() => handleEditCab(cab)}>
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handleDeleteCab(cab.id)}>
+                                                    <Trash className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" onClick={() => handlePreview(cab)}>
+                                                    <Car className="h-4 w-4" />
+                                                </Button>
+                                            
+                                        </TableCell>
+                                    </>
+                                )}
+                            </TableRow>
                       ))}
                     </TableBody>
                   </Table>
@@ -473,7 +513,7 @@ export default function AdminDashboard() {
                     )}
                 </DialogContent>
             </Dialog>
-    </div>
+
+    </>
   );
 }
-
