@@ -58,7 +58,7 @@ const prompt = ai.definePrompt({
       name: z.string().describe('The name of the suggested destination')
     })).describe('A list of suggested destinations with their coordinates.'),
   },
-  prompt: `You are a ride assistant specializing in destinations within Kerala, India. Given the user's current location and past ride history, suggest popular destinations within Kerala.
+  prompt: `You are a ride assistant specializing in destinations within Kerala, India. Given the user's current location and past ride history, suggest popular destinations within Kerala. Focus on destinations within and around Punalur city (Kollam district, Kerala), including places within a 25km radius.
 
 Current Location: {{{currentLocation.lat}}}, {{{currentLocation.lng}}}.
 
@@ -69,7 +69,7 @@ Past Ride History:
 {{/each}}
 {{/if}}
 
-Suggest destinations (latitude, longitude and a descriptive name) that the user may want to go to. Consider cities from all districts of Kerala, such as Thiruvananthapuram, Kollam, Pathanamthitta, Alappuzha, Kottayam, Idukki, Ernakulam, Thrissur, Palakkad, Malappuram, Kozhikode, Wayanad, Kannur, and Kasaragod. Return the destination name in the format "City Name, State".
+Suggest destinations (latitude, longitude and a descriptive name) that the user may want to go to. Consider cities from all districts of Kerala, such as Thiruvananthapuram, Kollam, Pathanamthitta, Alappuzha, Kottayam, Idukki, Ernakulam, Thrissur, Palakkad, Malappuram, Kozhikode, Wayanad, Kannur, and Kasaragod. Include specific locations around Punalur, like Thenmala Dam, Achankovil, Rosemala, and other nearby attractions and towns in Kollam district. Return the destination name in the format "Location Name, City, State".
 
 Return a JSON array of objects containing the suggested destination's latitude, longitude and a descriptive name.
 `,
