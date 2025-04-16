@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState, useCallback} from 'react';
+import {useEffect, useState, useCallback, useRef} from 'react';
 import {Address, Coordinate, getCurrentLocation, getAddressForCoordinate} from '@/services/map';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
