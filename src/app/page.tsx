@@ -56,6 +56,8 @@ export default function Home() {
   const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
   const [countryCode, setCountryCode] = useState('+91'); // Default country code
   const [bookingConfirmed, setBookingConfirmed] = useState(false); // Track booking status
+  const [otpSent, setOtpSent] = useState(false); // OTP sent status
+  const [otp, setOtp] = useState(''); // OTP input
     
 
   const fetchSuggestedSources = useCallback(async () => {
@@ -196,6 +198,7 @@ export default function Home() {
         title: "Registration initiated",
         description: `[SIMULATION] OTP sent to ${mobileNumber}.`,
       });
+        setOtpSent(true);
     } else {
       toast({
         title: "Registration Error",
@@ -204,6 +207,24 @@ export default function Home() {
       });
     }
   };
+
+    const verifyOTPAndBookCab = () => {
+        // Placeholder: Verify OTP logic (e.g., check against a stored OTP)
+        if (otp === "123456") { // Replace with actual OTP verification logic
+            toast({
+                title: "OTP Verified!",
+                description: "[SIMULATION] OTP verified. Booking cab...",
+            });
+            setOtpSent(false);
+            setBookingConfirmed(true);
+        } else {
+            toast({
+                title: "OTP Verification Failed",
+                description: "Invalid OTP. Please try again.",
+                variant: "destructive",
+            });
+        }
+    };
 
   const handleBookCabClick = () => {
     if (source && destination) {
@@ -353,6 +374,28 @@ export default function Home() {
             <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber }>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
+          {otpSent && (
+              <Card className="w-full max-w-md mt-10">
+                  <CardHeader>
+                      <CardTitle>Verify OTP</CardTitle>
+                      <CardDescription>Enter the OTP sent to your mobile number.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid gap-4">
+                      <div className="grid gap-2">
+                          <label htmlFor="otp">OTP</label>
+                          <Input
+                              type="text"
+                              id="otp"
+                              placeholder="Enter OTP"
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value)}
+                              required
+                          />
+                      </div>
+                      <Button onClick={verifyOTPAndBookCab} disabled={!otp}>Verify OTP</Button>
+                  </CardContent>
+              </Card>
+          )}
         {bookingConfirmed && (
           <Card className="w-full max-w-md mt-10">
             <CardHeader>
@@ -384,3 +427,4 @@ export default function Home() {
     </div>
   );
 }
+
