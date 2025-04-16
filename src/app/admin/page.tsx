@@ -253,14 +253,14 @@ export default function AdminDashboard() {
         
           
             <CardTitle>Let&#39;sGo Rides Admin Dashboard</CardTitle>
+            <Link href="/">
+              <Button variant="secondary">
+                <ArrowLeft className="mr-2" />
+                Back to Home
+              </Button>
+            </Link>
           
   
-          <Link href="/">
-            <Button variant="secondary">
-              <ArrowLeft className="mr-2" />
-              Back to Home
-            </Button>
-          </Link>
         
          
       
@@ -582,4 +582,5 @@ export default function AdminDashboard() {
     </>
   );
 }
+
 
