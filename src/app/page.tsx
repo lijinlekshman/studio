@@ -57,9 +57,6 @@ export default function Home() {
   const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
   const [countryCode, setCountryCode] = useState('+91'); // Default country code
   const [bookingConfirmed, setBookingConfirmed] = useState(false); // Track booking status
-  const [otpSent, setOtpSent] = useState(false); // OTP sent status
-  const [otp, setOtp] = useState(''); // OTP input
-  const router = useRouter();
 
   const fetchSuggestedSources = useCallback(async () => {
     try {
@@ -196,11 +193,11 @@ export default function Home() {
       // Directly confirm the booking
         bookCab();
     } else {
-      toast({
-        title: "Booking Error",
-        description: "Please select both source and destination.",
-        variant: "destructive",
-      });
+        toast({
+            title: "Booking Error",
+            description: "Please select both source and destination.",
+            variant: "destructive",
+        });
     }
   };
 
@@ -370,4 +367,3 @@ export default function Home() {
     </div>
   );
 }
-
