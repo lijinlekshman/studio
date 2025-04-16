@@ -186,7 +186,7 @@ export default function Home() {
     };
 
   const bookCab = () => {
-    if (source && destination && otpVerified) {
+    if (source && destination ) {
         // Placeholder: Simulate sending notification to user's mobile
         console.log(`Sending notification to ${mobileNumber}`);
         toast({
@@ -196,7 +196,7 @@ export default function Home() {
     } else {
         toast({
             title: "Error Booking Cab",
-            description: "Please select both source and destination and verify OTP.",
+            description: "Please select both source and destination.",
             variant: "destructive",
         });
     }
@@ -237,7 +237,7 @@ export default function Home() {
             <CardDescription>Enter your source and destination to book a cab.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-             <div className="grid gap-2">
+           {/* <div className="grid gap-2">
                     <label htmlFor="countryCode">Country Code</label>
                     <Select onValueChange={setCountryCode} defaultValue={countryCode}>
                         <SelectTrigger className="w-full">
@@ -254,7 +254,7 @@ export default function Home() {
                             </SelectGroup>
                         </SelectContent>
                     </Select>
-                </div>
+                </div>*/}
             <div className="grid gap-2">
               <label htmlFor="mobileNumber">Mobile Number</label>
               <Input
@@ -263,10 +263,10 @@ export default function Home() {
                 placeholder="Enter your mobile number"
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
-                disabled={otpSent}
+               
               />
             </div>
-             {!otpSent && (
+             {/*{!otpSent && (
                         <Button onClick={handleSendOtp} disabled={!mobileNumber}>
                             Send OTP
                         </Button>
@@ -288,7 +288,7 @@ export default function Home() {
                                 Verify OTP
                             </Button>
                         </>
-                    )}
+                    )}*/}
            <div className="grid gap-2">
                 <label htmlFor="source">Source</label>
                 <Select onValueChange={(value) => {
@@ -373,10 +373,11 @@ export default function Home() {
                 />
               </div>
             )}
-            <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber || !otpVerified}>Book Cab <Map className="ml-2"/></Button>
+            <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber }>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
       </main>
     </div>
   );
 }
+
