@@ -23,6 +23,16 @@ import {
 } from 'recharts';
 import Link from "next/link";
 import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 const data = [
   {
@@ -110,6 +120,9 @@ export default function Admin() {
   const [editedFareValue, setEditedFareValue] = useState(''); // State to hold edited fare value
   const [isEditingCab, setIsEditingCab] = useState(false);
   const [isEditingFare, setIsEditingFare] = useState(false);
+  const [previewCab, setPreviewCab] = useState<any>(null);
+  const [previewFare, setPreviewFare] = useState<any>(null);
+  const [openPreview, setOpenPreview] = useState(false);
 
 
   const addCab = () => {
@@ -186,6 +199,17 @@ export default function Admin() {
       description: `Fare for ${city} deleted.`,
     });
   };
+
+  const handlePreviewCab = (cab: any) => {
+    setPreviewCab(cab);
+    setOpenPreview(true);
+  };
+
+  const handlePreviewFare = (fare: any) => {
+    setPreviewFare(fare);
+    setOpenPreview(true);
+  };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -322,7 +346,7 @@ export default function Admin() {
                           <Button variant="ghost" size="sm" onClick={() => deleteCab(cab.id)} disabled={isEditingCab}>
                             <Trash className="mr-2 h-4 w-4"/>
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" onClick={() => handlePreviewCab(cab)}>
                             <Eye className="mr-2 h-4 w-4"/>
                           </Button>
                         </TableCell>
@@ -405,6 +429,9 @@ export default function Admin() {
                             )}
                           <Button variant="ghost" size="sm" onClick={() => deleteFare(fare.city)} disabled={isEditingCab || isEditingFare}>
                             <Trash className="mr-2 h-4 w-4"/>
+                          </Button>
+                           <Button variant="ghost" size="sm" onClick={() => handlePreviewFare(fare)}>
+                            <Eye className="mr-2 h-4 w-4"/>
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -489,7 +516,44 @@ export default function Admin() {
           </div>
         </div>
       </main>
+       <AlertDialog open={openPreview} onOpenChange={setOpenPreview}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {previewCab ? `Cab Details - ${previewCab.id}` : previewFare ? `Fare Details - ${previewFare.city}` : 'Details'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {previewCab ? (
+                <>
+                  <p><strong>Model:</strong> {previewCab.model}</p>
+                  <p><strong>City:</strong> {previewCab.city}</p>
+                  <p><strong>Type:</strong> {previewCab.type}</p>
+                  <p><strong>Status:</strong> {previewCab.status}</p>
+                  <p><strong>Notes:</strong> {previewCab.notes}</p>
+                </>
+              ) : previewFare ? (
+                <>
+                  <p><strong>City:</strong> {previewFare.city}</p>
+                  <p><strong>Fare:</strong> {previewFare.fare}</p>
+                </>
+              ) : (
+                'No details to display.'
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setOpenPreview(false);
+              setPreviewCab(null);
+              setPreviewFare(null);
+            }}>
+              Close
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
+
 
