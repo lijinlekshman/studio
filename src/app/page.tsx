@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
+import Image from 'next/image';
 
 const INR_CONVERSION_RATE = 83;
 
@@ -128,9 +129,7 @@ export default function Home() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <h1 className="text-6xl font-bold">
-          Let&apos;sGo Rides
-        </h1>
+        <Image src="/letsgo-logo.png" width={400} height={100} alt="Let'sGo Rides"/>
 
         <Card className="w-full max-w-md mt-10">
           <CardHeader>
