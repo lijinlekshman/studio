@@ -2,7 +2,6 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Address, Coordinate, getCurrentLocation, getAddressForCoordinate} from '@/services/map';
-import {getFare} from '@/services/fare';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import Image from 'next/image';
+import {calculateFare} from '@/ai/flows/calculate-fare';
 
 const INR_CONVERSION_RATE = 83;
 
@@ -25,13 +25,32 @@ export default function Home() {
   const [source, setSource] = useState<Coordinate | null>(null);
   const [destination, setDestination] = useState<Coordinate | null>(null);
   const [fare, setFare] = useState<number | null>(null);
+  const [distance, setDistance] = useState<number | null>(null);
   const [sourceAddress, setSourceAddress] = useState<Address | null>(null);
   const [destinationAddress, setDestinationAddress] = useState<Address | null>(null);
+  const [suggestedSources, setSuggestedSources] = useState<any[]>([]);
   const [suggestedDestinations, setSuggestedDestinations] = useState<any[]>([]);
   const {toast} = useToast();
+  const [sourceInput, setSourceInput] = useState('');
   const [destinationInput, setDestinationInput] = useState('');
 
-  const fetchSuggestedDestinations = useCallback(async (destinationName: string) => {
+  const fetchSuggestedSources = useCallback(async (sourceName: string) => {
+    try {
+      if (!sourceName) return;
+      const location = await getCurrentLocation(); // Use current location as a fallback
+      const destinations = await suggestDestinations({currentLocation: location, pastRideHistory: []});
+      setSuggestedSources(destinations);
+    } catch (error: any) {
+      toast({
+        title: "Error fetching sources",
+        description: error.message,
+        variant: "destructive",
+      });
+      console.error('Error fetching sources:', error);
+    }
+  }, [suggestDestinations, toast]);
+
+    const fetchSuggestedDestinations = useCallback(async (destinationName: string) => {
     try {
       if (!destinationName) return;
       const location = await getCurrentLocation(); // Use current location as a fallback
@@ -67,37 +86,83 @@ export default function Home() {
     fetchSourceAddress();
   }, [source]);
 
+    const handleSourceChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const sourceName = event.target.value;
+    setSourceInput(sourceName);
+    fetchSuggestedSources(sourceName);
+
+    // if (source) {
+    //   // Placeholder: Geocode the destination name to coordinates
+    //   const newSource: Coordinate = {lat: 8.5241, lng: 76.9366};
+    //   setSource(newSource);
+
+    //   const sourceAddress = await getAddressForCoordinate(newSource);
+    //   setSourceAddress(sourceAddress);
+    // }
+  };
+
   const handleDestinationChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const destinationName = event.target.value;
     setDestinationInput(destinationName);
     fetchSuggestedDestinations(destinationName);
 
-    if (source) {
-      // Placeholder: Geocode the destination name to coordinates
-      const newDestination: Coordinate = {lat: 8.5241, lng: 76.9366};
-      setDestination(newDestination);
+    // if (source) {
+    //   // Placeholder: Geocode the destination name to coordinates
+    //   const newDestination: Coordinate = {lat: 8.5241, lng: 76.9366};
+    //   setDestination(newDestination);
 
-      const destinationAddress = await getAddressForCoordinate(newDestination);
-      setDestinationAddress(destinationAddress);
-    }
+    //   const destinationAddress = await getAddressForCoordinate(newDestination);
+    //   setDestinationAddress(destinationAddress);
+    // }
   };
 
   useEffect(() => {
     const estimateFare = async () => {
       if (source && destination) {
-        const estimatedFare = await getFare(source, destination);
-        setFare(estimatedFare);
+        // const estimatedFare = await getFare(source, destination);
+        // setFare(estimatedFare);
+        try {
+          const fareDetails = await calculateFare({
+            sourceLat: source.lat,
+            sourceLng: source.lng,
+            destinationLat: destination.lat,
+            destinationLng: destination.lng,
+          });
+          setFare(fareDetails.fare);
+          setDistance(fareDetails.distance);
+        } catch (error: any) {
+          toast({
+            title: "Error calculating fare",
+            description: error.message,
+            variant: "destructive",
+          });
+          console.error('Error calculating fare:', error);
+        }
       }
     };
 
     estimateFare();
   }, [source, destination]);
 
+    const handleSourceSelect = async (selectedSource: any) => {
+    setSource({ lat: selectedSource.lat, lng: selectedSource.lng });
+    setSourceInput(selectedSource.name);
+    const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
+    setSourceAddress(address);
+  };
+
+  const handleDestinationSelect = async (selectedDestination: any) => {
+    setDestination({ lat: selectedDestination.lat, lng: selectedDestination.lng });
+    setDestinationInput(selectedDestination.name);
+    const address = await getAddressForCoordinate({ lat: selectedDestination.lat, lng: selectedDestination.lng });
+    setDestinationAddress(address);
+  };
+
   const bookCab = () => {
     if (source && destination) {
       toast({
         title: "Cab Booked!",
-        description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare * INR_CONVERSION_RATE : 0}`,
+        description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare : 0}`,
       });
     }
   };
@@ -111,7 +176,7 @@ export default function Home() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
                 <Avatar>
-                  <AvatarImage src="https://picsum.photos/id/11/50/50" alt="@shadcn" />
+                  <AvatarImage src="/assets/user.png" alt="@shadcn" />
                   <AvatarFallback>SC</AvatarFallback>
                 </Avatar>
               </Button>
@@ -134,17 +199,33 @@ export default function Home() {
         <Card className="w-full max-w-md mt-10">
           <CardHeader>
             <CardTitle>Book a Ride</CardTitle>
-            <CardDescription>Enter your destination to book a cab.</CardDescription>
+            <CardDescription>Enter your source and destination to book a cab.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-            <div className="grid gap-2">
+           <div className="grid gap-2">
               <label htmlFor="source">Source</label>
               <Input
                 type="text"
                 id="source"
-                value={sourceAddress ? sourceAddress.formattedAddress : 'Fetching current location...'}
-                disabled
+                placeholder="Enter source"
+                onChange={handleSourceChange}
+                value={sourceInput}
+                list="sourceSuggestions"
               />
+              <datalist id="sourceSuggestions">
+                {suggestedSources.map((src, index) => (
+                 <option key={index} value={src.name}  />
+                ))}
+              </datalist>
+             {suggestedSources.length > 0 && (
+                <div className="mt-1">
+                  {suggestedSources.map((src, index) => (
+                   <Button key={index} variant="outline" size="sm" className="mr-1 mb-1" onClick={() => handleSourceSelect(src)}>
+                      {src.name}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="grid gap-2">
               <label htmlFor="destination">Destination</label>
@@ -161,6 +242,15 @@ export default function Home() {
                   <option key={index} value={dest.name} />
                 ))}
               </datalist>
+               {suggestedDestinations.length > 0 && (
+                <div className="mt-1">
+                  {suggestedDestinations.map((dest, index) => (
+                    <Button key={index} variant="outline" size="sm" className="mr-1 mb-1" onClick={() => handleDestinationSelect(dest)}>
+                      {dest.name}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
             {fare !== null && (
               <div className="grid gap-2">
@@ -168,12 +258,23 @@ export default function Home() {
                 <Input
                   type="text"
                   id="fare"
-                  value={`₹${fare * INR_CONVERSION_RATE}`}
+                  value={`₹${fare.toFixed(2)}`}
                   disabled
                 />
               </div>
             )}
-            <Button onClick={bookCab}>Book Cab <Map className="ml-2"/></Button>
+             {distance !== null && (
+              <div className="grid gap-2">
+                <label htmlFor="distance">Distance</label>
+                <Input
+                  type="text"
+                  id="distance"
+                  value={`${distance.toFixed(2)} km`}
+                  disabled
+                />
+              </div>
+            )}
+            <Button onClick={bookCab} disabled={!source || !destination}>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
       </main>
