@@ -69,7 +69,7 @@ Past Ride History:
 {{/each}}
 {{/if}}
 
-Suggest destinations (latitude, longitude and a descriptive name) that the user may want to go to. Return the destination name in the format "City Name, State".
+Suggest destinations (latitude, longitude and a descriptive name) that the user may want to go to. Consider cities from all districts of Kerala, such as Thiruvananthapuram, Kollam, Pathanamthitta, Alappuzha, Kottayam, Idukki, Ernakulam, Thrissur, Palakkad, Malappuram, Kozhikode, Wayanad, Kannur, and Kasaragod. Return the destination name in the format "City Name, State".
 
 Return a JSON array of objects containing the suggested destination's latitude, longitude and a descriptive name.
 `,
@@ -86,4 +86,3 @@ const suggestDestinationsFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
-

@@ -53,4 +53,3 @@ export async function getAddressForCoordinate(coordinate: Coordinate): Promise<A
     formattedAddress: 'Punalur, Kollam, Kerala, India',
   };
 }
-
