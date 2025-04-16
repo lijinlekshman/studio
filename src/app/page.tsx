@@ -19,6 +19,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import Image from 'next/image';
 import {calculateFare} from '@/ai/flows/calculate-fare';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { useRouter } from 'next/navigation';
 
 const INR_CONVERSION_RATE = 83;
 
@@ -58,7 +59,7 @@ export default function Home() {
   const [bookingConfirmed, setBookingConfirmed] = useState(false); // Track booking status
   const [otpSent, setOtpSent] = useState(false); // OTP sent status
   const [otp, setOtp] = useState(''); // OTP input
-    
+  const router = useRouter();
 
   const fetchSuggestedSources = useCallback(async () => {
     try {
@@ -199,6 +200,10 @@ export default function Home() {
         description: `[SIMULATION] OTP sent to ${mobileNumber}.`,
       });
         setOtpSent(true);
+      router.push({
+        pathname: '/otp',
+        query: { mobileNumber: mobileNumber }, // Pass mobileNumber as query parameter
+      });
     } else {
       toast({
         title: "Registration Error",
@@ -373,28 +378,7 @@ export default function Home() {
             <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber }>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
-          {otpSent && (
-              <Card className="w-full max-w-md mt-10">
-                  <CardHeader>
-                      <CardTitle>Verify OTP</CardTitle>
-                      <CardDescription>Enter the OTP sent to your mobile number.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="grid gap-4">
-                      <div className="grid gap-2">
-                          <label htmlFor="otp">OTP</label>
-                          <Input
-                              type="text"
-                              id="otp"
-                              placeholder="Enter OTP"
-                              value={otp}
-                              onChange={(e) => setOtp(e.target.value)}
-                              required
-                          />
-                      </div>
-                      <Button onClick={verifyOTPAndBookCab} disabled={!otp}>Verify OTP</Button>
-                  </CardContent>
-              </Card>
-          )}
+          
         {bookingConfirmed && (
           <Card className="w-full max-w-md mt-10">
             <CardHeader>
