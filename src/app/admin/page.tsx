@@ -190,14 +190,32 @@ export default function AdminDashboard() {
     };
 
     const handleSaveFare = (id: string) => {
-        setFares(fares.map(fare =>
-            fare.id === id ? {
-                ...fare,
-                vehicleType: editedFareVehicleType,
-                baseFare: parseFloat(editedFareBaseFare),
-                perKmRate: parseFloat(editedFarePerKmRate)
-            } : fare
-        ));
+        setFares(fares.map(fare => {
+            if (fare.id === id) {
+                const updatedFare = {
+                    ...fare,
+                    vehicleType: editedFareVehicleType,
+                    baseFare: parseFloat(editedFareBaseFare),
+                    perKmRate: parseFloat(editedFarePerKmRate)
+                };
+
+                // Update bookings with the new fare
+                setBookings(prevBookings =>
+                    prevBookings.map(booking => {
+                        if (booking.cabModel === updatedFare.vehicleType) {
+                            // Recalculate fare based on the booking's distance (assuming you have a distance property)
+                            const distance = 50; // Replace with actual distance
+                            const newFare = updatedFare.baseFare + (distance * updatedFare.perKmRate);
+                            return { ...booking, fare: newFare };
+                        }
+                        return booking;
+                    })
+                );
+
+                return updatedFare;
+            }
+            return fare;
+        }));
         setEditingFareId(null);
         toast({
             title: "Fare Updated",
