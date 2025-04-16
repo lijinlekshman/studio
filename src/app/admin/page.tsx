@@ -23,6 +23,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from 'next/image';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, Legend } from 'recharts';
+import { useRouter } from 'next/navigation';
 
 // Placeholder data for cabs and fares
 const initialCabs = [
@@ -57,6 +58,22 @@ export default function AdminDashboard() {
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
    const [selectedBooking, setSelectedBooking] = useState(null);
     const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
+   const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        // Check if the user is authenticated (e.g., check for a token in local storage)
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            setIsAuthenticated(true);
+        } else {
+            router.push('/login'); // Redirect to login if not authenticated
+        }
+    }, [router]);
+
+    if (!isAuthenticated) {
+        return null; // Or a loading spinner, or a message like "Redirecting..."
+    }
 
   // Function to handle adding a new cab
   const handleAddCab = () => {
@@ -460,4 +477,4 @@ export default function AdminDashboard() {
   );
 }
 
-
+    
