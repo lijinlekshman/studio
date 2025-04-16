@@ -1,1 +1,2 @@
-// Flows will be imported for their side effects in this file.
+import '@/ai/flows/suggest-destinations.ts';
+import '@/ai/flows/optimize-dispatch.ts';
