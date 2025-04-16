@@ -197,12 +197,14 @@ export default function AdminDashboard() {
           
             {"Let'sGo Rides Admin Dashboard"}
        
+          <div className="flex justify-end">
           <Link href="/">
             <Button variant="secondary">
               <ArrowLeft className="mr-2" />
               Back to Home
             </Button>
           </Link>
+          </div>
         
       
 
@@ -260,7 +262,7 @@ export default function AdminDashboard() {
                                 <DialogContent>
                                     <DialogHeader>
                                         <DialogTitle>Add New Fare</DialogTitle>
-                                        <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
+                                        <DialogDescription>Enter the fare details for the new vehicle type.</CardDescription>
                                     </DialogHeader>
                                     
                                         
