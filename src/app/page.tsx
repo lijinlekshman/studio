@@ -211,7 +211,7 @@ export default function Home() {
           <CardContent className="grid gap-4">
            
             <div className="grid gap-2">
-              <label htmlFor="mobileNumber">Mobile Number</label>
+              <label htmlFor="mobileNumber" className="text-left">Mobile Number</label>
               <Input
                 type="tel"
                 id="mobileNumber"
@@ -223,7 +223,7 @@ export default function Home() {
             </div>
            
            <div className="grid gap-2">
-                <label htmlFor="source">Source</label>
+                <label htmlFor="source" className="text-left">Source</label>
                 <Select onValueChange={(value) => {
                     const selectedSource = suggestedSources.find(src => src.name === value);
                     if (selectedSource) {
@@ -246,7 +246,7 @@ export default function Home() {
                 </Select>
             </div>
             <div className="grid gap-2">
-                 <label htmlFor="destination">Destination</label>
+                 <label htmlFor="destination" className="text-left">Destination</label>
                 <Select onValueChange={(value) => {
                     const selectedDestination = suggestedDestinations.find(dest => dest.name === value);
                     if (selectedDestination) {
@@ -269,7 +269,7 @@ export default function Home() {
                 </Select>
             </div>
              <div className="grid gap-2">
-              <label htmlFor="vehicleType">Vehicle Type</label>
+              <label htmlFor="vehicleType" className="text-left">Vehicle Type</label>
               <Select onValueChange={setVehicleType} defaultValue={vehicleType}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select vehicle type" />
@@ -286,7 +286,7 @@ export default function Home() {
             </div>
             {fare !== null && (
               <div className="grid gap-2">
-                <label htmlFor="fare">Estimated Fare</label>
+                <label htmlFor="fare" className="text-left">Estimated Fare</label>
                 <Input
                   type="text"
                   id="fare"
@@ -297,7 +297,7 @@ export default function Home() {
             )}
              {distance !== null && (
               <div className="grid gap-2">
-                <label htmlFor="distance">Distance</label>
+                <label htmlFor="distance" className="text-left">Distance</label>
                 <Input
                   type="text"
                   id="distance"
