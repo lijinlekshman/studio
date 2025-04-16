@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash, Map, Plus } from 'lucide-react';
+import { ArrowLeft, Edit, Trash, Map, Plus, Car, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from 'next/image';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, Legend } from 'recharts';
 
 // Placeholder data for cabs and fares
 const initialCabs = [
@@ -34,9 +35,16 @@ const initialFares = [
   { id: '2', vehicleType: 'SUV', baseFare: 75, perKmRate: 15 },
 ];
 
+const initialBookings = [
+    { id: '1', userId: '101', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop' },
+    { id: '2', userId: '102', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi' },
+];
+
+
 export default function AdminDashboard() {
   const [cabs, setCabs] = useState(initialCabs);
   const [fares, setFares] = useState(initialFares);
+  const [bookings, setBookings] = useState(initialBookings);
   const [isAddCabDialogOpen, setIsAddCabDialogOpen] = useState(false);
   const [newCabModel, setNewCabModel] = useState('');
   const [newCabLicensePlate, setNewCabLicensePlate] = useState('');
@@ -47,6 +55,8 @@ export default function AdminDashboard() {
   const [selectedCab, setSelectedCab] = useState(null);
   const [selectedFare, setSelectedFare] = useState(null);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+   const [selectedBooking, setSelectedBooking] = useState(null);
+    const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
 
   // Function to handle adding a new cab
   const handleAddCab = () => {
@@ -152,6 +162,17 @@ export default function AdminDashboard() {
     setIsPreviewDialogOpen(true);
   };
 
+  const handleViewBooking = (booking: any) => {
+        setSelectedBooking(booking);
+        setIsBookingDialogOpen(true);
+    };
+
+  // Chart data (example)
+  const bookingData = [
+    { name: 'Sedan', bookings: bookings.filter(b => b.cabModel === 'Sedan').length },
+    { name: 'SUV', bookings: bookings.filter(b => b.cabModel === 'SUV').length },
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <header className="bg-white shadow">
@@ -170,86 +191,107 @@ export default function AdminDashboard() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Panel: Management Cards */}
-          <div className="md:col-span-2 space-y-6">
-            {/* Add New Cab Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Cabs</CardTitle>
-                <CardDescription>Add, edit, or remove cabs from the system.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => setIsAddCabDialogOpen(true)}><Plus className="mr-2" /> Add New Cab</Button>
-                <Dialog open={isAddCabDialogOpen} onOpenChange={setIsAddCabDialogOpen}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Cab</DialogTitle>
-                      <DialogDescription>Enter the details for the new cab.</DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="model" className="text-right">
-                          Model
-                        </Label>
-                        <Input id="model" value={newCabModel} onChange={(e) => setNewCabModel(e.target.value)} className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="licensePlate" className="text-right">
-                          License Plate
-                        </Label>
-                        <Input id="licensePlate" value={newCabLicensePlate} onChange={(e) => setNewCabLicensePlate(e.target.value)} className="col-span-3" required />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="button" onClick={handleAddCab}>Add Cab</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
+            {/* Left Panel: Management Cards & Charts */}
+            <div className="md:col-span-2 space-y-6">
+                {/* Management Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Add New Cab Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Manage Cabs</CardTitle>
+                            <CardDescription>Add, edit, or remove cabs from the system.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button onClick={() => setIsAddCabDialogOpen(true)}><Plus className="mr-2" /> Add New Cab</Button>
+                            <Dialog open={isAddCabDialogOpen} onOpenChange={setIsAddCabDialogOpen}>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Add New Cab</DialogTitle>
+                                        <DialogDescription>Enter the details for the new cab.</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="model" className="text-right">
+                                                Model
+                                            </Label>
+                                            <Input id="model" value={newCabModel} onChange={(e) => setNewCabModel(e.target.value)} className="col-span-3" required />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="licensePlate" className="text-right">
+                                                License Plate
+                                            </Label>
+                                            <Input id="licensePlate" value={newCabLicensePlate} onChange={(e) => setNewCabLicensePlate(e.target.value)} className="col-span-3" required />
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button type="button" onClick={handleAddCab}>Add Cab</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </CardContent>
+                    </Card>
 
-            {/* Update Fare Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Fares</CardTitle>
-                <CardDescription>Update base fares and per kilometer rates for different vehicle types.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => setIsAddFareDialogOpen(true)}><Plus className="mr-2" /> Add New Fare</Button>
-                <Dialog open={isAddFareDialogOpen} onOpenChange={setIsAddFareDialogOpen}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Fare</DialogTitle>
-                      <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="vehicleType" className="text-right">
-                          Vehicle Type
-                        </Label>
-                        <Input id="vehicleType" value={newFareVehicleType} onChange={(e) => setNewFareVehicleType(e.target.value)} className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="baseFare" className="text-right">
-                          Base Fare
-                        </Label>
-                        <Input id="baseFare" type="number" value={newFareBaseFare} onChange={(e) => setNewFareBaseFare(e.target.value)} className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="perKmRate" className="text-right">
-                          Per KM Rate
-                        </Label>
-                        <Input id="perKmRate" type="number" value={newFarePerKmRate} onChange={(e) => setNewFarePerKmRate(e.target.value)} className="col-span-3" required />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="button" onClick={handleAddFare}>Add Fare</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-          </div>
+                    {/* Update Fare Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Manage Fares</CardTitle>
+                            <CardDescription>Update base fares and per kilometer rates for different vehicle types.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Button onClick={() => setIsAddFareDialogOpen(true)}><Plus className="mr-2" /> Add New Fare</Button>
+                            <Dialog open={isAddFareDialogOpen} onOpenChange={setIsAddFareDialogOpen}>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Add New Fare</DialogTitle>
+                                        <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="vehicleType" className="text-right">
+                                                Vehicle Type
+                                            </Label>
+                                            <Input id="vehicleType" value={newFareVehicleType} onChange={(e) => setNewFareVehicleType(e.target.value)} className="col-span-3" required />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="baseFare" className="text-right">
+                                                Base Fare
+                                            </Label>
+                                            <Input id="baseFare" type="number" value={newFareBaseFare} onChange={(e) => setNewFareBaseFare(e.target.value)} className="col-span-3" required />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="perKmRate" className="text-right">
+                                                Per KM Rate
+                                            </Label>
+                                            <Input id="perKmRate" type="number" value={newFarePerKmRate} onChange={(e) => setNewFarePerKmRate(e.target.value)} className="col-span-3" required />
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button type="button" onClick={handleAddFare}>Add Fare</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Booking Summary Chart */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Booking Summary</CardTitle>
+                        <CardDescription>A summary of bookings by vehicle type.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <BarChart width={500} height={300} data={bookingData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <ChartTooltip />
+                            <Legend />
+                            <Bar dataKey="bookings" fill="#3498db" />
+                        </BarChart>
+                    </CardContent>
+                </Card>
+            </div>
 
           {/* Right Panel: Data Tables */}
           <div className="md:col-span-1 space-y-6">
@@ -283,7 +325,7 @@ export default function AdminDashboard() {
                                 <Trash className="h-4 w-4" />
                               </Button>
                               <Button variant="ghost" size="icon" onClick={() => handlePreview(cab)}>
-                                <Map className="h-4 w-4" />
+                                <Car className="h-4 w-4" />
                               </Button>
                             </div>
                           </TableCell>
@@ -341,6 +383,45 @@ export default function AdminDashboard() {
                 </ScrollArea>
               </CardContent>
             </Card>
+             {/* Bookings Table */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Bookings</CardTitle>
+                                <CardDescription>List of all current bookings.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ScrollArea>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>User ID</TableHead>
+                                                <TableHead>Source</TableHead>
+                                                <TableHead>Destination</TableHead>
+                                                <TableHead>Fare</TableHead>
+                                                <TableHead className="text-right">Actions</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {bookings.map((booking) => (
+                                                <TableRow key={booking.id}>
+                                                    <TableCell>{booking.userId}</TableCell>
+                                                    <TableCell>{booking.source}</TableCell>
+                                                    <TableCell>{booking.destination}</TableCell>
+                                                    <TableCell>{booking.fare}</TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex justify-end gap-2">
+                                                            <Button variant="ghost" size="icon" onClick={() => handleViewBooking(booking)}>
+                                                                <User className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </ScrollArea>
+                            </CardContent>
+                        </Card>
           </div>
         </div>
       </main>
@@ -358,6 +439,23 @@ export default function AdminDashboard() {
           )}
         </DialogContent>
       </Dialog>
+       <Dialog open={isBookingDialogOpen} onOpenChange={() => setIsBookingDialogOpen(false)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Booking Details</DialogTitle>
+                    </DialogHeader>
+                    {selectedBooking && (
+                        <div className="py-4">
+                            <p>User ID: {selectedBooking.userId}</p>
+                            <p>Source: {selectedBooking.source}</p>
+                            <p>Destination: {selectedBooking.destination}</p>
+                            <p>Fare: {selectedBooking.fare}</p>
+                            <p>Cab Model: {selectedBooking.cabModel}</p>
+                            <p>Driver Name: {selectedBooking.driverName}</p>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
     </div>
   );
 }
