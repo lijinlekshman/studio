@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background-image: url('https://t4.ftcdn.net/jpg/02/86/75/24/360_F_286752452_Eq9Zq1SyEjUmNcGC0gF8uY8f9Um7dbwz.jpg'); /* Replace with your image URL */
+  background-image: url('/Images/taxi-bg.jpg'); /* Replace with your image URL */
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
