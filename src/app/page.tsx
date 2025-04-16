@@ -6,6 +6,9 @@ import {getFare} from '@/services/fare';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Map} from 'lucide-react';
+
+const INR_CONVERSION_RATE = 83;
 
 export default function Home() {
   const [source, setSource] = useState<Coordinate | null>(null);
@@ -57,7 +60,7 @@ export default function Home() {
 
   const bookCab = () => {
     if (source && destination) {
-      alert(`Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for $${fare}`);
+      alert(`Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare * INR_CONVERSION_RATE : 0}`);
     }
   };
 
@@ -98,12 +101,12 @@ export default function Home() {
                 <Input
                   type="text"
                   id="fare"
-                  value={`$${fare}`}
+                  value={`₹${fare * INR_CONVERSION_RATE}`}
                   disabled
                 />
               </div>
             )}
-            <Button onClick={bookCab}>Book Cab</Button>
+            <Button onClick={bookCab}>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
       </main>
