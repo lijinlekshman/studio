@@ -122,7 +122,6 @@ export default function Home() {
                 value={sourceAddress ? sourceAddress.formattedAddress : 'Fetching current location...'}
                 disabled
               />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/India_Kerala_locator_map.svg/500px-India_Kerala_locator_map.svg.png" alt="Kerala Map" className="rounded-md shadow-md"/>
             </div>
             <div className="grid gap-2">
               <label htmlFor="destination">Destination</label>
