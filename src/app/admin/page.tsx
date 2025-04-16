@@ -5,7 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useToast} from "@/hooks/use-toast";
-import {ArrowLeft, Trash} from "lucide-react";
+import {ArrowLeft, Edit, Trash, Eye} from "lucide-react";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {
@@ -22,6 +22,7 @@ import {
   YAxis
 } from 'recharts';
 import Link from "next/link";
+import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 
 const data = [
   {
@@ -62,6 +63,26 @@ const data = [
   },
 ];
 
+// Dummy data for cabs
+const initialCabs = [
+  {
+    id: 'CAB001',
+    model: 'Sedan X',
+    city: 'Thiruvananthapuram',
+    type: 'Sedan',
+    status: 'available',
+    notes: 'Good condition'
+  },
+  {
+    id: 'CAB002',
+    model: 'SUV Y',
+    city: 'Kochi',
+    type: 'SUV',
+    status: 'on-trip',
+    notes: 'Driver on break'
+  }
+];
+
 export default function Admin() {
   const [cabId, setCabId] = useState('');
   const [cabModel, setCabModel] = useState('');
@@ -71,25 +92,37 @@ export default function Admin() {
   const [cabType, setCabType] = useState('');
   const [cabStatus, setCabStatus] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
+  const [cabs, setCabs] = useState(initialCabs); // State for cabs
 
   const addCab = () => {
+    const newCab = {
+      id: cabId,
+      model: cabModel,
+      city: city,
+      type: cabType,
+      status: cabStatus,
+      notes: additionalNotes
+    };
+    setCabs([...cabs, newCab]);
     toast({
       title: "Cab Added!",
       description: `Cab ${cabId} added to ${city}`,
     });
   };
 
-  const editCab = () => {
+  const editCab = (id: string) => {
+    // Logic to edit cab details
     toast({
       title: "Cab Edited!",
-      description: `Cab ${cabId} updated.`,
+      description: `Cab ${id} updated.`,
     });
   };
 
-  const deleteCab = () => {
+  const deleteCab = (id: string) => {
+    setCabs(cabs.filter(cab => cab.id !== id));
     toast({
       title: "Cab Deleted!",
-      description: `Cab ${cabId} deleted from ${city}.`,
+      description: `Cab ${id} deleted from ${city}.`,
     });
   };
 
@@ -174,87 +207,79 @@ export default function Admin() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button onClick={addCab}>Add Cab</Button>
-              </CardContent>
-            </Card>
-
-            {/* Edit Cab Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Edit Cab</CardTitle>
-                <CardDescription>Edit details of an existing cab.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
                 <div className="grid gap-2">
-                  <label htmlFor="cabId">Cab ID</label>
-                  <Input
-                    type="text"
-                    id="cabId"
-                    placeholder="Enter Cab ID"
-                    value={cabId}
-                    onChange={(e) => setCabId(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="cabModel">Cab Model</label>
-                  <Input
-                    type="text"
-                    id="cabModel"
-                    placeholder="Enter Cab Model"
-                    value={cabModel}
-                    onChange={(e) => setCabModel(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="city">City</label>
-                  <Input
-                    type="text"
-                    id="city"
-                    placeholder="Enter City"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="cabType">Cab Type</label>
-                  <Select onValueChange={setCabType}>
+                  <label htmlFor="cabStatus">Cab Status</label>
+                  <Select onValueChange={setCabStatus}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select cab type"/>
+                      <SelectValue placeholder="Select status"/>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectLabel>Type</SelectLabel>
-                        <SelectItem value="sedan">Sedan</SelectItem>
-                        <SelectItem value="suv">SUV</SelectItem>
-                        <SelectItem value="mini">Mini</SelectItem>
+                        <SelectLabel>Status</SelectLabel>
+                        <SelectItem value="available">Available</SelectItem>
+                        <SelectItem value="on-trip">On Trip</SelectItem>
+                        <SelectItem value="maintenance">Maintenance</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 </div>
-                <Button onClick={editCab}>Edit Cab</Button>
+                <div className="grid gap-2">
+                  <label htmlFor="additionalNotes">Additional Notes</label>
+                  <Textarea
+                    id="additionalNotes"
+                    placeholder="Enter any additional notes"
+                    value={additionalNotes}
+                    onChange={(e) => setAdditionalNotes(e.target.value)}
+                  />
+                </div>
+                <Button onClick={addCab}>Add Cab</Button>
               </CardContent>
             </Card>
 
-            {/* Delete Cab Card */}
+            {/* Added Cabs Listing */}
             <Card>
               <CardHeader>
-                <CardTitle>Delete Cab</CardTitle>
-                <CardDescription>Remove a cab from the system.</CardDescription>
+                <CardTitle>Added Cabs</CardTitle>
+                <CardDescription>Manage existing cabs in the system.</CardDescription>
               </CardHeader>
-              <CardContent className="grid gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="cabId">Cab ID</label>
-                  <Input
-                    type="text"
-                    id="cabId"
-                    placeholder="Enter Cab ID"
-                    value={cabId}
-                    onChange={(e) => setCabId(e.target.value)}
-                  />
-                </div>
-                <Button variant="destructive" onClick={deleteCab}>
-                  Delete Cab <Trash className="ml-2"/>
-                </Button>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Cab ID</TableHead>
+                      <TableHead>Model</TableHead>
+                      <TableHead>City</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {cabs.map((cab) => (
+                      <TableRow key={cab.id}>
+                        <TableCell>{cab.id}</TableCell>
+                        <TableCell>{cab.model}</TableCell>
+                        <TableCell>{cab.city}</TableCell>
+                        <TableCell>{cab.type}</TableCell>
+                        <TableCell>{cab.status}</TableCell>
+                        <TableCell className="text-right font-medium">
+                          <Button variant="ghost" size="sm" onClick={() => editCab(cab.id)}>
+                            <Edit className="mr-2 h-4 w-4"/>
+                            Edit
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => deleteCab(cab.id)}>
+                            <Trash className="mr-2 h-4 w-4"/>
+                            Delete
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <Eye className="mr-2 h-4 w-4"/>
+                            View
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
 
