@@ -5,7 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {useToast} from "@/hooks/use-toast";
-import {ArrowLeft, Edit, Trash, Eye, Save, Car} from "lucide-react";
+import {ArrowLeft, Edit, Trash, Eye, Save, Car, Locate} from "lucide-react";
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {Textarea} from "@/components/ui/textarea";
 import {
@@ -83,7 +83,9 @@ const initialCabs = [
     type: 'Sedan',
     status: 'available',
     notes: 'Good condition',
-    location: { lat: 8.5241, lng: 76.9366 } // Dummy location
+    location: { lat: 8.5241, lng: 76.9366 }, // Dummy location
+	driverDetails: { name: 'John Doe', mobile: '+919876543210' },
+	vehicleNumber: 'KL-01-AB-1234'
   },
   {
     id: 'CAB002',
@@ -92,7 +94,9 @@ const initialCabs = [
     type: 'SUV',
     status: 'on-trip',
     notes: 'Driver on break',
-    location: { lat: 9.9312, lng: 76.2673 } // Dummy location
+    location: { lat: 9.9312, lng: 76.2673 }, // Dummy location
+	driverDetails: { name: 'Jane Smith', mobile: '+918765432109' },
+	vehicleNumber: 'KL-07-CD-5678'
   }
 ];
 
@@ -158,7 +162,10 @@ export default function Admin() {
       city: city,
       type: cabType,
       status: cabStatus,
-      notes: additionalNotes
+      notes: additionalNotes,
+	  location: { lat: 8.5241, lng: 76.9366 }, // Dummy location
+	  driverDetails: { name: 'New Driver', mobile: '+919999999999' },
+	  vehicleNumber: 'KL-99-XX-9999'
     };
     setCabs([...cabs, newCab]);
     toast({
@@ -236,6 +243,17 @@ export default function Admin() {
         setMapURL(mapUrl);
     setOpenPreview(true);
   };
+
+	const handleTrackCab = (cab: any) => {
+		setPreviewCab(cab);
+		// Generate the Google Maps URL for tracking
+		const lat = cab.location.lat;
+		const lng = cab.location.lng;
+		const zoom = 14; // You can adjust the zoom level as needed
+		const mapUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=${zoom}&output=embed`;
+		setMapURL(mapUrl);
+		setOpenPreview(true);
+	};
 
   const handlePreviewFare = (fare: any) => {
     setPreviewFare(fare);
@@ -389,6 +407,9 @@ export default function Admin() {
                           <Button variant="ghost" size="sm" onClick={() => handlePreviewCab(cab)}>
                             <Eye className="mr-2 h-4 w-4"/>
                           </Button>
+						   <Button variant="ghost" size="sm" onClick={() => handleTrackCab(cab)}>
+								<Locate className="mr-2 h-4 w-4"/>
+							</Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -573,6 +594,22 @@ export default function Admin() {
                                                     <p><strong>Fare:</strong> {booking.fare}</p>
                                                     <p><strong>Cab ID:</strong> {booking.cabId}</p>
                                                     <p><strong>Mobile Number:</strong> {booking.mobileNumber}</p>
+													{/* Add Track Cab Button */}
+													<Button variant="ghost" size="sm" onClick={() => {
+														const cab = cabs.find(c => c.id === booking.cabId);
+														if (cab) {
+															handleTrackCab(cab);
+														} else {
+															toast({
+																title: "Cab Not Found",
+																description: `Cab with ID ${booking.cabId} not found.`,
+																variant: "destructive",
+															});
+														}
+													}}>
+														<Locate className="mr-2 h-4 w-4"/>
+														Track Cab
+													</Button>
                                                 </AccordionContent>
                                             </AccordionItem>
                                         ))}
@@ -628,6 +665,10 @@ export default function Admin() {
                   <p><strong>Type:</strong> {previewCab.type}</p>
                   <p><strong>Status:</strong> {previewCab.status}</p>
                   <p><strong>Notes:</strong> {previewCab.notes}</p>
+				  <p><strong>Vehicle Number:</strong> {previewCab.vehicleNumber}</p>
+				  <p><strong>Driver Name:</strong> {previewCab.driverDetails.name}</p>
+				  <p><strong>Driver Mobile:</strong> {previewCab.driverDetails.mobile}</p>
+                  
                                     <div className="mt-2">
                                         <iframe
                                             width="100%"
@@ -659,7 +700,7 @@ export default function Admin() {
             </AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </main>
     </div>
   );
 }
