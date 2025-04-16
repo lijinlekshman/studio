@@ -18,6 +18,7 @@ import {
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import Image from 'next/image';
 import {calculateFare} from '@/ai/flows/calculate-fare';
+import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 const INR_CONVERSION_RATE = 83;
 
@@ -33,6 +34,7 @@ export default function Home() {
   const {toast} = useToast();
   const [sourceInput, setSourceInput] = useState('');
   const [destinationInput, setDestinationInput] = useState('');
+  const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
 
   const fetchSuggestedSources = useCallback(async (sourceName: string) => {
     try {
@@ -108,7 +110,24 @@ export default function Home() {
             destinationLat: destination.lat,
             destinationLng: destination.lng,
           });
-          setFare(fareDetails.fare);
+          let calculatedFare = fareDetails.fare;
+
+          // Adjust fare based on vehicle type
+          switch (vehicleType) {
+            case 'sedan':
+              calculatedFare *= 1; // Base fare
+              break;
+            case 'suv':
+              calculatedFare *= 1.5; // 50% higher
+              break;
+            case 'mini':
+              calculatedFare *= 0.8; // 20% lower
+              break;
+            default:
+              break;
+          }
+
+          setFare(calculatedFare);
           setDistance(fareDetails.distance);
         } catch (error: any) {
           toast({
@@ -122,7 +141,7 @@ export default function Home() {
     };
 
     estimateFare();
-  }, [source, destination]);
+  }, [source, destination, vehicleType]);
 
     const handleSourceSelect = async (selectedSource: any) => {
     setSource({ lat: selectedSource.lat, lng: selectedSource.lng });
@@ -142,7 +161,7 @@ export default function Home() {
     if (source && destination) {
       toast({
         title: "Cab Booked!",
-        description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare : 0}`,
+        description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare.toFixed(2) : 0} in a ${vehicleType}.`,
       });
     }
   };
@@ -231,6 +250,22 @@ export default function Home() {
                   ))}
                 </div>
               )}
+            </div>
+             <div className="grid gap-2">
+              <label htmlFor="vehicleType">Vehicle Type</label>
+              <Select onValueChange={setVehicleType} defaultValue={vehicleType}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select vehicle type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Type</SelectLabel>
+                    <SelectItem value="sedan">Sedan</SelectItem>
+                    <SelectItem value="suv">SUV</SelectItem>
+                    <SelectItem value="mini">Mini</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
             {fare !== null && (
               <div className="grid gap-2">
