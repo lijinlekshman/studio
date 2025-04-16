@@ -36,9 +36,8 @@ export default function Home() {
   const [destinationInput, setDestinationInput] = useState('');
   const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
 
-  const fetchSuggestedSources = useCallback(async (sourceName: string) => {
+  const fetchSuggestedSources = useCallback(async () => {
     try {
-      if (!sourceName) return;
       const location = await getCurrentLocation(); // Use current location as a fallback
       const destinations = await suggestDestinations({currentLocation: location, pastRideHistory: []});
       setSuggestedSources(destinations);
@@ -52,9 +51,8 @@ export default function Home() {
     }
   }, [toast]);
 
-    const fetchSuggestedDestinations = useCallback(async (destinationName: string) => {
+    const fetchSuggestedDestinations = useCallback(async () => {
     try {
-      if (!destinationName) return;
       const location = await getCurrentLocation(); // Use current location as a fallback
       const destinations = await suggestDestinations({currentLocation: location, pastRideHistory: []});
       setSuggestedDestinations(destinations);
@@ -75,7 +73,9 @@ export default function Home() {
     };
 
     fetchCurrentLocation();
-  }, []);
+    fetchSuggestedSources();
+    fetchSuggestedDestinations();
+  }, [fetchSuggestedSources, fetchSuggestedDestinations]);
 
   useEffect(() => {
     const fetchSourceAddress = async () => {
@@ -87,18 +87,6 @@ export default function Home() {
 
     fetchSourceAddress();
   }, [source]);
-
-    const handleSourceChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const sourceName = event.target.value;
-    setSourceInput(sourceName);
-    fetchSuggestedSources(sourceName);
-  };
-
-  const handleDestinationChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const destinationName = event.target.value;
-    setDestinationInput(destinationName);
-    fetchSuggestedDestinations(destinationName);
-  };
 
   useEffect(() => {
     const estimateFare = async () => {
@@ -202,54 +190,50 @@ export default function Home() {
           </CardHeader>
           <CardContent className="grid gap-4">
            <div className="grid gap-2">
-              <label htmlFor="source">Source</label>
-              <Input
-                type="text"
-                id="source"
-                placeholder="Enter source"
-                onChange={handleSourceChange}
-                value={sourceInput}
-                list="sourceSuggestions"
-              />
-              <datalist id="sourceSuggestions">
-                {suggestedSources.map((src, index) => (
-                 <option key={index} value={src.name}  />
-                ))}
-              </datalist>
-             {suggestedSources.length > 0 && (
-                <div className="mt-1">
-                  {suggestedSources.map((src, index) => (
-                   <Button key={index} variant="outline" size="sm" className="mr-1 mb-1" onClick={() => handleSourceSelect(src)}>
-                      {src.name}
-                    </Button>
-                  ))}
-                </div>
-              )}
+                <label htmlFor="source">Source</label>
+                <Select onValueChange={(value) => {
+                    const selectedSource = suggestedSources.find(src => src.name === value);
+                    if (selectedSource) {
+                        handleSourceSelect(selectedSource);
+                    }
+                }}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Source</SelectLabel>
+                            {suggestedSources.map((src) => (
+                                <SelectItem key={src.name} value={src.name}>
+                                    {src.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
             </div>
             <div className="grid gap-2">
-              <label htmlFor="destination">Destination</label>
-              <Input
-                type="text"
-                id="destination"
-                placeholder="Enter destination"
-                onChange={handleDestinationChange}
-                value={destinationInput}
-                list="destinationSuggestions"
-              />
-              <datalist id="destinationSuggestions">
-                {suggestedDestinations.map((dest, index) => (
-                  <option key={index} value={dest.name} />
-                ))}
-              </datalist>
-               {suggestedDestinations.length > 0 && (
-                <div className="mt-1">
-                  {suggestedDestinations.map((dest, index) => (
-                    <Button key={index} variant="outline" size="sm" className="mr-1 mb-1" onClick={() => handleDestinationSelect(dest)}>
-                      {dest.name}
-                    </Button>
-                  ))}
-                </div>
-              )}
+                 <label htmlFor="destination">Destination</label>
+                <Select onValueChange={(value) => {
+                    const selectedDestination = suggestedDestinations.find(dest => dest.name === value);
+                    if (selectedDestination) {
+                        handleDestinationSelect(selectedDestination);
+                    }
+                }}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select destination" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Destination</SelectLabel>
+                            {suggestedDestinations.map((dest) => (
+                                <SelectItem key={dest.name} value={dest.name}>
+                                    {dest.name}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
             </div>
              <div className="grid gap-2">
               <label htmlFor="vehicleType">Vehicle Type</label>
