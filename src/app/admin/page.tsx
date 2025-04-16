@@ -194,7 +194,7 @@ export default function AdminDashboard() {
     
       
         
-          {"Let'sGo Rides Admin Dashboard"}
+          <CardTitle>{"Let'sGo Rides Admin Dashboard"}</CardTitle>
         
           <div className="flex justify-end">
           <Link href="/">
@@ -260,7 +260,7 @@ export default function AdminDashboard() {
                                 <DialogContent>
                                     <DialogHeader>
                                         <DialogTitle>Add New Fare</DialogTitle>
-                                        <DialogDescription>Enter the fare details for the new vehicle type.</CardDescription>
+                                        <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
                                     </DialogHeader>
                                     
                                         
@@ -476,4 +476,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
