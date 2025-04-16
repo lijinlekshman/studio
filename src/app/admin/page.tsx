@@ -274,7 +274,7 @@ export default function Admin() {
       
         
           
-            Let&apos;sGo Rides Admin Dashboard
+            Let'sGo Rides Admin Dashboard
           
           <Link href="/">
             <Button variant="secondary">
@@ -485,9 +485,6 @@ export default function Admin() {
               
                 
                   Fare Listing
-                
-                
-                  Manage fares for different cities.
                 
               
               
@@ -805,5 +802,3 @@ export default function Admin() {
     
   );
 }
-
-
