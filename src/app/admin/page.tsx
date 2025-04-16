@@ -194,16 +194,15 @@ export default function AdminDashboard() {
     
       
         
-          <CardTitle>{"Let'sGo Rides Admin Dashboard"}</CardTitle>
+          <CardTitle>Let'sGo Rides Admin Dashboard</CardTitle>
         
-          <div className="flex justify-end">
+          
           <Link href="/">
             <Button variant="secondary">
               <ArrowLeft className="mr-2" />
               Back to Home
             </Button>
           </Link>
-          </div>
         
 
       
@@ -476,3 +475,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
