@@ -105,11 +105,6 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-20 text-center relative">
         <div className="absolute top-4 right-4 flex items-center space-x-2">
-          <Link href="/admin">
-            <Button variant="secondary" size="sm">
-              Admin Portal
-            </Button>
-          </Link>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -121,6 +116,9 @@ export default function Home() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuItem>
+                <Link href="/admin">Admin Portal</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem>
                 Profile
               </DropdownMenuItem>
@@ -183,4 +181,3 @@ export default function Home() {
     </div>
   );
 }
-
