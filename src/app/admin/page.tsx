@@ -63,6 +63,10 @@ export default function AdminDashboard() {
     const [editingCabId, setEditingCabId] = useState(null);
     const [editedCabModel, setEditedCabModel] = useState('');
     const [editedCabLicensePlate, setEditedCabLicensePlate] = useState('');
+    const [editingFareId, setEditingFareId] = useState(null);
+    const [editedFareVehicleType, setEditedFareVehicleType] = useState('');
+    const [editedFareBaseFare, setEditedFareBaseFare] = useState('');
+    const [editedFarePerKmRate, setEditedFarePerKmRate] = useState('');
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -178,9 +182,28 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleEditFare = (fare: any) => {
-    setSelectedFare(fare);
-  };
+    const handleEditFare = (fare: any) => {
+        setEditingFareId(fare.id);
+        setEditedFareVehicleType(fare.vehicleType);
+        setEditedFareBaseFare(String(fare.baseFare));
+        setEditedFarePerKmRate(String(fare.perKmRate));
+    };
+
+    const handleSaveFare = (id: string) => {
+        setFares(fares.map(fare =>
+            fare.id === id ? {
+                ...fare,
+                vehicleType: editedFareVehicleType,
+                baseFare: parseFloat(editedFareBaseFare),
+                perKmRate: parseFloat(editedFarePerKmRate)
+            } : fare
+        ));
+        setEditingFareId(null);
+        toast({
+            title: "Fare Updated",
+            description: "Fare details updated successfully.",
+        });
+    };
 
   const handleUpdateFare = (id: string, updatedFare: any) => {
     setFares(fares.map(fare => fare.id === id ? updatedFare : fare));
@@ -414,26 +437,50 @@ export default function AdminDashboard() {
                     <TableBody>
                       {fares.map((fare) => (
                         <TableRow key={fare.id}>
-                          <TableCell>{fare.vehicleType}</TableCell>
-                          <TableCell>{fare.baseFare}</TableCell>
-                          <TableCell>{fare.perKmRate}</TableCell>
-                          <TableCell className="text-right">
-                            
-                              {selectedFare?.id === fare.id ? (
-                                <Button variant="ghost" size="icon" onClick={() => handleUpdateFare(fare.id, { ...fare, baseFare: parseFloat(newFareBaseFare), perKmRate: parseFloat(newFarePerKmRate) })}>
-                                  Save
-                                </Button>
-                              ) : (
-                                <Button variant="ghost" size="icon" onClick={() => handleEditFare(fare)}>
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              )}
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteFare(fare.id)}>
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            
-                          </TableCell>
-                        </TableRow>
+                                {editingFareId === fare.id ? (
+                                    <>
+                                        <TableCell>
+                                            <Input
+                                                value={editedFareVehicleType}
+                                                onChange={(e) => setEditedFareVehicleType(e.target.value)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
+                                                type="number"
+                                                value={editedFareBaseFare}
+                                                onChange={(e) => setEditedFareBaseFare(e.target.value)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
+                                                type="number"
+                                                value={editedFarePerKmRate}
+                                                onChange={(e) => setEditedFarePerKmRate(e.target.value)}
+                                            />
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="ghost" size="icon" onClick={() => handleSaveFare(fare.id)}>
+                                                <Save className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TableCell>{fare.vehicleType}</TableCell>
+                                        <TableCell>{fare.baseFare}</TableCell>
+                                        <TableCell>{fare.perKmRate}</TableCell>
+                                        <TableCell className="text-right">
+                                            <Button variant="ghost" size="icon" onClick={() => handleEditFare(fare)}>
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" onClick={() => handleDeleteFare(fare.id)}>
+                                                <Trash className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </>
+                                )}
+                            </TableRow>
                       ))}
                     </TableBody>
                   </Table>
