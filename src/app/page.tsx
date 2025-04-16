@@ -190,51 +190,11 @@ export default function Home() {
     }
   };
 
-  // Placeholder function for registering the user and sending OTP
-  const registerUserAndSendOTP = async () => {
-    if (source && destination && mobileNumber) {
-      // Simulate registering the user and sending OTP
-      console.log(`Registering user with mobile number: ${mobileNumber}`);
-      toast({
-        title: "Registration initiated",
-        description: `[SIMULATION] OTP sent to ${mobileNumber}.`,
-      });
-        setOtpSent(true);
-      router.push({
-        pathname: '/otp',
-        query: { mobileNumber: mobileNumber }, // Pass mobileNumber as query parameter
-      });
-    } else {
-      toast({
-        title: "Registration Error",
-        description: "Please ensure all fields are filled.",
-        variant: "destructive",
-      });
-    }
-  };
-
-    const verifyOTPAndBookCab = () => {
-        // Placeholder: Verify OTP logic (e.g., check against a stored OTP)
-        if (otp === "123456") { // Replace with actual OTP verification logic
-            toast({
-                title: "OTP Verified!",
-                description: "[SIMULATION] OTP verified. Booking cab...",
-            });
-            setOtpSent(false);
-            setBookingConfirmed(true);
-        } else {
-            toast({
-                title: "OTP Verification Failed",
-                description: "Invalid OTP. Please try again.",
-                variant: "destructive",
-            });
-        }
-    };
 
   const handleBookCabClick = () => {
     if (source && destination) {
-      // Proceed to register the user
-      registerUserAndSendOTP();
+      // Directly confirm the booking
+        bookCab();
     } else {
       toast({
         title: "Booking Error",
