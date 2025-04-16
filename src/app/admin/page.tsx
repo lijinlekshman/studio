@@ -195,7 +195,7 @@ export default function AdminDashboard() {
       
         
           
-            Let'sGo Rides Admin Dashboard
+            {"Let'sGo Rides Admin Dashboard"}
           
           <Link href="/">
             <Button variant="secondary">
