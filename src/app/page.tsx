@@ -188,7 +188,7 @@ export default function Home() {
   const bookCab = () => {
     if (source && destination ) {
         // Placeholder: Simulate sending notification to user's mobile
-        console.log(`Sending notification to ${mobileNumber}`);
+        console.log(`Simulating sending notification to ${mobileNumber}`);
         toast({
             title: "Cab Booked!",
             description: `Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare.toFixed(2) : 0} in a ${vehicleType}. A notification has been sent to ${mobileNumber}.`,
