@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {Address, Coordinate, getCurrentLocation, getAddressForCoordinate} from '@/services/map';
 import {getFare} from '@/services/fare';
 import {Button} from '@/components/ui/button';
@@ -21,6 +21,21 @@ export default function Home() {
   const [destinationAddress, setDestinationAddress] = useState<Address | null>(null);
   const [suggestedDestinations, setSuggestedDestinations] = useState<any[]>([]);
   const {toast} = useToast();
+  const [destinationInput, setDestinationInput] = useState('');
+
+  const fetchSuggestedDestinations = useCallback(async (location: Coordinate) => {
+    try {
+      const destinations = await suggestDestinations({currentLocation: location, pastRideHistory: []});
+      setSuggestedDestinations(destinations);
+    } catch (error: any) {
+      toast({
+        title: "Error fetching destinations",
+        description: error.message,
+        variant: "destructive",
+      });
+      console.error('Error fetching destinations:', error);
+    }
+  }, [suggestDestinations, toast]);
 
   useEffect(() => {
     const fetchCurrentLocation = async () => {
@@ -42,34 +57,20 @@ export default function Home() {
     fetchSourceAddress();
   }, [source]);
 
-  useEffect(() => {
-    const fetchSuggestedDestinations = async () => {
-      if (source) {
-        try {
-          const destinations = await suggestDestinations({currentLocation: source, pastRideHistory: []});
-          setSuggestedDestinations(destinations);
-        } catch (error: any) {
-          toast({
-            title: "Error fetching destinations",
-            description: error.message,
-            variant: "destructive",
-          });
-          console.error('Error fetching destinations:', error);
-        }
-      }
-    };
-
-    fetchSuggestedDestinations();
-  }, [source, toast]);
-
   const handleDestinationChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const destinationName = event.target.value;
-    // Placeholder: Geocode the destination name to coordinates
-    const newDestination: Coordinate = {lat: 8.5241, lng: 76.9366};
-    setDestination(newDestination);
+    setDestinationInput(destinationName);
 
-    const destinationAddress = await getAddressForCoordinate(newDestination);
-    setDestinationAddress(destinationAddress);
+    if (source) {
+      // Placeholder: Geocode the destination name to coordinates
+      const newDestination: Coordinate = {lat: 8.5241, lng: 76.9366};
+      setDestination(newDestination);
+
+      const destinationAddress = await getAddressForCoordinate(newDestination);
+      setDestinationAddress(destinationAddress);
+
+      fetchSuggestedDestinations(source);
+    }
   };
 
   useEffect(() => {
@@ -122,7 +123,14 @@ export default function Home() {
                 id="destination"
                 placeholder="Enter destination"
                 onChange={handleDestinationChange}
+                value={destinationInput}
+                list="destinationSuggestions"
               />
+              <datalist id="destinationSuggestions">
+                {suggestedDestinations.map((dest, index) => (
+                  <option key={index} value={dest.name} />
+                ))}
+              </datalist>
             </div>
             {fare !== null && (
               <div className="grid gap-2">
@@ -136,16 +144,6 @@ export default function Home() {
               </div>
             )}
             <Button onClick={bookCab}>Book Cab <Map className="ml-2"/></Button>
-            {suggestedDestinations.length > 0 && (
-              <div className="grid gap-2">
-                <label>Suggested Destinations</label>
-                <ul>
-                  {suggestedDestinations.map((dest, index) => (
-                    <li key={index}>{dest.name}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </CardContent>
         </Card>
         <Link href="/admin">
@@ -155,5 +153,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
