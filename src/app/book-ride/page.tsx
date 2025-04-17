@@ -40,8 +40,7 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [showMenu, setShowMenu] = useState(false); // State for dropdown menu
-
+    
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -239,38 +238,13 @@ export default function BookRidePage() {
 
     
 
-    const toggleMenu = () => {
-        setShowMenu((prevShowMenu) => !prevShowMenu);
-    };
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
-            <div className="absolute top-4 right-4 flex items-center space-x-2">
-                <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="secondary" className="rounded-full p-2">
-                            <Home className="mr-2" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {isAuthenticated ? (
-                            <DropdownMenuItem onClick={handleLogout}>
-                                <User className="mr-2" />
-                                Logout
-                            </DropdownMenuItem>
-                        ) : (
-                            <DropdownMenuItem onClick={() => router.push('/login')}>
-                                <User className="mr-2" />
-                                Login
-                            </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem onClick={() => router.push('/admin')}>
-                            Admin Portal
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+            <Button onClick={() => router.push('/admin')} className="absolute top-4 right-4">
+                Admin
+            </Button>
+
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
