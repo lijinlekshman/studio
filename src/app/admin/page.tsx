@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit, Trash, Map, Plus, Car, User, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -611,4 +613,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
