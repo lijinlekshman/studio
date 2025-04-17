@@ -40,7 +40,8 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    
+    const [showMenu, setShowMenu] = useState(false);
+
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
