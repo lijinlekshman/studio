@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, Save, ArrowLeft } from 'lucide-react';
+import { Edit, Save, ArrowLeft, Calendar } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 const UserDashboardPage: React.FC = () => {
@@ -29,6 +29,15 @@ const UserDashboardPage: React.FC = () => {
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
     const { toast } = useToast();
+    const [activeMenu, setActiveMenu] = useState('my-profile'); // Default active menu
+
+    // Placeholder data for booking history
+    const [bookingHistory, setBookingHistory] = useState([
+        { id: 'past1', date: '2024-05-01', source: 'Kollam', destination: 'Trivandrum', status: 'completed' },
+        { id: 'past2', date: '2024-05-15', source: 'Punalur', destination: 'Kottarakkara', status: 'completed' },
+        { id: 'future1', date: '2024-07-01', source: 'Kollam', destination: 'Trivandrum', status: 'scheduled' },
+    ]);
+
 
     useEffect(() => {
         if (!mobileNumber) {
@@ -109,43 +118,10 @@ const UserDashboardPage: React.FC = () => {
         setIsEditing(false);
     };
 
-    return (
-        <div className="flex h-screen bg-gray-100">
-            {/* Left Menu */}
-            <div className="w-64 bg-gray-200 p-4">
-                <nav>
-                    <Link href="/" className="block py-2 text-blue-600 hover:text-blue-800">
-                        <ArrowLeft className="mr-2 inline-block" /> Back to Home
-                    </Link>
-                    <hr className="my-4" />
-                    <ul className="space-y-2">
-                        <li>
-                            <a href="#" className="block py-2 hover:bg-gray-300 rounded">
-                                My Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="block py-2 hover:bg-gray-300 rounded">
-                                Booking History
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="block py-2 hover:bg-gray-300 rounded">
-                                Payment Methods
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" className="block py-2 hover:bg-gray-300 rounded">
-                                Settings
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-
-            {/* Main Content */}
-            <main className="flex-1 p-4">
-                <div className="max-w-4xl mx-auto">
+    const renderContent = () => {
+        switch (activeMenu) {
+            case 'my-profile':
+                return (
                     <Card>
                         <CardHeader>
                             <CardTitle>User Profile</CardTitle>
@@ -238,6 +214,125 @@ const UserDashboardPage: React.FC = () => {
                             )}
                         </CardContent>
                     </Card>
+                );
+            case 'booking-history':
+                return (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Booking History</CardTitle>
+                            <CardDescription>
+                                Here are your past and upcoming bookings.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ScrollArea>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Source</TableHead>
+                                            <TableHead>Destination</TableHead>
+                                            <TableHead>Status</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {bookingHistory.map((booking) => (
+                                            <TableRow key={booking.id}>
+                                                <TableCell>{booking.date}</TableCell>
+                                                <TableCell>{booking.source}</TableCell>
+                                                <TableCell>{booking.destination}</TableCell>
+                                                <TableCell>{booking.status}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </ScrollArea>
+                        </CardContent>
+                    </Card>
+                );
+            case 'payment-methods':
+                return (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Payment Methods</CardTitle>
+                            <CardDescription>Manage your payment methods.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p>Payment methods content here.</p>
+                        </CardContent>
+                    </Card>
+                );
+            case 'settings':
+                return (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Settings</CardTitle>
+                            <CardDescription>Configure your account settings.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p>Settings content here.</p>
+                        </CardContent>
+                    </Card>
+                );
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <div className="flex h-screen bg-gray-100">
+            {/* Left Menu */}
+            <div className="w-64 bg-gray-200 p-4">
+                <nav>
+                    <Link href="/" className="block py-2 text-blue-600 hover:text-blue-800">
+                        <ArrowLeft className="mr-2 inline-block" /> Back to Home
+                    </Link>
+                    <hr className="my-4" />
+                    <ul className="space-y-2">
+                        <li>
+                            <Button
+                                className="block py-2 hover:bg-gray-300 rounded w-full"
+                                onClick={() => setActiveMenu('my-profile')}
+                                variant={activeMenu === 'my-profile' ? 'default' : 'ghost'}
+                            >
+                                My Profile
+                            </Button>
+                        </li>
+                        <li>
+                            <Button
+                                className="block py-2 hover:bg-gray-300 rounded w-full"
+                                onClick={() => setActiveMenu('booking-history')}
+                                variant={activeMenu === 'booking-history' ? 'default' : 'ghost'}
+                            >
+                                Booking History <Calendar className="ml-2 inline-block" />
+                            </Button>
+                        </li>
+                        <li>
+                            <Button
+                                className="block py-2 hover:bg-gray-300 rounded w-full"
+                                onClick={() => setActiveMenu('payment-methods')}
+                                variant={activeMenu === 'payment-methods' ? 'default' : 'ghost'}
+                            >
+                                Payment Methods
+                            </Button>
+                        </li>
+                        <li>
+                            <Button
+                                className="block py-2 hover:bg-gray-300 rounded w-full"
+                                onClick={() => setActiveMenu('settings')}
+                                variant={activeMenu === 'settings' ? 'default' : 'ghost'}
+                            >
+                                Settings
+                            </Button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            {/* Main Content */}
+            <main className="flex-1 p-4">
+                <div className="max-w-4xl mx-auto">
+                    {renderContent()}
 
                     <Card className="mt-6">
                         <CardHeader>
