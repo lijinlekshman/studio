@@ -23,6 +23,7 @@ import Image from 'next/image';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Placeholder data for cabs and fares
 const initialCabs = [
@@ -75,7 +76,7 @@ export default function AdminDashboard() {
       const [editedCabDriverName, setEditedCabDriverName] = useState('');
     const [editingFareId, setEditingFareId] = useState(null);
     const [editedFareVehicleType, setEditedFareVehicleType] = useState('');
-    const [editedFareBaseFare, setEditedFareBaseFare) = useState('');
+    const [editedFareBaseFare, setEditedFareBaseFare] = useState('');
     const [editedFarePerKmRate, setEditedFarePerKmRate] = useState('');
 
     useEffect(() => {
@@ -616,4 +617,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
