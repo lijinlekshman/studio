@@ -37,8 +37,8 @@ const initialFares = [
 ];
 
 const initialBookings = [
-    { id: '1', userId: '101', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop', mobileNumber: '9876543210' },
-    { id: '2', userId: '102', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi', mobileNumber: '8765432190' },
+    { id: '1', userId: '101', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop', mobileNumber: '9876543210', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
+    { id: '2', userId: '102', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi', mobileNumber: '8765432190', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
 ];
 
 
@@ -464,6 +464,8 @@ export default function AdminDashboard() {
                         <TableHead>Source</TableHead>
                         <TableHead>Destination</TableHead>
                         <TableHead>Fare</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Time</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -475,6 +477,8 @@ export default function AdminDashboard() {
                           <TableCell>{booking.source}</TableCell>
                           <TableCell>{booking.destination}</TableCell>
                           <TableCell>{booking.fare}</TableCell>
+                          <TableCell>{booking.date}</TableCell>
+                          <TableCell>{booking.time}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end">
                               <Button variant="ghost" size="icon" onClick={() => handleViewBooking(booking)}>
