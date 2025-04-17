@@ -43,6 +43,12 @@ export default function BookRidePage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
 
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
         useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
         if (typeof window !== 'undefined') {
@@ -245,25 +251,23 @@ export default function BookRidePage() {
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
             <div className="absolute top-4 right-4 flex items-center space-x-2">
-                 <Button variant="secondary" className="rounded-full p-2" onClick={toggleMenu}>
-                    <Home className="mr-2" />
-                </Button>
-
-                 {showMenu && (
-                    <div className="flex flex-col bg-white border rounded-md shadow-md absolute top-12 right-0 z-10">
-                         <Link href="/login">
-                             <Button variant="ghost" className="justify-start">
-                                 <User className="mr-2" /> Login
-                             </Button>
-                         </Link>
-                         <Link href="/admin">
-                             <Button variant="ghost" className="justify-start">
-                                 <Menu className="mr-2" /> Admin Portal
-                             </Button>
-                         </Link>
-                     </div>
-                 )}
-
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="secondary" className="rounded-full p-2">
+                            <Home className="mr-2" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.push('/login')}>
+                            <User className="mr-2" />
+                            Login
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push('/admin')}>
+                            <Menu className="mr-2" />
+                            Admin Portal
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
