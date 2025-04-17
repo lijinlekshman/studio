@@ -40,6 +40,7 @@ export default function Home() {
           <p className="text-md md:text-lg text-white mt-2">
             Your trusted partner for safe and comfortable rides.
           </p>
+         
           <Link href="/book-ride">
           <Button className="mt-8">
             Book a Cab <Map className="ml-2" />
@@ -56,4 +57,3 @@ export default function Home() {
     </div>
   );
 }
-
