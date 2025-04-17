@@ -188,7 +188,8 @@ export default function Home() {
            localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
 
             // Redirect to user dashboard with booking details
-            router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
+            //router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
+            router.push(`/otp?mobileNumber=${mobileNumber}`);
 
         } else {
             toast({
@@ -360,4 +361,3 @@ export default function Home() {
     </div>
   );
 }
-
