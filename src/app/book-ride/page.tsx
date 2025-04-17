@@ -40,6 +40,7 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showMenu, setShowMenu] = useState(false); // State for dropdown menu
 
 
     useEffect(() => {
@@ -236,6 +237,12 @@ export default function BookRidePage() {
         }
     };
 
+    
+
+    const toggleMenu = () => {
+        setShowMenu(!showMenu);
+    };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
@@ -247,10 +254,17 @@ export default function BookRidePage() {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => router.push('/login')}>
-                            <User className="mr-2" />
-                            Login
-                        </DropdownMenuItem>
+                        {isAuthenticated ? (
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <User className="mr-2" />
+                                Logout
+                            </DropdownMenuItem>
+                        ) : (
+                            <DropdownMenuItem onClick={() => router.push('/login')}>
+                                <User className="mr-2" />
+                                Login
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={() => router.push('/admin')}>
                             Admin Portal
                         </DropdownMenuItem>
@@ -393,4 +407,6 @@ export default function BookRidePage() {
         </div>
     );
 }
+
+
 
