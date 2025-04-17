@@ -48,6 +48,7 @@ export default function Home() {
   const router = useRouter();
   const [selectedSourceValue, setSelectedSourceValue] = useState<string | null>(null);
   const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
+   const [userId, setUserId] = useState('');
 
   const fetchSuggestedSources = useCallback(async () => {
     try {
@@ -160,32 +161,41 @@ export default function Home() {
     setDestinationAddress(address);
   };
 
-  const bookCab = () => {
-    if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue) {
-      // Store booking details
-      const bookingDetails = {
-        mobileNumber: mobileNumber,
-        source: selectedSourceValue,
-        destination: selectedDestinationValue,
-        cabType: vehicleType,
-        fare: fare.toFixed(2),
-      };
+    const generateUniqueId = () => {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    };
 
-      // Redirect to OTP verification page with booking details as query parameters
-      // const params = new URLSearchParams(bookingDetails);
-      // router.push(`/otp?${params.toString()}`);
-          localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
+    const bookCab = () => {
+        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && userId) {
+            // Store booking details
+            const newBooking = {
+                id: generateUniqueId(),
+                mobileNumber: mobileNumber,
+                userId: userId,
+                source: selectedSourceValue,
+                destination: selectedDestinationValue,
+                cabModel: vehicleType,
+                fare: fare.toFixed(2),
+                driverName: 'Anoop', // Placeholder
+            };
 
-          router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
-    } else {
-      toast({
-        title: "Error Booking Cab",
-        description: "Please select both source and destination, and enter your mobile number.",
-        variant: "destructive",
-      });
-    }
-  };
+            // Save booking details to local storage
 
+            let existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            existingBookings.push(newBooking);
+            localStorage.setItem('bookings', JSON.stringify(existingBookings));
+
+            // Redirect to user dashboard with booking details
+            router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
+
+        } else {
+            toast({
+                title: "Error Booking Cab",
+                description: "Please select both source and destination, and enter your mobile number and User ID.",
+                variant: "destructive",
+            });
+        }
+    };
 
   const handleBookCabClick = () => {
     if (selectedSourceValue && selectedDestinationValue) {
@@ -245,6 +255,17 @@ export default function Home() {
                 required
               />
             </div>
+             <div className="grid gap-2">
+                  <label htmlFor="userId">User ID</label>
+                  <Input
+                      type="text"
+                      id="userId"
+                      placeholder="Enter User ID"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                      required
+                  />
+              </div>
            
            <div className="grid gap-2">
                 <label htmlFor="source">Source</label>
@@ -330,11 +351,10 @@ export default function Home() {
                 />
               </div>
             )}
-            <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber }>Book Cab <Map className="ml-2"/></Button>
+            <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !userId}>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
       </main>
     </div>
   );
 }
-

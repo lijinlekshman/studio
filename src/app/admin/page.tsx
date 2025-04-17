@@ -37,15 +37,21 @@ const initialFares = [
 ];
 
 const initialBookings = [
-    { id: '1', userId: '101', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop' },
-    { id: '2', userId: '102', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi' },
+    { id: '1', userId: '101', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop', mobileNumber: '9876543210' },
+    { id: '2', userId: '102', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi', mobileNumber: '8765432190' },
 ];
 
 
 export default function AdminDashboard() {
   const [cabs, setCabs] = useState(initialCabs);
   const [fares, setFares] = useState(initialFares);
-  const [bookings, setBookings] = useState(initialBookings);
+  const [bookings, setBookings] = useState(() => {
+        const storedBookings = localStorage.getItem('bookings');
+        return storedBookings ? JSON.parse(storedBookings) : initialBookings;
+    });
+    useEffect(() => {
+        localStorage.setItem('bookings', JSON.stringify(bookings));
+    }, [bookings]);
   const [isAddCabDialogOpen, setIsAddCabDialogOpen] = useState(false);
   const [newCabModel, setNewCabModel] = useState('');
   const [newCabLicensePlate, setNewCabLicensePlate] = useState('');
@@ -247,10 +253,20 @@ export default function AdminDashboard() {
     { name: 'SUV', bookings: bookings.filter(b => b.cabModel === 'SUV').length },
   ];
 
+    const handleAddBooking = (newBooking: any) => {
+        setBookings([...bookings, newBooking]);
+        toast({
+            title: "New Booking Added",
+            description: `A new booking from ${newBooking.source} to ${newBooking.destination} has been added.`,
+        });
+    };
+
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          
           <h1 className="text-3xl font-bold text-gray-900">
             Let'sGo Rides Admin Dashboard
           </h1>
@@ -510,6 +526,7 @@ export default function AdminDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>Mobile Number</TableHead>
                         <TableHead>User ID</TableHead>
                         <TableHead>Source</TableHead>
                         <TableHead>Destination</TableHead>
@@ -520,6 +537,7 @@ export default function AdminDashboard() {
                     <TableBody>
                       {bookings.map((booking) => (
                         <TableRow key={booking.id}>
+                            <TableCell>{booking.mobileNumber}</TableCell>
                           <TableCell>{booking.userId}</TableCell>
                           <TableCell>{booking.source}</TableCell>
                           <TableCell>{booking.destination}</TableCell>
@@ -564,6 +582,7 @@ export default function AdminDashboard() {
           </DialogHeader>
           {selectedBooking && (
             <>
+                <p>Mobile Number: {selectedBooking.mobileNumber}</p>
               <p>User ID: {selectedBooking.userId}</p>
               <p>Source: {selectedBooking.source}</p>
               <p>Destination: {selectedBooking.destination}</p>
