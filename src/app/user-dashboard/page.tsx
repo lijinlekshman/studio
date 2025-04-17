@@ -358,6 +358,7 @@ const UserDashboardPage: React.FC = () => {
                                     <p><strong>Destination:</strong> {bookingDetails.destination}</p>
                                     <p><strong>Cab Type:</strong> {bookingDetails.cabModel}</p>
                                     <p><strong>Fare:</strong> ₹{bookingDetails.fare}</p>
+                                    <p><strong>Driver Name:</strong> {bookingDetails.driverName}</p>
                                     <Button onClick={toggleMap}>
                                         {showMap ? 'Hide Map' : 'Track Cab'}
                                     </Button>
@@ -393,3 +394,4 @@ const UserDashboardPage: React.FC = () => {
 };
 
 export default UserDashboardPage;
+
