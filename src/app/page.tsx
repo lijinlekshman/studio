@@ -214,7 +214,27 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
+      {/* Landing Page Section */}
+      <div
+        className="relative w-full h-screen flex items-center justify-center bg-cover bg-center"
+        style={{ backgroundImage: "url('/Images/taxi-bg.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-black opacity-40"></div>
+        <div className="relative z-10 text-center">
+          <Image src="/Images/LetsGo-W-slogan.png" width={400} height={100} alt="Let'sGo Rides" />
+          <h1 className="text-3xl md:text-5xl font-bold text-white mt-4">
+            Book a Ride with Let'sGo
+          </h1>
+          <p className="text-md md:text-lg text-white mt-2">
+            Your trusted partner for safe and comfortable rides.
+          </p>
+          <Button onClick={() => document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' })} className="mt-8">
+            Book a Cab <Map className="ml-2" />
+          </Button>
+        </div>
+      </div>
+
+      <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
         <div className="absolute top-4 right-4 flex items-center space-x-2">
 
           <DropdownMenu>
@@ -241,7 +261,6 @@ export default function Home() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <Image src="/Images/LetsGo-W-slogan.png" width={400} height={100} alt="Let'sGo Rides"/>
 
         <Card className="w-full max-w-md mt-10">
           <CardHeader>
