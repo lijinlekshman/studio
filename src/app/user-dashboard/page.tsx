@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Image from 'next/image';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const UserDashboardPage: React.FC = () => {
     const searchParams = useSearchParams();
@@ -63,9 +64,10 @@ const UserDashboardPage: React.FC = () => {
                                 </Button>
                                 {showMap && (
                                     <div style={{ width: '100%', height: '400px' }}>
+                                        <ScrollArea>
                                         {/* Replace with actual Google Maps integration */}
                                         <iframe
-                                            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15764.868434407826!2d76.9127246!3d9.0344791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1718956825276!5m2!1sen!2sin"
+                                            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15764.868434407826!2d76.9127246!3d9.0344791!2m3!1f0!2f0!3f0!3m2!1sen!2sin!4v1718956825276!5m2!1sen!2sin"
                                             width="100%"
                                             height="400"
                                             style={{ border: 0 }}
@@ -73,6 +75,7 @@ const UserDashboardPage: React.FC = () => {
                                             loading="lazy"
                                             referrerPolicy="no-referrer-when-downgrade"
                                         />
+                                        </ScrollArea>
                                         <p>Cab Location: Placeholder - Punalur, Kerala</p>
                                         <p>Vehicle Number: KL01AB1234</p>
                                         <p>Driver Name: Anoop</p>
