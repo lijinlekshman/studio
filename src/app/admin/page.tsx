@@ -1,6 +1,3 @@
-'use client';
-
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit, Trash, Map, Plus, Car, User, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -563,7 +560,7 @@ export default function AdminDashboard() {
                 <CardDescription>A summary of bookings by vehicle type.</CardDescription>
               </CardHeader>
               <CardContent>
-                <BarChart width={500} height={300} data={bookingData}>
+                <BarChart width={400} height={300} data={bookingData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
