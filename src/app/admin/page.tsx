@@ -44,10 +44,13 @@ const initialBookings = [
 export default function AdminDashboard() {
   const [cabs, setCabs] = useState(initialCabs);
   const [fares, setFares] = useState(initialFares);
-  const [bookings, setBookings] = useState(() => {
+  const [bookings, setBookings] = useState(initialBookings);
+    useEffect(() => {
         const storedBookings = localStorage.getItem('bookings');
-        return storedBookings ? JSON.parse(storedBookings) : initialBookings;
-    });
+        if (storedBookings) {
+            setBookings(JSON.parse(storedBookings));
+        }
+    }, []);
     useEffect(() => {
         localStorage.setItem('bookings', JSON.stringify(bookings));
     }, [bookings]);
@@ -72,7 +75,7 @@ export default function AdminDashboard() {
       const [editedCabDriverName, setEditedCabDriverName] = useState('');
     const [editingFareId, setEditingFareId] = useState(null);
     const [editedFareVehicleType, setEditedFareVehicleType] = useState('');
-    const [editedFareBaseFare, setEditedFareBaseFare] = useState('');
+    const [editedFareBaseFare, setEditedFareBaseFare) = useState('');
     const [editedFarePerKmRate, setEditedFarePerKmRate] = useState('');
 
     useEffect(() => {
@@ -613,3 +616,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
