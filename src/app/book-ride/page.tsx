@@ -19,7 +19,7 @@ import {calculateFare} from '@/ai/flows/calculate-fare';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 import { Home, User } from "lucide-react";
-
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 
 export default function BookRidePage() {
@@ -381,3 +381,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
