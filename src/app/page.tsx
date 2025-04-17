@@ -157,9 +157,22 @@ export default function Home() {
   };
 
   const bookCab = () => {
-    if (source && destination && mobileNumber) {
-      // Redirect to OTP verification page with mobile number as query parameter
-      router.push(`/otp?mobileNumber=${mobileNumber}`);
+    if (source && destination && mobileNumber && fare) {
+      // Store booking details
+      const bookingDetails = {
+        mobileNumber: mobileNumber,
+        source: sourceAddress?.formattedAddress || 'Unknown Source',
+        destination: destinationAddress?.formattedAddress || 'Unknown Destination',
+        cabType: vehicleType,
+        fare: fare.toFixed(2),
+      };
+
+      // Redirect to OTP verification page with booking details as query parameters
+      // const params = new URLSearchParams(bookingDetails);
+      // router.push(`/otp?${params.toString()}`);
+          localStorage.setItem('bookingDetails', JSON.stringify(bookingDetails));
+
+          router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
     } else {
       toast({
         title: "Error Booking Cab",
