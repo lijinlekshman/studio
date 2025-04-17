@@ -20,6 +20,7 @@ import Image from 'next/image';
 import {calculateFare} from '@/ai/flows/calculate-fare';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
+import { Menu } from "lucide-react";
 
 const INR_CONVERSION_RATE = 83;
 
@@ -67,11 +68,8 @@ export default function Home() {
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <Avatar>
-                                <AvatarImage src="/assets/user.png" alt="@shadcn" />
-                                <AvatarFallback>SC</AvatarFallback>
-                            </Avatar>
+                       <Button variant="ghost" className="h-8 w-8 p-0">
+                           <Menu className="h-4 w-4"/>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -120,3 +118,4 @@ export default function Home() {
     </div>
   );
 }
+
