@@ -165,7 +165,7 @@ export default function BookRidePage() {
         setDestination({ lat: selectedDestination.lat, lng: selectedDestination.lng });
         setDestinationInput(selectedDestination.name);
         setSelectedDestinationValue(selectedDestination.name);
-        const address = await getAddressForCoordinate({ lat: selectedDestination.lat, lng: selectedDestination.lng });
+        const address = await getAddressForCoordinate({ lat: selectedDestination.lat, lng: selectedSource.lng });
         setDestinationAddress(address);
     };
 
@@ -349,7 +349,7 @@ export default function BookRidePage() {
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="vehicleType">Vehicle Type</label>
-                            <Select onValueChange={setVehicleType} defaultValue={vehicleType}>
+                            <Select onValueChange={setVehicleType} defaultValue={vehicleType} required>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select vehicle type" />
                                 </SelectTrigger>
@@ -392,3 +392,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
