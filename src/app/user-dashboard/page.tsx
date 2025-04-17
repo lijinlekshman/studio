@@ -12,6 +12,7 @@ const UserDashboardPage: React.FC = () => {
     const router = useRouter();
     const mobileNumber = searchParams.get('mobileNumber');
     const [bookingDetails, setBookingDetails] = useState<any>(null);
+    const [showMap, setShowMap] = useState(false);
 
     useEffect(() => {
         if (!mobileNumber) {
@@ -33,6 +34,10 @@ const UserDashboardPage: React.FC = () => {
         return <div>Redirecting...</div>;
     }
 
+    const toggleMap = () => {
+        setShowMap(!showMap);
+    };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center">
@@ -53,7 +58,26 @@ const UserDashboardPage: React.FC = () => {
                                 <p><strong>Destination:</strong> {bookingDetails.destination}</p>
                                 <p><strong>Cab Type:</strong> {bookingDetails.cabType}</p>
                                 <p><strong>Fare:</strong> ₹{bookingDetails.fare}</p>
-                                <Button onClick={() => alert('Tracking feature not implemented yet.')}>Track Cab</Button>
+                                <Button onClick={toggleMap}>
+                                    {showMap ? 'Hide Map' : 'Track Cab'}
+                                </Button>
+                                {showMap && (
+                                    <div style={{ width: '100%', height: '400px' }}>
+                                        {/* Replace with actual Google Maps integration */}
+                                        <iframe
+                                            src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d15764.868434407826!2d76.9127246!3d9.0344791!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1718956825276!5m2!1sen!2sin"
+                                            width="100%"
+                                            height="400"
+                                            style={{ border: 0 }}
+                                            allowFullScreen={true}
+                                            loading="lazy"
+                                            referrerPolicy="no-referrer-when-downgrade"
+                                        />
+                                        <p>Cab Location: Placeholder - Punalur, Kerala</p>
+                                        <p>Vehicle Number: KL01AB1234</p>
+                                        <p>Driver Name: Anoop</p>
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <p>No bookings found for this mobile number.</p>
@@ -69,5 +93,3 @@ const UserDashboardPage: React.FC = () => {
 };
 
 export default UserDashboardPage;
-
-
