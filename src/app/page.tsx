@@ -34,6 +34,21 @@ export default function Home() {
 
   const {toast} = useToast();
   const router = useRouter();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        // Check if the user is authenticated (e.g., check for a token in local storage)
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('authToken');
+            setIsAuthenticated(!!token);
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        setIsAuthenticated(false);
+        router.push('/'); // Redirect to home after logout
+    };
 
 
 
@@ -46,7 +61,43 @@ export default function Home() {
       >
         <div className="absolute inset-0 bg-black opacity-40"></div>
         <div className="relative z-10 text-center">
+
           <Image src="/Images/LetsGo-W-slogan.png" width={400} height={100} alt="Let'sGo Rides" />
+           <div className="absolute top-4 right-4 flex items-center space-x-2">
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Avatar>
+                                <AvatarImage src="/assets/user.png" alt="@shadcn" />
+                                <AvatarFallback>SC</AvatarFallback>
+                            </Avatar>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                        {isAuthenticated ? (
+                            <>
+                                <DropdownMenuItem>
+                                    <Link href="/user-dashboard">User Dashboard</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href="/admin">Admin Portal</Link>
+                                </DropdownMenuItem>
+                            </>
+                        ) : (
+                            <>
+                                <DropdownMenuItem>
+                                    <Link href="/login">Admin Portal</Link>
+                                </DropdownMenuItem>
+                                 <DropdownMenuItem>
+                                    <Link href="/login">Login</Link>
+                                </DropdownMenuItem>
+                            </>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
           <h1 className="text-3xl md:text-5xl font-bold text-white mt-4">
             Book a Ride with Let'sGo
           </h1>

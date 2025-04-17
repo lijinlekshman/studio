@@ -49,6 +49,22 @@ export default function BookRidePage() {
     const [selectedSourceValue, setSelectedSourceValue] = useState<string | null>(null);
     const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
     const [userId, setUserId] = useState('');
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        // Check if the user is authenticated (e.g., check for a token in local storage)
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('authToken');
+            setIsAuthenticated(!!token);
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        setIsAuthenticated(false);
+        router.push('/'); // Redirect to home after logout
+    };
+
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
@@ -239,17 +255,26 @@ export default function BookRidePage() {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end" forceMount>
-                        <DropdownMenuItem>
-                            <Link href="/admin">Admin Portal</Link></DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <Link href="/login">Login</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            Profile
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            Logout
-                        </DropdownMenuItem>
+                        {isAuthenticated ? (
+                            <>
+                                <DropdownMenuItem>
+                                    <Link href="/user-dashboard">User Dashboard</Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href="/admin">Admin Portal</Link>
+                                </DropdownMenuItem>
+                            </>
+                        ) : (
+                            <>
+                                <DropdownMenuItem>
+                                    <Link href="/login">Admin Portal</Link>
+                                </DropdownMenuItem>
+                                 <DropdownMenuItem>
+                                    <Link href="/login">Login</Link>
+                                </DropdownMenuItem>
+                            </>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
