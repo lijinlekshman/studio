@@ -46,9 +46,25 @@ const UserDashboardPage: React.FC = () => {
     const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
     const { toast } = useToast();
     const [activeMenu, setActiveMenu] = useState('my-profile'); // Default active menu
+     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     // Placeholder data for booking history
     const [bookingHistory, setBookingHistory] = useState<any[]>([]);
+
+     useEffect(() => {
+        // Check if the user is authenticated (e.g., check for a token in local storage)
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('authToken');
+            setIsAuthenticated(!!token);
+        }
+    }, []);
+
+        const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        setIsAuthenticated(false);
+        router.push('/'); // Redirect to home after logout
+    };
+
 
     useEffect(() => {
         if (!mobileNumber) {
@@ -415,6 +431,8 @@ const UserDashboardPage: React.FC = () => {
                                             <DropdownMenuItem>
                                                 <Link href="/">Home</Link>
                                             </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+
                                             <DropdownMenuItem>
                                                 <Link href="/login">Login</Link>
                                             </DropdownMenuItem>
@@ -480,4 +498,5 @@ const UserDashboardPage: React.FC = () => {
 };
 
 export default UserDashboardPage;
+
 
