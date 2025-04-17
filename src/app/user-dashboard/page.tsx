@@ -12,6 +12,14 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Edit, Save, ArrowLeft, Calendar } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 
 const UserDashboardPage: React.FC = () => {
     const searchParams = useSearchParams();
