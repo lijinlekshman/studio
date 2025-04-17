@@ -185,6 +185,8 @@ export default function Home() {
             existingBookings.push(newBooking);
             localStorage.setItem('bookings', JSON.stringify(existingBookings));
 
+           localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
+
             // Redirect to user dashboard with booking details
             router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
 
@@ -358,3 +360,4 @@ export default function Home() {
     </div>
   );
 }
+

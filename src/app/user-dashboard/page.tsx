@@ -21,7 +21,7 @@ const UserDashboardPage: React.FC = () => {
             return;
         }
 
-        const storedBookingDetails = localStorage.getItem('bookingDetails');
+       const storedBookingDetails = localStorage.getItem('bookingDetails');
         if (storedBookingDetails) {
             try {
                 setBookingDetails(JSON.parse(storedBookingDetails));
@@ -31,8 +31,8 @@ const UserDashboardPage: React.FC = () => {
         }
     }, [mobileNumber, router]);
 
-    if (!mobileNumber) {
-        return <div>Redirecting...</div>;
+    if (!mobileNumber || !bookingDetails) {
+        return <div>Loading...</div>;
     }
 
     const toggleMap = () => {
@@ -55,9 +55,10 @@ const UserDashboardPage: React.FC = () => {
                         {bookingDetails ? (
                             <>
                                 <p><strong>Mobile Number:</strong> {mobileNumber}</p>
+                                <p><strong>User ID:</strong> {bookingDetails.userId}</p>
                                 <p><strong>Source:</strong> {bookingDetails.source}</p>
                                 <p><strong>Destination:</strong> {bookingDetails.destination}</p>
-                                <p><strong>Cab Type:</strong> {bookingDetails.cabType}</p>
+                                <p><strong>Cab Type:</strong> {bookingDetails.cabModel}</p>
                                 <p><strong>Fare:</strong> ₹{bookingDetails.fare}</p>
                                 <Button onClick={toggleMap}>
                                     {showMap ? 'Hide Map' : 'Track Cab'}
@@ -96,3 +97,4 @@ const UserDashboardPage: React.FC = () => {
 };
 
 export default UserDashboardPage;
+
