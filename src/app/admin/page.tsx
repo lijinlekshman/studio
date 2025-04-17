@@ -297,6 +297,7 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <ScrollArea className="h-[calc(100vh-150px)]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left Panel: Data Tables */}
           <div className="md:col-span-2 space-y-6">
@@ -587,6 +588,7 @@ export default function AdminDashboard() {
             </Card>
           </div>
         </div>
+          </ScrollArea>
       </main>
 
       <Dialog open={isPreviewDialogOpen} onOpenChange={() => setIsPreviewDialogOpen(false)}>
@@ -626,4 +628,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
