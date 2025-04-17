@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Edit, Save, ArrowLeft } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 const UserDashboardPage: React.FC = () => {
     const searchParams = useSearchParams();
@@ -25,6 +26,9 @@ const UserDashboardPage: React.FC = () => {
         address: 'Punalur, Kerala',
     });
     const [tempDetails, setTempDetails] = useState({ ...userDetails });
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         if (!mobileNumber) {
@@ -39,6 +43,11 @@ const UserDashboardPage: React.FC = () => {
             } catch (error) {
                 console.error('Error parsing booking details from localStorage:', error);
             }
+        }
+        // Load stored profile image from localStorage
+        const storedProfileImage = localStorage.getItem('profileImage');
+        if (storedProfileImage) {
+            setProfileImage(storedProfileImage);
         }
     }, [mobileNumber, router]);
 
@@ -74,6 +83,30 @@ const UserDashboardPage: React.FC = () => {
             ...prev,
             [name]: value,
         }));
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setNewProfileImage(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfileImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleUploadImage = () => {
+        if (newProfileImage) {
+            // Save the new profile image to localStorage
+            localStorage.setItem('profileImage', profileImage || '');
+            toast({
+                title: "Profile Image Updated",
+                description: "Your profile image has been updated successfully.",
+            });
+        }
+        setIsEditing(false);
     };
 
     return (
@@ -123,8 +156,11 @@ const UserDashboardPage: React.FC = () => {
                         <CardContent>
                             <div className="mb-4">
                                 <Avatar className="w-24 h-24">
-                                    <AvatarImage src="/assets/user.png" alt="User Avatar" />
-                                    <AvatarFallback>UG</AvatarFallback>
+                                    {profileImage ? (
+                                        <AvatarImage src={profileImage} alt="User Avatar" />
+                                    ) : (
+                                        <AvatarFallback>UG</AvatarFallback>
+                                    )}
                                 </Avatar>
                             </div>
 
@@ -163,11 +199,20 @@ const UserDashboardPage: React.FC = () => {
                                             required
                                         />
                                     </div>
+                                    <div>
+                                        <Label htmlFor="image">Upload Image</Label>
+                                        <Input
+                                            type="file"
+                                            id="image"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                        />
+                                    </div>
                                     <div className="flex justify-end gap-2">
                                         <Button variant="secondary" onClick={handleCancelClick}>
                                             Cancel
                                         </Button>
-                                        <Button onClick={handleSaveClick}>
+                                        <Button onClick={handleUploadImage}>
                                             <Save className="mr-2 h-4 w-4" /> Save
                                         </Button>
                                     </div>
