@@ -46,15 +46,22 @@ export default function AdminDashboard() {
   const [cabs, setCabs] = useState(initialCabs);
   const [fares, setFares] = useState(initialFares);
   const [bookings, setBookings] = useState(initialBookings);
+
     useEffect(() => {
-        const storedBookings = localStorage.getItem('bookings');
-        if (storedBookings) {
-            setBookings(JSON.parse(storedBookings));
+        if (typeof window !== 'undefined') {
+            const storedBookings = localStorage.getItem('bookings');
+            if (storedBookings) {
+                setBookings(JSON.parse(storedBookings));
+            }
         }
     }, []);
+
     useEffect(() => {
-        localStorage.setItem('bookings', JSON.stringify(bookings));
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+        }
     }, [bookings]);
+
   const [isAddCabDialogOpen, setIsAddCabDialogOpen] = useState(false);
   const [newCabModel, setNewCabModel] = useState('');
   const [newCabLicensePlate, setNewCabLicensePlate] = useState('');
@@ -81,11 +88,13 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
-        const token = localStorage.getItem('authToken');
-        if (token) {
-            setIsAuthenticated(true);
-        } else {
-            router.push('/login'); // Redirect to login if not authenticated
+        if (typeof window !== 'undefined') {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                setIsAuthenticated(true);
+            } else {
+                router.push('/login'); // Redirect to login if not authenticated
+            }
         }
     }, [router]);
 
@@ -617,3 +626,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

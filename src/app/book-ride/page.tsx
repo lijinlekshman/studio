@@ -181,11 +181,15 @@ export default function BookRidePage() {
 
             // Save booking details to local storage
 
-            let existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            let existingBookings = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('bookings') || '[]' : '[]');
             existingBookings.push(newBooking);
-            localStorage.setItem('bookings', JSON.stringify(existingBookings));
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('bookings', JSON.stringify(existingBookings));
+            }
 
-            localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
+            }
 
             // Redirect to user dashboard with booking details
             //router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);

@@ -53,18 +53,20 @@ const UserDashboardPage: React.FC = () => {
             return;
         }
 
-        const storedBookingDetails = localStorage.getItem('bookingDetails');
-        if (storedBookingDetails) {
-            try {
-                setBookingDetails(JSON.parse(storedBookingDetails));
-            } catch (error) {
-                console.error('Error parsing booking details from localStorage:', error);
+        if (typeof window !== 'undefined') {
+            const storedBookingDetails = localStorage.getItem('bookingDetails');
+            if (storedBookingDetails) {
+                try {
+                    setBookingDetails(JSON.parse(storedBookingDetails));
+                } catch (error) {
+                    console.error('Error parsing booking details from localStorage:', error);
+                }
             }
-        }
-        // Load stored profile image from localStorage
-        const storedProfileImage = localStorage.getItem('profileImage');
-        if (storedProfileImage) {
-            setProfileImage(storedProfileImage);
+            // Load stored profile image from localStorage
+            const storedProfileImage = localStorage.getItem('profileImage');
+            if (storedProfileImage) {
+                setProfileImage(storedProfileImage);
+            }
         }
     }, [mobileNumber, router]);
 
@@ -117,7 +119,9 @@ const UserDashboardPage: React.FC = () => {
     const handleUploadImage = () => {
         if (newProfileImage) {
             // Save the new profile image to localStorage
-            localStorage.setItem('profileImage', profileImage || '');
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('profileImage', profileImage || '');
+            }
             toast({
                 title: "Profile Image Updated",
                 description: "Your profile image has been updated successfully.",
@@ -233,7 +237,7 @@ const UserDashboardPage: React.FC = () => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ScrollArea>
+                            <ScrollArea className="w-full">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -394,4 +398,3 @@ const UserDashboardPage: React.FC = () => {
 };
 
 export default UserDashboardPage;
-
