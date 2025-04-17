@@ -18,7 +18,7 @@ import {
 import {calculateFare} from '@/ai/flows/calculate-fare';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
-import { Menu, Home } from "lucide-react";
+import { Menu, Home, User } from "lucide-react";
 
 
 
@@ -41,6 +41,7 @@ export default function BookRidePage() {
     const [email, setEmail] = useState('');
     const [userId, setUserId] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
         useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -236,18 +237,33 @@ export default function BookRidePage() {
         }
     };
 
+        const toggleMenu = () => {
+            setShowMenu(!showMenu);
+        };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
             <div className="absolute top-4 right-4 flex items-center space-x-2">
-                <Link href="/">
-                    <Button variant="secondary">
-                        <Home className="mr-2" />
-                        Home
-                    </Button>
-                </Link>
+                 <Button variant="secondary" className="rounded-full p-2" onClick={toggleMenu}>
+                    <Home className="mr-2" />
+                </Button>
 
-                
+                 {showMenu && (
+                    <div className="flex flex-col bg-white border rounded-md shadow-md absolute top-12 right-0 z-10">
+                         <Link href="/login">
+                             <Button variant="ghost" className="justify-start">
+                                 <User className="mr-2" /> Login
+                             </Button>
+                         </Link>
+                         <Link href="/admin">
+                             <Button variant="ghost" className="justify-start">
+                                 <Menu className="mr-2" /> Admin Portal
+                             </Button>
+                         </Link>
+                     </div>
+                 )}
+
             </div>
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
@@ -396,4 +412,5 @@ export default function BookRidePage() {
         </div>
     );
 }
+
 
