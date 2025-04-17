@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, Save, ArrowLeft, Calendar } from 'lucide-react';
+import { Edit, Save, ArrowLeft, Calendar, Menu } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import {
     Table,
@@ -20,7 +20,6 @@ import {
     TableHead,
     TableCell,
 } from "@/components/ui/table";
-import { Menu } from "lucide-react";
 
 
 const UserDashboardPage: React.FC = () => {
@@ -40,12 +39,9 @@ const UserDashboardPage: React.FC = () => {
     const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
     const { toast } = useToast();
     const [activeMenu, setActiveMenu] = useState('my-profile'); // Default active menu
-     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // Placeholder data for booking history
-    const [bookingHistory, setBookingHistory] = useState<any[]>([]);
-
-     useEffect(() => {
+    useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('authToken');
@@ -53,12 +49,11 @@ const UserDashboardPage: React.FC = () => {
         }
     }, []);
 
-        const handleLogout = () => {
+    const handleLogout = () => {
         localStorage.removeItem('authToken');
         setIsAuthenticated(false);
         router.push('/'); // Redirect to home after logout
     };
-
 
     useEffect(() => {
         if (!mobileNumber) {
@@ -466,4 +461,3 @@ const UserDashboardPage: React.FC = () => {
 };
 
 export default UserDashboardPage;
-

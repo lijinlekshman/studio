@@ -147,14 +147,14 @@ export default function AdminDashboard() {
           setEditedCabDriverName(cab.driverName);
     };
 
-  // Function to handle updating cab status (placeholder)
-  const handleUpdateCabStatus = (id: string, status: string) => {
-    setCabs(cabs.map(cab => cab.id === id ? { ...cab, status } : cab));
-    toast({
-      title: "Cab Status Updated",
-      description: `Cab status updated to ${status}.`,
-    });
-  };
+    // Function to handle updating cab status (placeholder)
+    const handleUpdateCabStatus = (id: string, status: string) => {
+        setCabs(cabs.map(cab => cab.id === id ? { ...cab, status } : cab));
+        toast({
+            title: "Cab Status Updated",
+            description: `Cab status updated to ${status}.`,
+        });
+    };
 
     const handleSaveCab = (id: string) => {
         setCabs(cabs.map(cab =>
@@ -167,34 +167,34 @@ export default function AdminDashboard() {
         });
     };
 
-  // Function to handle adding a new fare
-  const handleAddFare = () => {
-    if (!newFareVehicleType || !newFareBaseFare || !newFarePerKmRate) {
-      toast({
-        title: "Error Adding Fare",
-        description: "Please fill in all fare details.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Function to handle adding a new fare
+    const handleAddFare = () => {
+        if (!newFareVehicleType || !newFareBaseFare || !newFarePerKmRate) {
+            toast({
+                title: "Error Adding Fare",
+                description: "Please fill in all fare details.",
+                variant: "destructive",
+            });
+            return;
+        }
 
-    const newFare = {
-      id: String(fares.length + 1),
-      vehicleType: newFareVehicleType,
-      baseFare: parseFloat(newFareBaseFare),
-      perKmRate: parseFloat(newFarePerKmRate),
+        const newFare = {
+            id: String(fares.length + 1),
+            vehicleType: newFareVehicleType,
+            baseFare: parseFloat(newFareBaseFare),
+            perKmRate: parseFloat(newFarePerKmRate),
+        };
+
+        setFares([...fares, newFare]);
+        setIsAddFareDialogOpen(false);
+        setNewFareVehicleType('');
+        setNewFareBaseFare('');
+        setNewFarePerKmRate('');
+        toast({
+            title: "Fare Added",
+            description: `Fare for ${newFare.vehicleType} has been added successfully.`,
+        });
     };
-
-    setFares([...fares, newFare]);
-    setIsAddFareDialogOpen(false);
-    setNewFareVehicleType('');
-    setNewFareBaseFare('');
-    setNewFarePerKmRate('');
-    toast({
-      title: "Fare Added",
-      description: `Fare for ${newFare.vehicleType} has been added successfully.`,
-    });
-  };
 
   // Function to handle deleting a fare
   const handleDeleteFare = (id: string) => {
@@ -264,11 +264,11 @@ export default function AdminDashboard() {
         setIsBookingDialogOpen(true);
     };
 
-  // Chart data (example)
-  const bookingData = [
-    { name: 'Sedan', bookings: bookings.filter(b => b.cabModel === 'Sedan').length },
-    { name: 'SUV', bookings: bookings.filter(b => b.cabModel === 'SUV').length },
-  ];
+    // Chart data (example)
+    const bookingData = [
+        { name: 'Sedan', bookings: bookings.filter(b => b.cabModel === 'Sedan').length },
+        { name: 'SUV', bookings: bookings.filter(b => b.cabModel === 'SUV').length },
+    ];
 
     const handleAddBooking = (newBooking: any) => {
         setBookings([...bookings, newBooking]);
@@ -632,4 +632,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-

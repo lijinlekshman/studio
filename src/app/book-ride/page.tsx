@@ -150,6 +150,9 @@ export default function BookRidePage() {
         estimateFare();
     }, [source, destination, vehicleType]);
 
+    const [sourceInput, setSourceInput] = useState('');
+    const [destinationInput, setDestinationInput] = useState('');
+
     const handleSourceSelect = async (selectedSource: any) => {
         setSource({ lat: selectedSource.lat, lng: selectedSource.lng });
         setSourceInput(selectedSource.name);
@@ -305,7 +308,7 @@ export default function BookRidePage() {
                                 if (selectedSource) {
                                     handleSourceSelect(selectedSource);
                                 }
-                            }} required value={selectedSourceValue || ""}>
+                            }} required value={selectedSourceValue || ""} >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select source" />
                                 </SelectTrigger>
@@ -389,4 +392,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
