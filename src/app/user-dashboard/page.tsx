@@ -147,7 +147,7 @@ const UserDashboardPage: React.FC = () => {
                                     {profileImage ? (
                                         <AvatarImage src={profileImage} alt="User Avatar" />
                                     ) : (
-                                        <AvatarFallback>UG</AvatarFallback>
+                                        <AvatarFallback>{userDetails.name.charAt(0).toUpperCase()}{userDetails.name.split(' ')[1].charAt(0).toUpperCase()}</AvatarFallback>
                                     )}
                                 </Avatar>
                             </div>
