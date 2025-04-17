@@ -230,6 +230,9 @@ export default function Home() {
               <DropdownMenuItem>
                 <Link href="/admin">Admin Portal</Link></DropdownMenuItem>
               <DropdownMenuItem>
+               <Link href="/login">Login</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem>
