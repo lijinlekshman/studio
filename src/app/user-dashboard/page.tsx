@@ -20,12 +20,6 @@ import {
     TableHead,
     TableCell,
 } from "@/components/ui/table";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Menu } from "lucide-react";
 
 
@@ -88,8 +82,7 @@ const UserDashboardPage: React.FC = () => {
                     });
                     setTempDetails({
                         name: parsedBookingDetails.userName || '', // Use userName from booking details
-                        email: parsedBookingDetails.email || '',   // Use email from booking details
-                        address: '', // Address is not available in booking details
+                        email: parsedBookingDetails.email || '',   // Address is not available in booking details
                     });
                 } catch (error) {
                     console.error('Error parsing booking details from localStorage:', error);
@@ -416,32 +409,7 @@ const UserDashboardPage: React.FC = () => {
             {/* Main Content */}
             <main className="flex-1 p-4">
                 <div className="max-w-4xl mx-auto">
-                    <div className="absolute top-4 right-4 flex items-center space-x-2">
-
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <Menu className="h-4 w-4"/>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56" align="end" forceMount>
-                               {
-                                        <>
-
-                                            <DropdownMenuItem>
-                                                <Link href="/">Home</Link>
-                                            </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-
-                                            <DropdownMenuItem>
-                                                <Link href="/login">Login</Link>
-                                            </DropdownMenuItem>
-                                        </>
-
-                                }
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                 
                     {renderContent()}
 
                     <Card className="mt-6">

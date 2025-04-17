@@ -15,21 +15,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import Image from 'next/image';
 import {calculateFare} from '@/ai/flows/calculate-fare';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 import { Menu } from "lucide-react";
 
-const INR_CONVERSION_RATE = 83;
 
-const countryCodes = [
-    { label: 'India (+91)', value: '+91' },
-    { label: 'USA (+1)', value: '+1' },
-    { label: 'UK (+44)', value: '+44' },
-    // Add more country codes as needed
-];
 
 export default function BookRidePage() {
     const [source, setSource] = useState<Coordinate | null>(null);
@@ -41,18 +32,15 @@ export default function BookRidePage() {
     const [suggestedSources, setSuggestedSources] = useState<any[]>([]);
     const [suggestedDestinations, setSuggestedDestinations] = useState<any[]>([]);
     const {toast} = useToast();
-    const [sourceInput, setSourceInput] = useState('');
-    const [destinationInput, setDestinationInput] = useState('');
     const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
     const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
-    const [countryCode, setCountryCode] = useState('+91'); // Default country code
     const router = useRouter();
     const [selectedSourceValue, setSelectedSourceValue] = useState<string | null>(null);
     const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
     const [userId, setUserId] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    useEffect(() => {
+        useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('authToken');
@@ -401,3 +389,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
