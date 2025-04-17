@@ -46,6 +46,8 @@ export default function Home() {
   const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
   const [countryCode, setCountryCode] = useState('+91'); // Default country code
   const router = useRouter();
+  const [selectedSourceValue, setSelectedSourceValue] = useState<string | null>(null);
+  const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
 
   const fetchSuggestedSources = useCallback(async () => {
     try {
@@ -145,6 +147,7 @@ export default function Home() {
     const handleSourceSelect = async (selectedSource: any) => {
     setSource({ lat: selectedSource.lat, lng: selectedSource.lng });
     setSourceInput(selectedSource.name);
+    setSelectedSourceValue(selectedSource.name);
     const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
     setSourceAddress(address);
   };
@@ -152,17 +155,18 @@ export default function Home() {
   const handleDestinationSelect = async (selectedDestination: any) => {
     setDestination({ lat: selectedDestination.lat, lng: selectedDestination.lng });
     setDestinationInput(selectedDestination.name);
+      setSelectedDestinationValue(selectedDestination.name);
     const address = await getAddressForCoordinate({ lat: selectedDestination.lat, lng: selectedDestination.lng });
     setDestinationAddress(address);
   };
 
   const bookCab = () => {
-    if (source && destination && mobileNumber && fare) {
+    if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue) {
       // Store booking details
       const bookingDetails = {
         mobileNumber: mobileNumber,
-        source: sourceAddress?.formattedAddress || 'Unknown Source',
-        destination: destinationAddress?.formattedAddress || 'Unknown Destination',
+        source: selectedSourceValue,
+        destination: selectedDestinationValue,
         cabType: vehicleType,
         fare: fare.toFixed(2),
       };
@@ -184,7 +188,7 @@ export default function Home() {
 
 
   const handleBookCabClick = () => {
-    if (source && destination) {
+    if (selectedSourceValue && selectedDestinationValue) {
       bookCab();
     } else {
         toast({
@@ -249,7 +253,7 @@ export default function Home() {
                     if (selectedSource) {
                         handleSourceSelect(selectedSource);
                     }
-                }} required>
+                }} required value={selectedSourceValue || ""}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select source" />
                     </SelectTrigger>
@@ -272,7 +276,7 @@ export default function Home() {
                     if (selectedDestination) {
                         handleDestinationSelect(selectedDestination);
                     }
-                }} required>
+                }} required value={selectedDestinationValue || ""}>
                     <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select destination" />
                     </SelectTrigger>
