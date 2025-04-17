@@ -17,9 +17,9 @@ const OTPPage: React.FC = () => {
     const verifyOTPAndBookCab = () => {
         // Placeholder: Verify OTP logic (e.g., check against a stored OTP)
         if (otp === "123456") { // Replace with actual OTP verification logic
-            alert("OTP Verified! Booking cab...");
-            // Redirect to booking confirmation page or any other relevant page
-            router.push('/'); // Navigate back to the home page after OTP verification
+            alert("OTP Verified! Redirecting to user dashboard...");
+            // Redirect to the user dashboard page with mobile number as a query parameter
+            router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
         } else {
             alert("OTP Verification Failed: Invalid OTP. Please try again.");
         }
