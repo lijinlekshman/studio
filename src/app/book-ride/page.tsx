@@ -215,6 +215,32 @@ export default function BookRidePage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
+            <div className="absolute top-4 right-4 flex items-center space-x-2">
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Avatar>
+                                <AvatarImage src="/assets/user.png" alt="@shadcn" />
+                                <AvatarFallback>SC</AvatarFallback>
+                            </Avatar>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                        <DropdownMenuItem>
+                            <Link href="/admin">Admin Portal</Link></DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Link href="/login">Login</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                            Logout
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
