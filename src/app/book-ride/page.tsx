@@ -241,9 +241,9 @@ export default function BookRidePage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
-            <Button onClick={() => router.push('/admin')} className="absolute top-4 right-4">
+            <Link href="/admin" className="absolute top-4 right-4">
                 Admin
-            </Button>
+            </Link>
 
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
@@ -381,10 +381,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
-
-
-
-
-
-
