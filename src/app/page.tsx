@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState, useCallback, useRef} from 'react';
+import {useEffect, useState, useCallback} from 'react';
 import {Address, Coordinate, getCurrentLocation, getAddressForCoordinate} from '@/services/map';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
@@ -30,17 +30,6 @@ const countryCodes = [
     // Add more country codes as needed
 ];
 
-// Dummy data for cab and driver details
-const dummyCabDetails = {
-  cabModel: "Sedan",
-  cabLicensePlate: "KL 01 AB 1234",
-};
-
-const dummyDriverDetails = {
-  driverName: "Anoop Krishna",
-  driverMobileNumber: "+919876543210",
-};
-
 export default function Home() {
   const [source, setSource] = useState<Coordinate | null>(null);
   const [destination, setDestination] = useState<Coordinate | null>(null);
@@ -56,7 +45,7 @@ export default function Home() {
   const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
   const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
   const [countryCode, setCountryCode] = useState('+91'); // Default country code
-  const [bookingConfirmed, setBookingConfirmed] = useState(false); // Track booking status
+  const router = useRouter();
 
   const fetchSuggestedSources = useCallback(async () => {
     try {
@@ -167,31 +156,23 @@ export default function Home() {
     setDestinationAddress(address);
   };
 
-    
-
   const bookCab = () => {
-    if (source && destination ) {
-        // Placeholder: Simulate sending notification to user's mobile
-        console.log(`Simulating sending notification to ${mobileNumber}`);
-        toast({
-            title: "Cab Booked!",
-            description: `[SIMULATION] Cab booked from ${sourceAddress?.formattedAddress} to ${destinationAddress?.formattedAddress} for ₹${fare ? fare.toFixed(2) : 0} in a ${vehicleType}. A notification has been sent to ${mobileNumber}.`,
-        });
-        setBookingConfirmed(true); // Set booking confirmation status
+    if (source && destination && mobileNumber) {
+      // Redirect to OTP verification page with mobile number as query parameter
+      router.push(`/otp?mobileNumber=${mobileNumber}`);
     } else {
-        toast({
-            title: "Error Booking Cab",
-            description: "Please select both source and destination.",
-            variant: "destructive",
-        });
+      toast({
+        title: "Error Booking Cab",
+        description: "Please select both source and destination, and enter your mobile number.",
+        variant: "destructive",
+      });
     }
   };
 
 
   const handleBookCabClick = () => {
     if (source && destination) {
-      // Directly confirm the booking
-        bookCab();
+      bookCab();
     } else {
         toast({
             title: "Booking Error",
@@ -335,34 +316,6 @@ export default function Home() {
             <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber }>Book Cab <Map className="ml-2"/></Button>
           </CardContent>
         </Card>
-          
-        {bookingConfirmed && (
-          <Card className="w-full max-w-md mt-10">
-            <CardHeader>
-              <CardTitle>Booking Confirmed!</CardTitle>
-              <CardDescription>Here are your cab and driver details.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <label htmlFor="cabModel">Cab Model</label>
-                <Input type="text" id="cabModel" value={dummyCabDetails.cabModel} disabled />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="cabLicensePlate">Cab License Plate</label>
-                <Input type="text" id="cabLicensePlate" value={dummyCabDetails.cabLicensePlate} disabled />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="driverName">Driver Name</label>
-                <Input type="text" id="driverName" value={dummyDriverDetails.driverName} disabled />
-              </div>
-              <div className="grid gap-2">
-                <label htmlFor="driverMobileNumber">Driver Mobile Number</label>
-                <Input type="text" id="driverMobileNumber" value={dummyDriverDetails.driverMobileNumber} disabled />
-              </div>
-              <Button>Track Cab <Map className="ml-2" /></Button>
-            </CardContent>
-          </Card>
-        )}
       </main>
     </div>
   );
