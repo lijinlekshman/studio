@@ -240,14 +240,14 @@ export default function BookRidePage() {
     
 
     const toggleMenu = () => {
-        setShowMenu(!showMenu);
+        setShowMenu((prevShowMenu) => !prevShowMenu);
     };
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
             <div className="absolute top-4 right-4 flex items-center space-x-2">
-                <DropdownMenu>
+                <DropdownMenu open={showMenu} onOpenChange={setShowMenu}>
                     <DropdownMenuTrigger asChild>
                         <Button variant="secondary" className="rounded-full p-2">
                             <Home className="mr-2" />
@@ -407,6 +407,7 @@ export default function BookRidePage() {
         </div>
     );
 }
+
 
 
 
