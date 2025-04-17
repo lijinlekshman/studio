@@ -29,9 +29,9 @@ const UserDashboardPage: React.FC = () => {
     const [showMap, setShowMap] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [userDetails, setUserDetails] = useState({
-        name: 'Anoop G',
-        email: 'anoopg@example.com',
-        address: 'Punalur, Kerala',
+        name: '',
+        email: '',
+        address: '',
     });
     const [tempDetails, setTempDetails] = useState({ ...userDetails });
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -46,7 +46,6 @@ const UserDashboardPage: React.FC = () => {
         { id: 'future1', date: '2024-07-01', source: 'Kollam', destination: 'Trivandrum', status: 'scheduled' },
     ]);
 
-
     useEffect(() => {
         if (!mobileNumber) {
             router.push('/');
@@ -57,7 +56,22 @@ const UserDashboardPage: React.FC = () => {
             const storedBookingDetails = localStorage.getItem('bookingDetails');
             if (storedBookingDetails) {
                 try {
-                    setBookingDetails(JSON.parse(storedBookingDetails));
+                    const parsedBookingDetails = JSON.parse(storedBookingDetails);
+                    setBookingDetails(parsedBookingDetails);
+
+                    // Extract user details from booking details
+                    setUserDetails({
+                        name: parsedBookingDetails.userName || '', // Use userName from booking details
+                        email: parsedBookingDetails.email || '',   // Use email from booking details
+                        address: '', // Address is not available in booking details
+                    });
+                    setTempDetails({
+                        name: parsedBookingDetails.userName || '', // Use userName from booking details
+                        email: parsedBookingDetails.email || '',   // Use email from booking details
+                        address: '', // Address is not available in booking details
+                    });
+
+
                 } catch (error) {
                     console.error('Error parsing booking details from localStorage:', error);
                 }
@@ -94,6 +108,32 @@ const UserDashboardPage: React.FC = () => {
     const handleSaveClick = () => {
         setUserDetails({ ...tempDetails });
         setIsEditing(false);
+
+        // Update booking details in localStorage
+        if (typeof window !== 'undefined') {
+            const storedBookingDetails = localStorage.getItem('bookingDetails');
+            if (storedBookingDetails) {
+                try {
+                    const parsedBookingDetails = JSON.parse(storedBookingDetails);
+                    const updatedBookingDetails = {
+                        ...parsedBookingDetails,
+                        userName: tempDetails.name, // Update userName
+                        email: tempDetails.email      // Update email
+                    };
+                    localStorage.setItem('bookingDetails', JSON.stringify(updatedBookingDetails));
+                    setBookingDetails(updatedBookingDetails);
+                    toast({
+                        title: "Profile Updated",
+                        description: "Your profile has been updated successfully.",
+                    });
+
+                } catch (error) {
+                    console.error('Error parsing booking details from localStorage:', error);
+                }
+            }
+        }
+
+
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -147,7 +187,7 @@ const UserDashboardPage: React.FC = () => {
                                     {profileImage ? (
                                         <AvatarImage src={profileImage} alt="User Avatar" />
                                     ) : (
-                                        <AvatarFallback>{userDetails.name.charAt(0).toUpperCase()}{userDetails.name.split(' ')[1].charAt(0).toUpperCase()}</AvatarFallback>
+                                        <AvatarFallback>{userDetails.name.charAt(0).toUpperCase()}{userDetails.name.split(' ')[1]?.charAt(0).toUpperCase()}</AvatarFallback>
                                     )}
                                 </Avatar>
                             </div>
@@ -200,7 +240,7 @@ const UserDashboardPage: React.FC = () => {
                                         <Button variant="secondary" onClick={handleCancelClick}>
                                             Cancel
                                         </Button>
-                                        <Button onClick={handleUploadImage}>
+                                        <Button onClick={handleSaveClick}>
                                             <Save className="mr-2 h-4 w-4" /> Save
                                         </Button>
                                     </div>
@@ -358,6 +398,8 @@ const UserDashboardPage: React.FC = () => {
                                 <>
                                     <p><strong>Mobile Number:</strong> {mobileNumber}</p>
                                     <p><strong>User ID:</strong> {bookingDetails.userId}</p>
+                                    <p><strong>User Name:</strong> {bookingDetails.userName}</p>  {/* Display User Name */}
+                                    <p><strong>Email:</strong> {bookingDetails.email}</p>        {/* Display Email */}
                                     <p><strong>Source:</strong> {bookingDetails.source}</p>
                                     <p><strong>Destination:</strong> {bookingDetails.destination}</p>
                                     <p><strong>Cab Type:</strong> {bookingDetails.cabModel}</p>
