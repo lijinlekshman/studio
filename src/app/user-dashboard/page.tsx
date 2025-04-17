@@ -40,11 +40,7 @@ const UserDashboardPage: React.FC = () => {
     const [activeMenu, setActiveMenu] = useState('my-profile'); // Default active menu
 
     // Placeholder data for booking history
-    const [bookingHistory, setBookingHistory] = useState([
-        { id: 'past1', date: '2024-05-01', source: 'Kollam', destination: 'Trivandrum', status: 'completed' },
-        { id: 'past2', date: '2024-05-15', source: 'Punalur', destination: 'Kottarakkara', status: 'completed' },
-        { id: 'future1', date: '2024-07-01', source: 'Kollam', destination: 'Trivandrum', status: 'scheduled' },
-    ]);
+    const [bookingHistory, setBookingHistory] = useState<any[]>([]);
 
     useEffect(() => {
         if (!mobileNumber) {
@@ -53,6 +49,7 @@ const UserDashboardPage: React.FC = () => {
         }
 
         if (typeof window !== 'undefined') {
+            // Load booking details from local storage
             const storedBookingDetails = localStorage.getItem('bookingDetails');
             if (storedBookingDetails) {
                 try {
@@ -70,19 +67,32 @@ const UserDashboardPage: React.FC = () => {
                         email: parsedBookingDetails.email || '',   // Use email from booking details
                         address: '', // Address is not available in booking details
                     });
-
-
                 } catch (error) {
                     console.error('Error parsing booking details from localStorage:', error);
                 }
             }
+
             // Load stored profile image from localStorage
             const storedProfileImage = localStorage.getItem('profileImage');
             if (storedProfileImage) {
                 setProfileImage(storedProfileImage);
             }
+
+            // Load booking history from local storage based on mobile number
+            const storedBookings = localStorage.getItem('bookings');
+            if (storedBookings) {
+                try {
+                    const allBookings = JSON.parse(storedBookings);
+                    // Filter bookings based on the user's mobile number
+                    const userBookings = allBookings.filter((booking: any) => booking.mobileNumber === mobileNumber);
+                    setBookingHistory(userBookings);
+                } catch (error) {
+                    console.error('Error parsing bookings from localStorage:', error);
+                }
+            }
         }
     }, [mobileNumber, router]);
+
 
     useEffect(() => {
         setTempDetails({ ...userDetails });
@@ -132,8 +142,6 @@ const UserDashboardPage: React.FC = () => {
                 }
             }
         }
-
-
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
