@@ -37,6 +37,8 @@ export default function BookRidePage() {
     const router = useRouter();
     const [selectedSourceValue, setSelectedSourceValue] = useState<string | null>(null);
     const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
+    const [userName, setUserName] = useState('');
+    const [email, setEmail] = useState('');
     const [userId, setUserId] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -165,7 +167,7 @@ export default function BookRidePage() {
         setDestination({ lat: selectedDestination.lat, lng: selectedDestination.lng });
         setDestinationInput(selectedDestination.name);
         setSelectedDestinationValue(selectedDestination.name);
-        const address = await getAddressForCoordinate({ lat: selectedDestination.lat, lng: selectedSource.lng });
+        const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
         setDestinationAddress(address);
     };
 
@@ -174,7 +176,7 @@ export default function BookRidePage() {
     };
 
     const bookCab = () => {
-        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && userId) {
+        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && userId && userName && email) {
             // Get current date and time
             const bookingDateTime = new Date();
             const bookingDate = bookingDateTime.toLocaleDateString();
@@ -185,6 +187,8 @@ export default function BookRidePage() {
                 id: generateUniqueId(),
                 mobileNumber: mobileNumber,
                 userId: userId,
+                userName: userName, // Added user name
+                email: email,       // Added email
                 source: selectedSourceValue,
                 destination: selectedDestinationValue,
                 cabModel: vehicleType,
@@ -214,7 +218,7 @@ export default function BookRidePage() {
         } else {
             toast({
                 title: "Error Booking Cab",
-                description: "Please select both source and destination, and enter your mobile number and User ID.",
+                description: "Please select both source and destination, and enter your mobile number, User ID, User Name and Email.",
                 variant: "destructive",
             });
         }
@@ -277,6 +281,28 @@ export default function BookRidePage() {
                         <CardDescription>Enter your source and destination to book a cab.</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
+                         <div className="grid gap-2">
+                            <label htmlFor="userName">User Name</label>
+                            <Input
+                                type="text"
+                                id="userName"
+                                placeholder="Enter your user name"
+                                value={userName}
+                                onChange={(e) => setUserName(e.target.value)}
+                                required
+                            />
+                        </div>
+                         <div className="grid gap-2">
+                            <label htmlFor="email">Email</label>
+                            <Input
+                                type="email"
+                                id="email"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
 
                         <div className="grid gap-2">
                             <label htmlFor="mobileNumber">Mobile Number</label>
@@ -385,11 +411,10 @@ export default function BookRidePage() {
                                 />
                             </div>
                         )}
-                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !userId}>Book Cab <Map className="ml-2"/></Button>
+                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !userId || !userName || !email}>Book Cab <Map className="ml-2"/></Button>
                     </CardContent>
                 </Card>
             </main>
         </div>
     );
 }
-

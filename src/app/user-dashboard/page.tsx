@@ -40,6 +40,8 @@ const UserDashboardPage: React.FC = () => {
     const { toast } = useToast();
     const [activeMenu, setActiveMenu] = useState('my-profile'); // Default active menu
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+     const [bookingHistory, setBookingHistory] = useState<any[]>([]);
+
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
