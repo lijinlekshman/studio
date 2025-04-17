@@ -27,8 +27,8 @@ import { useRouter } from 'next/navigation';
 
 // Placeholder data for cabs and fares
 const initialCabs = [
-  { id: '1', model: 'Sedan', licensePlate: 'KL 01 AB 1234', status: 'Active' },
-  { id: '2', model: 'SUV', licensePlate: 'KL 02 CD 5678', status: 'Inactive' },
+  { id: '1', model: 'Sedan', licensePlate: 'KL 01 AB 1234', status: 'Active', driverName: 'Anoop' },
+  { id: '2', model: 'SUV', licensePlate: 'KL 02 CD 5678', status: 'Inactive', driverName: 'Gopi' },
 ];
 
 const initialFares = [
@@ -55,6 +55,7 @@ export default function AdminDashboard() {
   const [isAddCabDialogOpen, setIsAddCabDialogOpen] = useState(false);
   const [newCabModel, setNewCabModel] = useState('');
   const [newCabLicensePlate, setNewCabLicensePlate] = useState('');
+   const [newCabDriverName, setNewCabDriverName] = useState('');
   const [isAddFareDialogOpen, setIsAddFareDialogOpen] = useState(false);
   const [newFareVehicleType, setNewFareVehicleType] = useState('');
   const [newFareBaseFare, setNewFareBaseFare] = useState('');
@@ -69,6 +70,7 @@ export default function AdminDashboard() {
     const [editingCabId, setEditingCabId] = useState(null);
     const [editedCabModel, setEditedCabModel] = useState('');
     const [editedCabLicensePlate, setEditedCabLicensePlate] = useState('');
+      const [editedCabDriverName, setEditedCabDriverName] = useState('');
     const [editingFareId, setEditingFareId] = useState(null);
     const [editedFareVehicleType, setEditedFareVehicleType] = useState('');
     const [editedFareBaseFare, setEditedFareBaseFare] = useState('');
@@ -90,7 +92,7 @@ export default function AdminDashboard() {
 
   // Function to handle adding a new cab
   const handleAddCab = () => {
-    if (!newCabModel || !newCabLicensePlate) {
+    if (!newCabModel || !newCabLicensePlate || !newCabDriverName) {
       toast({
         title: "Error Adding Cab",
         description: "Please fill in all cab details.",
@@ -103,11 +105,13 @@ export default function AdminDashboard() {
       model: newCabModel,
       licensePlate: newCabLicensePlate,
       status: 'Active', // Default status
+        driverName: newCabDriverName,
     };
     setCabs([...cabs, newCab]);
     setIsAddCabDialogOpen(false);
     setNewCabModel('');
     setNewCabLicensePlate('');
+      setNewCabDriverName('');
     toast({
       title: "Cab Added",
       description: `Cab ${newCab.model} with license plate ${newCab.licensePlate} has been added successfully.`,
@@ -128,6 +132,7 @@ export default function AdminDashboard() {
         setEditingCabId(cab.id);
         setEditedCabModel(cab.model);
         setEditedCabLicensePlate(cab.licensePlate);
+          setEditedCabDriverName(cab.driverName);
     };
 
   // Function to handle updating cab status (placeholder)
@@ -141,7 +146,7 @@ export default function AdminDashboard() {
 
     const handleSaveCab = (id: string) => {
         setCabs(cabs.map(cab =>
-            cab.id === id ? { ...cab, model: editedCabModel, licensePlate: editedCabLicensePlate } : cab
+            cab.id === id ? { ...cab, model: editedCabModel, licensePlate: editedCabLicensePlate, driverName: editedCabDriverName } : cab
         ));
         setEditingCabId(null);
         toast({
@@ -281,101 +286,8 @@ export default function AdminDashboard() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Panel: Management Cards */}
+          {/* Left Panel: Data Tables */}
           <div className="md:col-span-2 space-y-6">
-            {/* Add New Cab Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Cabs</CardTitle>
-                <CardDescription>Add, edit, or remove cabs from the system.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => setIsAddCabDialogOpen(true)}>
-                  <Plus className="mr-2" /> Add New Cab
-                </Button>
-                <Dialog open={isAddCabDialogOpen} onOpenChange={setIsAddCabDialogOpen}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Cab</DialogTitle>
-                      <DialogDescription>Enter the details for the new cab.</DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="model" className="text-right">Model</Label>
-                        <Input id="model" value={newCabModel} onChange={(e) => setNewCabModel(e.target.value)} className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="licensePlate" className="text-right">License Plate</Label>
-                        <Input id="licensePlate" value={newCabLicensePlate} onChange={(e) => setNewCabLicensePlate(e.target.value)} className="col-span-3" required />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="button" onClick={handleAddCab}>Add Cab</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-
-            {/* Update Fare Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Fares</CardTitle>
-                <CardDescription>Update base fares and per kilometer rates for different vehicle types.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={() => setIsAddFareDialogOpen(true)}>
-                  <Plus className="mr-2" /> Add New Fare
-                </Button>
-                <Dialog open={isAddFareDialogOpen} onOpenChange={setIsAddFareDialogOpen}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Add New Fare</DialogTitle>
-                      <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="vehicleType" className="text-right">Vehicle Type</Label>
-                        <Input id="vehicleType" value={newFareVehicleType} onChange={(e) => setNewFareVehicleType(e.target.value)} className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="baseFare" className="text-right">Base Fare</Label>
-                        <Input id="baseFare" type="number" value={newFareBaseFare} onChange={(e) => setNewFareBaseFare(e.target.value)} className="col-span-3" required />
-                      </div>
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="perKmRate" className="text-right">Per KM Rate</Label>
-                        <Input id="perKmRate" type="number" value={newFarePerKmRate} onChange={(e) => setNewFarePerKmRate(e.target.value)} className="col-span-3" required />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button type="button" onClick={handleAddFare}>Add Fare</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
-
-            {/* Booking Summary Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Booking Summary</CardTitle>
-                <CardDescription>A summary of bookings by vehicle type.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <BarChart width={500} height={300} data={bookingData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="bookings" fill="#3498db" />
-                </BarChart>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Panel: Data Tables */}
-          <div className="md:col-span-1 space-y-6">
             {/* Added Cabs Table */}
             <Card>
               <CardHeader>
@@ -389,6 +301,7 @@ export default function AdminDashboard() {
                       <TableRow>
                         <TableHead>Model</TableHead>
                         <TableHead>License Plate</TableHead>
+                          <TableHead>Driver Name</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -409,6 +322,12 @@ export default function AdminDashboard() {
                                   onChange={(e) => setEditedCabLicensePlate(e.target.value)}
                                 />
                               </TableCell>
+                                <TableCell>
+                                    <Input
+                                        value={editedCabDriverName}
+                                        onChange={(e) => setEditedCabDriverName(e.target.value)}
+                                    />
+                                </TableCell>
                               <TableCell className="text-right">
                                 <Button variant="ghost" size="icon" onClick={() => handleSaveCab(cab.id)}>
                                   <Save className="h-4 w-4" />
@@ -419,6 +338,7 @@ export default function AdminDashboard() {
                             <>
                               <TableCell>{cab.model}</TableCell>
                               <TableCell>{cab.licensePlate}</TableCell>
+                                <TableCell>{cab.driverName}</TableCell>
                               <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
                                   <Button variant="ghost" size="icon" onClick={() => handleEditCab(cab)}>
@@ -557,6 +477,103 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Right Panel: Management Cards */}
+          <div className="md:col-span-1 space-y-6">
+            {/* Add New Cab Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Manage Cabs</CardTitle>
+                <CardDescription>Add, edit, or remove cabs from the system.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => setIsAddCabDialogOpen(true)}>
+                  <Plus className="mr-2" /> Add New Cab
+                </Button>
+                <Dialog open={isAddCabDialogOpen} onOpenChange={setIsAddCabDialogOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Cab</DialogTitle>
+                      <DialogDescription>Enter the details for the new cab.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="model" className="text-right">Model</Label>
+                        <Input id="model" value={newCabModel} onChange={(e) => setNewCabModel(e.target.value)} className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="licensePlate" className="text-right">License Plate</Label>
+                        <Input id="licensePlate" value={newCabLicensePlate} onChange={(e) => setNewCabLicensePlate(e.target.value)} className="col-span-3" required />
+                      </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="driverName" className="text-right">Driver Name</Label>
+                            <Input id="driverName" value={newCabDriverName} onChange={(e) => setNewCabDriverName(e.target.value)} className="col-span-3" required />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="button" onClick={handleAddCab}>Add Cab</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+
+            {/* Update Fare Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Manage Fares</CardTitle>
+                <CardDescription>Update base fares and per kilometer rates for different vehicle types.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={() => setIsAddFareDialogOpen(true)}>
+                  <Plus className="mr-2" /> Add New Fare
+                </Button>
+                <Dialog open={isAddFareDialogOpen} onOpenChange={setIsAddFareDialogOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add New Fare</DialogTitle>
+                      <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="vehicleType" className="text-right">Vehicle Type</Label>
+                        <Input id="vehicleType" value={newFareVehicleType} onChange={(e) => setNewFareVehicleType(e.target.value)} className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="baseFare" className="text-right">Base Fare</Label>
+                        <Input id="baseFare" type="number" value={newFareBaseFare} onChange={(e) => setNewFareBaseFare(e.target.value)} className="col-span-3" required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="perKmRate" className="text-right">Per KM Rate</Label>
+                        <Input id="perKmRate" type="number" value={newFarePerKmRate} onChange={(e) => setNewFarePerKmRate(e.target.value)} className="col-span-3" required />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="button" onClick={handleAddFare}>Add Fare</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardContent>
+            </Card>
+
+            {/* Booking Summary Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Booking Summary</CardTitle>
+                <CardDescription>A summary of bookings by vehicle type.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BarChart width={500} height={300} data={bookingData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="bookings" fill="#3498db" />
+                </BarChart>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </main>
 
@@ -570,6 +587,7 @@ export default function AdminDashboard() {
               <p>Model: {selectedCab.model}</p>
               <p>License Plate: {selectedCab.licensePlate}</p>
               <p>Status: {selectedCab.status}</p>
+                <p>Driver Name: {selectedCab.driverName}</p>
             </>
           )}
         </DialogContent>
@@ -596,3 +614,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
