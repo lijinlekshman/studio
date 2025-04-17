@@ -167,6 +167,11 @@ export default function BookRidePage() {
 
     const bookCab = () => {
         if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && userId) {
+            // Get current date and time
+            const bookingDateTime = new Date();
+            const bookingDate = bookingDateTime.toLocaleDateString();
+            const bookingTime = bookingDateTime.toLocaleTimeString();
+
             // Store booking details
             const newBooking = {
                 id: generateUniqueId(),
@@ -177,6 +182,9 @@ export default function BookRidePage() {
                 cabModel: vehicleType,
                 fare: fare.toFixed(2),
                 driverName: 'Anoop', // Placeholder
+                date: bookingDate,   // Add booking date
+                time: bookingTime,   // Add booking time
+                status: 'Confirmed', // Set initial status
             };
 
             // Save booking details to local storage
@@ -370,3 +378,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
