@@ -41,7 +41,7 @@ export default function BookRidePage() {
     const [email, setEmail] = useState('');
     const [userId, setUserId] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);
+
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -414,5 +414,4 @@ export default function BookRidePage() {
         </div>
     );
 }
-
 
