@@ -241,35 +241,7 @@ export default function BookRidePage() {
 
             <div className="absolute top-4 right-4 flex items-center space-x-2">
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                         <Button variant="ghost" className="h-8 w-8 p-0">
-                           <Menu className="h-4 w-4"/>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end" forceMount>
-                        {isAuthenticated ? (
-                            <>
-                                <DropdownMenuItem>
-                                    <Link href="/user-dashboard">User Dashboard</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Link href="/admin">Admin Portal</Link>
-                                </DropdownMenuItem>
-                            </>
-                        ) : (
-                            <>
-                                <DropdownMenuItem>
-                                    <Link href="/login">Admin Portal</Link>
-                                </DropdownMenuItem>
-                                 <DropdownMenuItem>
-                                    <Link href="/login">Login</Link>
-                                </DropdownMenuItem>
-                            </>
-                        )}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                
             </div>
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
@@ -418,5 +390,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
-
