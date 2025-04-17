@@ -37,8 +37,8 @@ const initialFares = [
 ];
 
 const initialBookings = [
-    { id: '1', userId: '101', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop', mobileNumber: '9876543210', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
-    { id: '2', userId: '102', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi', mobileNumber: '8765432190', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
+    { id: '1', mobileNumber: '9876543210', user: 'Anoop', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
+    { id: '2', mobileNumber: '8765432190', user: 'Gopi', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
 ];
 
 
@@ -460,7 +460,7 @@ export default function AdminDashboard() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Mobile Number</TableHead>
-                        <TableHead>User ID</TableHead>
+                        <TableHead>User</TableHead>
                         <TableHead>Source</TableHead>
                         <TableHead>Destination</TableHead>
                         <TableHead>Fare</TableHead>
@@ -473,7 +473,7 @@ export default function AdminDashboard() {
                       {bookings.map((booking) => (
                         <TableRow key={booking.id}>
                             <TableCell>{booking.mobileNumber}</TableCell>
-                          <TableCell>{booking.userId}</TableCell>
+                          <TableCell>{booking.user}</TableCell>
                           <TableCell>{booking.source}</TableCell>
                           <TableCell>{booking.destination}</TableCell>
                           <TableCell>{booking.fare}</TableCell>
@@ -619,7 +619,7 @@ export default function AdminDashboard() {
           {selectedBooking && (
             <>
                 <p>Mobile Number: {selectedBooking.mobileNumber}</p>
-              <p>User ID: {selectedBooking.userId}</p>
+              <p>User: {selectedBooking.user}</p>
               <p>Source: {selectedBooking.source}</p>
               <p>Destination: {selectedBooking.destination}</p>
               <p>Fare: {selectedBooking.fare}</p>

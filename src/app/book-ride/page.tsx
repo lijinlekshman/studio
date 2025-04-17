@@ -18,7 +18,7 @@ import {
 import {calculateFare} from '@/ai/flows/calculate-fare';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
-import { Menu, Home, User } from "lucide-react";
+import { Home, User } from "lucide-react";
 
 
 
@@ -37,19 +37,12 @@ export default function BookRidePage() {
     const router = useRouter();
     const [selectedSourceValue, setSelectedSourceValue] = useState<string | null>(null);
     const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
-    const [userName, setUserName] = useState('');
+    const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
-    const [userId, setUserId] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
-
-        useEffect(() => {
+    useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('authToken');
@@ -183,7 +176,7 @@ export default function BookRidePage() {
     };
 
     const bookCab = () => {
-        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && userId && userName && email) {
+        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && user && email) {
             // Get current date and time
             const bookingDateTime = new Date();
             const bookingDate = bookingDateTime.toLocaleDateString();
@@ -193,8 +186,8 @@ export default function BookRidePage() {
             const newBooking = {
                 id: generateUniqueId(),
                 mobileNumber: mobileNumber,
-                userId: userId,
-                userName: userName, // Added user name
+                user: user,
+                userName: user, // Added user name
                 email: email,       // Added email
                 source: selectedSourceValue,
                 destination: selectedDestinationValue,
@@ -225,7 +218,7 @@ export default function BookRidePage() {
         } else {
             toast({
                 title: "Error Booking Cab",
-                description: "Please select both source and destination, and enter your mobile number, User ID, User Name and Email.",
+                description: "Please select both source and destination, and enter your mobile number, User and Email.",
                 variant: "destructive",
             });
         }
@@ -243,8 +236,6 @@ export default function BookRidePage() {
         }
     };
 
-        
-
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
 
@@ -261,7 +252,6 @@ export default function BookRidePage() {
                             Login
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.push('/admin')}>
-                            <Menu className="mr-2" />
                             Admin Portal
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -278,13 +268,13 @@ export default function BookRidePage() {
                     </CardHeader>
                     <CardContent className="grid gap-4">
                          <div className="grid gap-2">
-                            <label htmlFor="userName">User Name</label>
+                            <label htmlFor="user">User</label>
                             <Input
                                 type="text"
-                                id="userName"
-                                placeholder="Enter your user name"
-                                value={userName}
-                                onChange={(e) => setUserName(e.target.value)}
+                                id="user"
+                                placeholder="Enter your user"
+                                value={user}
+                                onChange={(e) => setUser(e.target.value)}
                                 required
                             />
                         </div>
@@ -308,17 +298,6 @@ export default function BookRidePage() {
                                 placeholder="Enter your mobile number"
                                 value={mobileNumber}
                                 onChange={(e) => setMobileNumber(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <label htmlFor="userId">User ID</label>
-                            <Input
-                                type="text"
-                                id="userId"
-                                placeholder="Enter User ID"
-                                value={userId}
-                                onChange={(e) => setUserId(e.target.value)}
                                 required
                             />
                         </div>
@@ -407,7 +386,7 @@ export default function BookRidePage() {
                                 />
                             </div>
                         )}
-                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !userId || !userName || !email}>Book Cab <Map className="ml-2"/></Button>
+                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !user || !email}>Book Cab <Map className="ml-2"/></Button>
                     </CardContent>
                 </Card>
             </main>

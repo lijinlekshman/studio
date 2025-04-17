@@ -420,7 +420,7 @@ const UserDashboardPage: React.FC = () => {
                             {bookingDetails ? (
                                 <>
                                     <p><strong>Mobile Number:</strong> {mobileNumber}</p>
-                                    <p><strong>User ID:</strong> {bookingDetails.userId}</p>
+                                    <p><strong>User:</strong> {bookingDetails.user}</p>
                                     <p><strong>User Name:</strong> {bookingDetails.userName}</p>  {/* Display User Name */}
                                     <p><strong>Email:</strong> {bookingDetails.email}</p>        {/* Display Email */}
                                     <p><strong>Source:</strong> {bookingDetails.source}</p>
