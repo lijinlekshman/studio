@@ -1,16 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Map } from 'lucide-react';
+import { Map, User } from 'lucide-react';
 import Link from "next/link";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 
 export default function Home() {
     const router = useRouter();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -19,6 +27,16 @@ export default function Home() {
             setIsAuthenticated(!!token);
         }
     }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        setIsAuthenticated(false);
+        router.push('/'); // Redirect to home after logout
+    };
+
+    const toggleMenu = () => {
+        setShowMenu(!showMenu);
+    };
 
 
     return (
@@ -39,6 +57,30 @@ export default function Home() {
                     <p className="text-md md:text-lg text-white mt-2">
                         Your trusted partner for safe and comfortable rides.
                     </p>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="rounded-full h-9 w-9 p-0 hover:bg-accent" aria-label="Toggle menu">
+                                <Avatar className="h-8 w-8">
+                                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56 mr-2">
+                            {isAuthenticated ? (
+                                <DropdownMenuItem onClick={handleLogout}>
+                                    Logout
+                                </DropdownMenuItem>
+                            ) : (
+                                <DropdownMenuItem onClick={() => router.push('/login')}>
+                                    Login
+                                </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => router.push('/admin')}>
+                                Admin Portal
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     <Link href="/book-ride">
                         <Button className="mt-8">
@@ -56,4 +98,3 @@ export default function Home() {
         </div>
     );
 }
-
