@@ -21,7 +21,6 @@ import { useRouter } from 'next/navigation';
 import { Home, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-
 export default function BookRidePage() {
     const [source, setSource] = useState<Coordinate | null>(null);
     const [destination, setDestination] = useState<Coordinate | null>(null);
@@ -40,7 +39,6 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -240,12 +238,14 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-             <Link href="/admin">
+             <div className="absolute top-4 right-4">
+                <Link href="/login">
                     <Button>
-                        Admin
+                         <User className="mr-2 h-4 w-4" /> Admin
                     </Button>
                 </Link>
-            <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
+            </div>
+            <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
 
                 <Card className="w-full max-w-md mt-10">
@@ -380,4 +380,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
