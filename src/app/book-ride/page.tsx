@@ -40,7 +40,6 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);
 
 
     useEffect(() => {
@@ -246,7 +245,7 @@ export default function BookRidePage() {
                         Admin
                     </Button>
                 </Link>
-            <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
+            <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
 
                 <Card className="w-full max-w-md mt-10">
@@ -381,3 +380,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+

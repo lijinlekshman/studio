@@ -46,11 +46,6 @@ export default function Home() {
                             Book a Cab <Map className="ml-2" />
                         </Button>
                     </Link>
-                     <Link href="/login">
-                        <Button className="mt-8">
-                            Admin Login
-                        </Button>
-                    </Link>
                 </div>
             </div>
 
@@ -62,3 +57,4 @@ export default function Home() {
         </div>
     );
 }
+
