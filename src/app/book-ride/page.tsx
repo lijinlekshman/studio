@@ -241,14 +241,13 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-          <div className="absolute top-4 right-4">
-            <Link href="/admin">
-              <Button>
-                Admin
-              </Button>
-            </Link>
-          </div>
-
+            {isAuthenticated && (
+                    <Link href="/admin">
+                        <Button className="absolute top-4 right-4">
+                            Admin
+                        </Button>
+                    </Link>
+                )}
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
 
@@ -377,7 +376,7 @@ export default function BookRidePage() {
                                 />
                             </div>
                         )}
-                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !user || !email}>Book Cab <Map className="ml-2"/></Button>
+                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !user || !email}>Book Cab <Map className="ml-2" /></Button>
                     </CardContent>
                 </Card>
             </main>
