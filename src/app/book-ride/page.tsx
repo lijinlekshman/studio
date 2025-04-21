@@ -18,7 +18,7 @@ import {
 import { calculateFare } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
-import { Home, User } from "lucide-react";
+import { Home, User, ArrowLeft } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 
@@ -257,11 +257,12 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-             <Link href="/admin">
-                    <Button>
-                        Admin
-                    </Button>
-                </Link>
+             <Link href="/">
+                <Button variant="secondary">
+                  <ArrowLeft className="mr-2" />
+                  Back to Home
+                </Button>
+              </Link>
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
 
@@ -397,3 +398,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
