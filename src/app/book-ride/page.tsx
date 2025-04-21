@@ -40,6 +40,8 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -143,7 +145,7 @@ export default function BookRidePage() {
                         description: error.message,
                         variant: "destructive",
                     });
-                    console.error('Error calculating fare:', error);
+                    console.error('Error fetching fare:', error);
                 }
             }
         };
@@ -239,13 +241,6 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-             <div className="absolute top-4 right-4">
-                <Link href="/login">
-                    <Button>
-                         <User className="mr-2 h-4 w-4" /> Admin
-                    </Button>
-                </Link>
-            </div>
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
 

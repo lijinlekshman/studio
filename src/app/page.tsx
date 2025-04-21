@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-
+import { User } from "lucide-react";
 
 
 export default function Home() {
@@ -46,6 +46,11 @@ export default function Home() {
                             Book a Cab <Map className="ml-2" />
                         </Button>
                     </Link>
+                       <Link href="/login">
+                    <Button>
+                         <User className="mr-2 h-4 w-4" /> Admin
+                    </Button>
+                </Link>
                 </div>
             </div>
 
