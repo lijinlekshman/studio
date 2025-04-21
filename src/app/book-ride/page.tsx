@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { useRouter } from 'next/navigation';
 import { Home, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowLeft } from "lucide-react";
 
 
 export default function BookRidePage() {
@@ -259,11 +260,11 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-             <Link href="/admin">
-                    <Button>
-                        Admin
+             
+             <Button onClick={() => router.back()}>
+                        <ArrowLeft className="mr-2" />
+                        Back
                     </Button>
-                </Link>
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
 
@@ -399,4 +400,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
