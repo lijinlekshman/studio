@@ -9,12 +9,17 @@ import { Map } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { calculateFare } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 import { Home, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeft } from 'lucide-react';
 
 
 export default function BookRidePage() {
@@ -35,6 +40,7 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
 
     useEffect(() => {
@@ -84,8 +90,12 @@ export default function BookRidePage() {
 
     useEffect(() => {
         const fetchCurrentLocation = async () => {
-            const location = await getCurrentLocation();
-            setSource(location);
+            try {
+                const location = await getCurrentLocation();
+                setSource(location);
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         fetchCurrentLocation();
@@ -96,8 +106,12 @@ export default function BookRidePage() {
     useEffect(() => {
         const fetchSourceAddress = async () => {
             if (source) {
-                const address = await getAddressForCoordinate(source);
-                setSourceAddress(address);
+                try {
+                    const address = await getAddressForCoordinate(source);
+                    setSourceAddress(address);
+                } catch (e) {
+                    console.error(e);
+                }
             }
         };
 
@@ -154,16 +168,24 @@ export default function BookRidePage() {
         setSource({ lat: selectedSource.lat, lng: selectedSource.lng });
         setSourceInput(selectedSource.name);
         setSelectedSourceValue(selectedSource.name);
-        const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
-        setSourceAddress(address);
+        try {
+            const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
+            setSourceAddress(address);
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const handleDestinationSelect = async (selectedDestination: any) => {
         setDestination({ lat: selectedDestination.lat, lng: selectedDestination.lng });
         setDestinationInput(selectedDestination.name);
         setSelectedDestinationValue(selectedDestination.name);
-        const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
-        setDestinationAddress(address);
+        try {
+            const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
+            setDestinationAddress(address);
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const generateUniqueId = () => {
@@ -235,14 +257,12 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            
-            
-
+             <Link href="/admin">
+                    <Button>
+                        Admin
+                    </Button>
+                </Link>
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
-            <Button variant="ghost" onClick={() => router.back()} className="absolute top-4 left-4">
-                <ArrowLeft className="mr-2" />
-                Back
-            </Button>
 
 
                 <Card className="w-full max-w-md mt-10">
@@ -377,4 +397,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
