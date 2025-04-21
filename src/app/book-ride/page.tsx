@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { Home, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
+
 export default function BookRidePage() {
     const [source, setSource] = useState<Coordinate | null>(null);
     const [destination, setDestination] = useState<Coordinate | null>(null);
@@ -380,3 +381,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
