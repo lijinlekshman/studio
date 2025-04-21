@@ -90,25 +90,43 @@ export default function BookRidePage() {
 
     useEffect(() => {
         const fetchCurrentLocation = async () => {
-            const location = await getCurrentLocation();
-            setSource(location);
+            try {
+                const location = await getCurrentLocation();
+                setSource(location);
+            } catch (error) {
+                console.error("Error getting current location:", error);
+                toast({
+                    title: "Error",
+                    description: "Could not get current location.",
+                    variant: "destructive",
+                });
+            }
         };
 
         fetchCurrentLocation();
         fetchSuggestedSources();
         fetchSuggestedDestinations();
-    }, [fetchSuggestedSources, fetchSuggestedDestinations]);
+    }, [fetchSuggestedSources, fetchSuggestedDestinations, toast]);
 
     useEffect(() => {
         const fetchSourceAddress = async () => {
             if (source) {
-                const address = await getAddressForCoordinate(source);
-                setSourceAddress(address);
+                try {
+                    const address = await getAddressForCoordinate(source);
+                    setSourceAddress(address);
+                } catch (error) {
+                    console.error("Error getting source address:", error);
+                    toast({
+                        title: "Error",
+                        description: "Could not get source address.",
+                        variant: "destructive",
+                    });
+                }
             }
         };
 
         fetchSourceAddress();
-    }, [source]);
+    }, [source, toast]);
 
     useEffect(() => {
         const estimateFare = async () => {
@@ -145,13 +163,13 @@ export default function BookRidePage() {
                         description: error.message,
                         variant: "destructive",
                     });
-                    console.error('Error fetching fare:', error);
+                    console.error('Error calculating fare:', error);
                 }
             }
         };
 
         estimateFare();
-    }, [source, destination, vehicleType]);
+    }, [source, destination, vehicleType, toast]);
 
     const [sourceInput, setSourceInput] = useState('');
     const [destinationInput, setDestinationInput] = useState('');
@@ -241,6 +259,11 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
+             <Link href="/admin">
+                    <Button>
+                        Admin
+                    </Button>
+                </Link>
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
 
 
