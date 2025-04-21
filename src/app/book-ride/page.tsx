@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { useRouter } from 'next/navigation';
 import { Home, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { ArrowLeft } from 'lucide-react';
+
 
 export default function BookRidePage() {
     const [source, setSource] = useState<Coordinate | null>(null);
@@ -34,6 +36,7 @@ export default function BookRidePage() {
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
         if (typeof window !== 'undefined') {
@@ -47,6 +50,7 @@ export default function BookRidePage() {
         setIsAuthenticated(false);
         router.push('/'); // Redirect to home after logout
     };
+
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
@@ -232,16 +236,13 @@ export default function BookRidePage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
             
-                <Link href="/admin">
-                    <Button
-                        className="rounded-full absolute top-4 right-4"
-                    >
-                        <User className="h-4 w-4" />
-                    </Button>
-                </Link>
             
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
+            <Button variant="ghost" onClick={() => router.back()} className="absolute top-4 left-4">
+                <ArrowLeft className="mr-2" />
+                Back
+            </Button>
 
 
                 <Card className="w-full max-w-md mt-10">
