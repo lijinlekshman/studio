@@ -20,6 +20,12 @@ import {
     TableHead,
     TableCell,
 } from "@/components/ui/table";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 const UserDashboardPage: React.FC = () => {
@@ -41,7 +47,7 @@ const UserDashboardPage: React.FC = () => {
     const [activeMenu, setActiveMenu] = useState('my-profile'); // Default active menu
     const [isAuthenticated, setIsAuthenticated] = useState(false);
      const [bookingHistory, setBookingHistory] = useState<any[]>([]);
-
+    const [showLogoutMenu, setShowLogoutMenu] = useState(false);
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
@@ -399,6 +405,15 @@ const UserDashboardPage: React.FC = () => {
                                 Settings
                             </Button>
                         </li>
+                         <li>
+                            <Button
+                                className="block py-2 hover:bg-gray-300 rounded w-full"
+                                onClick={handleLogout}
+                                variant="ghost"
+                            >
+                                Logout
+                            </Button>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -463,4 +478,3 @@ const UserDashboardPage: React.FC = () => {
 };
 
 export default UserDashboardPage;
-
