@@ -1,13 +1,13 @@
 'use client';
 
-import {useEffect, useState, useCallback} from 'react';
-import {Address, Coordinate, getCurrentLocation, getAddressForCoordinate} from '@/services/map';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Map} from 'lucide-react';
-import {suggestDestinations} from '@/ai/flows/suggest-destinations';
-import {useToast} from "@/hooks/use-toast";
+import { useEffect, useState, useCallback } from 'react';
+import { Address, Coordinate, getCurrentLocation, getAddressForCoordinate } from '@/services/map';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Map } from 'lucide-react';
+import { suggestDestinations } from '@/ai/flows/suggest-destinations';
+import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import {
     DropdownMenu,
@@ -15,8 +15,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {calculateFare} from '@/ai/flows/calculate-fare';
-import {Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { calculateFare } from '@/ai/flows/calculate-fare';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 import { Home, User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -31,7 +31,7 @@ export default function BookRidePage() {
     const [destinationAddress, setDestinationAddress] = useState<Address | null>(null);
     const [suggestedSources, setSuggestedSources] = useState<any[]>([]);
     const [suggestedDestinations, setSuggestedDestinations] = useState<any[]>([]);
-    const {toast} = useToast();
+    const { toast } = useToast();
     const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
     const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
     const router = useRouter();
@@ -61,7 +61,7 @@ export default function BookRidePage() {
     const fetchSuggestedSources = useCallback(async () => {
         try {
             const location = await getCurrentLocation(); // Use current location as a fallback
-            const destinations = await suggestDestinations({currentLocation: location, pastRideHistory: []});
+            const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedSources(destinations);
         } catch (error: any) {
             toast({
@@ -76,7 +76,7 @@ export default function BookRidePage() {
     const fetchSuggestedDestinations = useCallback(async () => {
         try {
             const location = await getCurrentLocation(); // Use current location as a fallback
-            const destinations = await suggestDestinations({currentLocation: location, pastRideHistory: []});
+            const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedDestinations(destinations);
         } catch (error: any) {
             toast({
@@ -241,15 +241,12 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            {isAuthenticated && (
-                    <Link href="/admin">
-                        <Button className="absolute top-4 right-4">
-                            Admin
-                        </Button>
-                    </Link>
-                )}
+            
+                    <Button onClick={() => router.push('/admin')}>
+                        Admin
+                    </Button>
+               
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
-
 
                 <Card className="w-full max-w-md mt-10">
                     <CardHeader>
@@ -383,4 +380,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
