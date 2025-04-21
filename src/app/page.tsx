@@ -31,13 +31,7 @@ export default function Home() {
             >
                 <div className="absolute inset-0 bg-black opacity-40"></div>
                 <div className="relative z-10 text-center">
-                     <div className="absolute top-4 right-4">
-                         <Link href="/login">
-                            <Button className="mt-8">
-                                Admin Login
-                            </Button>
-                         </Link>
-                     </div>
+
                     <Image src="/Images/LetsGo-W-slogan.png" width={400} height={100} alt="Let'sGo Rides" />
 
                     <h1 className="text-3xl md:text-5xl font-bold text-white mt-4">
@@ -50,6 +44,11 @@ export default function Home() {
                     <Link href="/book-ride">
                         <Button className="mt-8">
                             Book a Cab <Map className="ml-2" />
+                        </Button>
+                    </Link>
+                     <Link href="/login">
+                        <Button className="mt-8">
+                            Admin Login
                         </Button>
                     </Link>
                 </div>
