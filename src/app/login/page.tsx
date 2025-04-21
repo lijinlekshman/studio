@@ -18,8 +18,8 @@ const LoginPage: React.FC = () => {
     if (username === 'admin' && password === 'password') {
       localStorage.setItem('authToken', 'admin-token');
       //const mobileNumber = localStorage.getItem('mobileNumber'); // Retrieve mobileNumber
-        router.push(`/user-dashboard`);
-      //router.push('/admin');
+        //router.push(`/user-dashboard`);
+      router.push('/admin');
     } else {
       alert('Invalid credentials');
     }
