@@ -36,16 +36,11 @@ const initialFares = [
   { id: '2', vehicleType: 'SUV', baseFare: 75, perKmRate: 15 },
 ];
 
-const initialBookings = [
-    { id: '1', mobileNumber: '9876543210', user: 'Anoop', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
-    { id: '2', mobileNumber: '8765432190', user: 'Gopi', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
-];
-
 
 export default function AdminDashboard() {
   const [cabs, setCabs] = useState(initialCabs);
   const [fares, setFares] = useState(initialFares);
-  const [bookings, setBookings] = useState(initialBookings);
+  const [bookings, setBookings] = useState([]);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -632,4 +627,5 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
 

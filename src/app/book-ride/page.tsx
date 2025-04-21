@@ -213,8 +213,7 @@ export default function BookRidePage() {
             }
 
             // Redirect to user dashboard with booking details
-            //router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
-            router.push(`/otp?mobileNumber=${mobileNumber}`);
+            router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
 
         } else {
             toast({
@@ -241,12 +240,13 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            
-                    <Button onClick={() => router.push('/admin')}>
+            <Link href="/admin">
+                    <Button>
                         Admin
                     </Button>
-               
+                </Link>
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
+
 
                 <Card className="w-full max-w-md mt-10">
                     <CardHeader>
@@ -380,3 +380,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
