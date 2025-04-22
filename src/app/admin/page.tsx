@@ -157,6 +157,14 @@ export default function AdminDashboard() {
     };
 
     const handleSaveCab = (id: string) => {
+        if (!editedCabModel || !editedCabLicensePlate || !editedCabDriverName) {
+            toast({
+                title: "Error Updating Cab",
+                description: "Please fill in all cab details.",
+                variant: "destructive",
+            });
+            return;
+        }
         setCabs(cabs.map(cab =>
             cab.id === id ? { ...cab, model: editedCabModel, licensePlate: editedCabLicensePlate, driverName: editedCabDriverName } : cab
         ));
@@ -213,8 +221,17 @@ export default function AdminDashboard() {
     };
 
     const handleSaveFare = (id: string) => {
+        if (!editedFareVehicleType || !editedFareBaseFare || !editedFarePerKmRate) {
+            toast({
+                title: "Error Updating Fare",
+                description: "Please fill in all fare details.",
+                variant: "destructive",
+            });
+            return;
+        }
         setFares(fares.map(fare => {
             if (fare.id === id) {
+                try {
                 const updatedFare = {
                     ...fare,
                     vehicleType: editedFareVehicleType,
@@ -236,6 +253,14 @@ export default function AdminDashboard() {
                 );
 
                 return updatedFare;
+            } catch (error:any) {
+                toast({
+                    title: "Error Updating Fare",
+                    description: error.message,
+                    variant: "destructive",
+                });
+                return fare;
+            }
             }
             return fare;
         }));
