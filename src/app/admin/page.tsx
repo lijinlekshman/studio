@@ -256,7 +256,7 @@ export default function AdminDashboard() {
                         if (booking.cabModel === updatedFare.vehicleType) {
                             // Recalculate fare based on the booking's distance (assuming you have a distance property)
                             // This is a placeholder, you'll need a way to get the actual distance for each booking
-                            const bookingDistance = booking.distance || 50; // Example: use a stored distance or a default
+                            const bookingDistance = (booking as any).distance || 50; // Example: use a stored distance or a default
                             const newFareForBooking = updatedFare.baseFare + (bookingDistance * updatedFare.perKmRate);
                             return { ...booking, fare: newFareForBooking };
                         }
@@ -672,3 +672,6 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+
+    
