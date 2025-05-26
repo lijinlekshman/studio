@@ -54,31 +54,39 @@ export default function AdminDashboard() {
                 const storedCabs = localStorage.getItem('cabs');
                 if (storedCabs) {
                     setCabs(JSON.parse(storedCabs));
+                } else {
+                    setCabs(initialCabs); 
                 }
             } catch (error) {
                 console.error("Failed to parse cabs from localStorage", error);
-                // Optionally clear corrupted item: localStorage.removeItem('cabs');
+                setCabs(initialCabs);
             }
 
             try {
                 const storedFares = localStorage.getItem('fares');
                 if (storedFares) {
                     setFares(JSON.parse(storedFares));
+                } else {
+                    setFares(initialFares);
                 }
             } catch (error) {
                 console.error("Failed to parse fares from localStorage", error);
+                setFares(initialFares);
             }
 
             try {
                 const storedBookings = localStorage.getItem('bookings');
                 if (storedBookings) {
                     setBookings(JSON.parse(storedBookings));
+                } else {
+                    setBookings(initialBookings);
                 }
             } catch (error) {
                 console.error("Failed to parse bookings from localStorage", error);
+                setBookings(initialBookings);
             }
         }
-    }, []); // Empty dependency array ensures this runs once on mount
+    }, []); 
 
 
     useEffect(() => {
@@ -135,14 +143,13 @@ export default function AdminDashboard() {
         }
     }, [router]);
 
-    useEffect(() => { // Effect to refresh bookings from localStorage periodically or on an event
+    useEffect(() => { 
         const interval = setInterval(() => {
             if (typeof window !== 'undefined') {
                 const storedBookings = localStorage.getItem('bookings');
                 if (storedBookings) {
                     try {
                         const currentBookings = JSON.parse(storedBookings);
-                        // Basic check to see if bookings have changed to avoid unnecessary re-renders
                         if (JSON.stringify(currentBookings) !== JSON.stringify(bookings)) {
                             setBookings(currentBookings);
                         }
@@ -151,15 +158,14 @@ export default function AdminDashboard() {
                     }
                 }
             }
-        }, 5000); // Refresh every 5 seconds, adjust as needed
+        }, 5000); 
         return () => clearInterval(interval);
-    }, [bookings]); // Rerun if bookings state itself changes
+    }, [bookings]); 
 
     if (!isAuthenticated) {
-        return null; // Or a loading spinner, or a message like "Redirecting..."
+        return null; 
     }
 
-  // Function to handle adding a new cab
   const handleAddCab = () => {
     if (!newCabModel || !newCabLicensePlate || !newCabDriverName) {
       toast({
@@ -170,25 +176,24 @@ export default function AdminDashboard() {
       return;
     }
     const newCab = {
-      id: String(cabs.length > 0 ? Math.max(...cabs.map(c => parseInt(c.id))) + 1 : 1), // Robust ID generation
+      id: String(cabs.length > 0 ? Math.max(...cabs.map(c => parseInt(c.id))) + 1 : 1), 
       model: newCabModel,
       licensePlate: newCabLicensePlate,
-      status: 'Active', // Default status
+      status: 'Active', 
       driverName: newCabDriverName,
     };
     
     const updatedCabs = [...cabs, newCab];
     setCabs(updatedCabs);
 
-    // Check if a fare rule for this cab model already exists
     const fareExists = fares.some(fare => fare.vehicleType === newCab.model);
 
     if (!fareExists) {
         const newFareRule = {
-            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), // Robust ID generation
+            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), 
             vehicleType: newCab.model,
-            baseFare: 0, // Placeholder, admin can edit
-            perKmRate: 0, // Placeholder, admin can edit
+            baseFare: 0, 
+            perKmRate: 0, 
         };
         setFares(prevFares => [...prevFares, newFareRule]);
         toast({
@@ -208,7 +213,6 @@ export default function AdminDashboard() {
     });
   };
 
-  // Function to handle deleting a cab
   const handleDeleteCab = (id: string) => {
     setCabs(cabs.filter(cab => cab.id !== id));
     toast({
@@ -217,7 +221,6 @@ export default function AdminDashboard() {
     });
   };
 
-  // Function to handle editing a cab
   const handleEditCab = (cab: any) => {
         setEditingCabId(cab.id);
         setEditedCabModel(cab.model);
@@ -225,7 +228,6 @@ export default function AdminDashboard() {
           setEditedCabDriverName(cab.driverName);
     };
 
-    // Function to handle updating cab status (placeholder)
     const handleUpdateCabStatus = (id: string, status: string) => {
         setCabs(cabs.map(cab => cab.id === id ? { ...cab, status } : cab));
         toast({
@@ -253,7 +255,6 @@ export default function AdminDashboard() {
         });
     };
 
-    // Function to handle adding a new fare
     const handleAddFare = () => {
         if (!newFareVehicleType || !newFareBaseFare || !newFarePerKmRate) {
             toast({
@@ -264,7 +265,6 @@ export default function AdminDashboard() {
             return;
         }
 
-        // Check if fare for this vehicle type already exists
         if (fares.some(f => f.vehicleType === newFareVehicleType)) {
             toast({
                 title: "Fare Exists",
@@ -276,7 +276,7 @@ export default function AdminDashboard() {
 
 
         const newFare = {
-            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), // Robust ID generation
+            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), 
             vehicleType: newFareVehicleType,
             baseFare: parseFloat(newFareBaseFare),
             perKmRate: parseFloat(newFarePerKmRate),
@@ -293,7 +293,6 @@ export default function AdminDashboard() {
         });
     };
 
-  // Function to handle deleting a fare
   const handleDeleteFare = (id: string) => {
     setFares(fares.filter(fare => fare.id !== id));
     toast({
@@ -357,11 +356,12 @@ export default function AdminDashboard() {
         setIsBookingDialogOpen(true);
     };
 
-    // Chart data
     const bookingData = fares.map(fareRule => ({
         name: fareRule.vehicleType,
         bookings: bookings.filter(b => b.cabModel === fareRule.vehicleType).length
     }));
+
+    const uniqueCabModels = Array.from(new Set(cabs.map(cab => cab.model)));
 
 
   return (
@@ -486,6 +486,7 @@ export default function AdminDashboard() {
                                 <Input
                                   value={editedFareVehicleType}
                                   onChange={(e) => setEditedFareVehicleType(e.target.value)}
+                                  disabled // Vehicle type shouldn't be changed here, but through cab model
                                 />
                               </TableCell>
                               <TableCell>
@@ -643,7 +644,27 @@ export default function AdminDashboard() {
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="vehicleType" className="text-right">Vehicle Type</Label>
-                        <Input id="vehicleType" value={newFareVehicleType} onChange={(e) => setNewFareVehicleType(e.target.value)} className="col-span-3" required />
+                         <Select 
+                            onValueChange={(value) => setNewFareVehicleType(value)} 
+                            value={newFareVehicleType}
+                            required 
+                            
+                          >
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select Cab Model" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Available Cab Models</SelectLabel>
+                                    {uniqueCabModels.map((model) => (
+                                        <SelectItem key={model} value={model}>
+                                            {model}
+                                        </SelectItem>
+                                    ))}
+                                    {uniqueCabModels.length === 0 && <SelectItem value="" disabled>No cab models available</SelectItem>}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="baseFare" className="text-right">Base Fare</Label>
