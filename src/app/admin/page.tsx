@@ -50,6 +50,10 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
+            const storedCabs = localStorage.getItem('cabs');
+            if (storedCabs) {
+                setCabs(JSON.parse(storedCabs));
+            }
             const storedBookings = localStorage.getItem('bookings');
             if (storedBookings) {
                 setBookings(JSON.parse(storedBookings));
@@ -60,6 +64,12 @@ export default function AdminDashboard() {
             }
         }
     }, []);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('cabs', JSON.stringify(cabs));
+        }
+    }, [cabs]);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
