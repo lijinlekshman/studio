@@ -1,4 +1,4 @@
-'use server';
+
 /**
  * @fileOverview Provides destination suggestions based on the user's current location.
  *
@@ -32,7 +32,17 @@ const SuggestDestinationsOutputSchema = z.array(z.object({
 export type SuggestDestinationsOutput = z.infer<typeof SuggestDestinationsOutputSchema>;
 
 export async function suggestDestinations(input: SuggestDestinationsInput): Promise<SuggestDestinationsOutput> {
-  return suggestDestinationsFlow(input);
+  // NOTE: This flow will not work as intended in a pure static export
+  // as Genkit prompts/flows require a server environment.
+  // For static export, this will likely result in an error or unexpected behavior.
+  // Consider returning mock data or a static list client-side.
+  try {
+    return await suggestDestinationsFlow(input);
+  } catch (error) {
+    console.error("Error in suggestDestinations (static context):", error);
+    // Fallback for static export: return an empty array.
+    return [];
+  }
 }
 
 const prompt = ai.definePrompt({

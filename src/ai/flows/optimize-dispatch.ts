@@ -1,6 +1,5 @@
 // This file is machine-generated - DO NOT EDIT.
 
-'use server';
 
 /**
  * @fileOverview An AI-powered cab dispatch optimizer.
@@ -83,7 +82,14 @@ const OptimizeDispatchOutputSchema = z.object({
 export type OptimizeDispatchOutput = z.infer<typeof OptimizeDispatchOutputSchema>;
 
 export async function optimizeDispatch(input: OptimizeDispatchInput): Promise<OptimizeDispatchOutput> {
-  return optimizeDispatchFlow(input);
+  // NOTE: This flow will not work as intended in a pure static export
+  // as Genkit prompts/flows require a server environment.
+  try {
+    return await optimizeDispatchFlow(input);
+  } catch (error) {
+    console.error("Error in optimizeDispatch (static context):", error);
+    return { dispatchPlan: [] }; // Fallback for static export
+  }
 }
 
 const optimizeDispatchPrompt = ai.definePrompt({

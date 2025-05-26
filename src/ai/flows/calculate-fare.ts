@@ -1,4 +1,4 @@
-'use server';
+
 /**
  * @fileOverview Calculates the distance based on source and destination coordinates.
  *
@@ -24,7 +24,18 @@ const CalculateDistanceOutputSchema = z.object({
 export type CalculateDistanceOutput = z.infer<typeof CalculateDistanceOutputSchema>;
 
 export async function calculateDistance(input: CalculateDistanceInput): Promise<CalculateDistanceOutput> {
-  return calculateDistanceFlow(input);
+  // NOTE: This flow will not work as intended in a pure static export
+  // as Genkit prompts/flows require a server environment.
+  // For static export, this will likely result in an error or unexpected behavior.
+  // Consider returning mock data or a simplified calculation if this needs to "work" client-side.
+  try {
+    return await calculateDistanceFlow(input);
+  } catch (error) {
+    console.error("Error in calculateDistance (static context):", error);
+    // Fallback for static export: return a default or throw.
+    // Returning a default distance to prevent complete UI breakage.
+    return { distance: 0 };
+  }
 }
 
 const prompt = ai.definePrompt({
