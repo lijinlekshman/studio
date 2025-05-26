@@ -7,7 +7,7 @@
  * - SuggestDestinationsOutput - The return type for the suggestDestinations function.
  */
 
-import {ai} from '@/ai/ai-instance';
+// import {ai} from '@/ai/ai-instance'; // Commented out for static export
 import {z} from 'genkit';
 
 const SuggestDestinationsInputSchema = z.object({
@@ -33,17 +33,22 @@ export type SuggestDestinationsOutput = z.infer<typeof SuggestDestinationsOutput
 
 export async function suggestDestinations(input: SuggestDestinationsInput): Promise<SuggestDestinationsOutput> {
   // NOTE: This flow will not work as intended in a pure static export
-  // as Genkit prompts/flows require a server environment.
-  // For static export, this will likely result in an error or unexpected behavior.
-  // Consider returning mock data or a static list client-side.
-  try {
-    return await suggestDestinationsFlow(input);
-  } catch (error) {
-    console.error("Error in suggestDestinations (static context):", error);
-    // Fallback for static export: return an empty array.
-    return [];
-  }
+  // For static export, directly returning mock data.
+  console.warn("suggestDestinations called in static context, returning mock data.");
+  return [ // Mock data for static export
+    { lat: 9.0345, lng: 76.9245, name: "Punalur Bus Stand, Punalur, Kerala" },
+    { lat: 9.0321, lng: 76.9203, name: "Punalur Railway Station, Punalur, Kerala" },
+    { lat: 8.9987, lng: 77.0807, name: "Thenmala Dam, Thenmala, Kerala" },
+    { lat: 9.1700, lng: 76.7800, name: "Achankovil River, Achankovil, Kerala" },
+    { lat: 9.0750, lng: 77.1540, name: "Rosemala View Point, Rosemala, Kerala" },
+    { lat: 8.9700, lng: 76.7300, name: "Kollam Beach, Kollam, Kerala" },
+    { lat: 8.4860, lng: 76.9490, name: "Sree Padmanabhaswamy Temple, Thiruvananthapuram, Kerala" },
+  ];
 }
+
+/*
+// Original Genkit prompt and flow definition - commented out for static export
+import {ai} from '@/ai/ai-instance';
 
 const prompt = ai.definePrompt({
   name: 'suggestDestinationsPrompt',
@@ -96,3 +101,4 @@ const suggestDestinationsFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
+*/

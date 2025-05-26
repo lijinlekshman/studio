@@ -7,7 +7,7 @@
  * - CalculateDistanceOutput - The return type for the calculateDistance function.
  */
 
-import {ai} from '@/ai/ai-instance';
+// import {ai} from '@/ai/ai-instance'; // Commented out for static export
 import {z} from 'genkit';
 
 const CalculateDistanceInputSchema = z.object({
@@ -26,17 +26,14 @@ export type CalculateDistanceOutput = z.infer<typeof CalculateDistanceOutputSche
 export async function calculateDistance(input: CalculateDistanceInput): Promise<CalculateDistanceOutput> {
   // NOTE: This flow will not work as intended in a pure static export
   // as Genkit prompts/flows require a server environment.
-  // For static export, this will likely result in an error or unexpected behavior.
-  // Consider returning mock data or a simplified calculation if this needs to "work" client-side.
-  try {
-    return await calculateDistanceFlow(input);
-  } catch (error) {
-    console.error("Error in calculateDistance (static context):", error);
-    // Fallback for static export: return a default or throw.
-    // Returning a default distance to prevent complete UI breakage.
-    return { distance: 0 };
-  }
+  // For static export, directly returning mock data.
+  console.warn("calculateDistance called in static context, returning mock data.");
+  return { distance: 50 }; // Default mock distance
 }
+
+/*
+// Original Genkit prompt and flow definition - commented out for static export
+import {ai} from '@/ai/ai-instance';
 
 const prompt = ai.definePrompt({
   name: 'calculateDistancePrompt',
@@ -67,3 +64,4 @@ const calculateDistanceFlow = ai.defineFlow<
   const {output} = await prompt(input);
   return output!;
 });
+*/

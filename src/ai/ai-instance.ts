@@ -7,7 +7,7 @@ import {googleAI} from '@genkit-ai/googleai';
 const apiKey = process.env.GOOGLE_GENAI_API_KEY || "";
 
 export const ai = genkit({
-  promptDir: './prompts',
+  // promptDir: './prompts', // Removed: This might cause FS access issues during static build
   plugins: [
     googleAI({
       apiKey: apiKey,
