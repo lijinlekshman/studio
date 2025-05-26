@@ -44,18 +44,28 @@ export default function BookRidePage() {
 
             const storedCabs = localStorage.getItem('cabs');
             if (storedCabs) {
-                setAvailableCabs(JSON.parse(storedCabs));
+                try {
+                    setAvailableCabs(JSON.parse(storedCabs));
+                } catch (error) {
+                    console.error("Failed to parse availableCabs from localStorage", error);
+                    setAvailableCabs([]); // Fallback to empty array on error
+                }
             }
             const storedFares = localStorage.getItem('fares');
             if (storedFares) {
-                setCurrentFares(JSON.parse(storedFares));
-                 // Set default vehicle type if not set and fares are available
-                if (!vehicleType && JSON.parse(storedFares).length > 0) {
-                    setVehicleType(JSON.parse(storedFares)[0].vehicleType);
+                try {
+                    const parsedFares = JSON.parse(storedFares);
+                    setCurrentFares(parsedFares);
+                    if (!vehicleType && parsedFares.length > 0) {
+                        setVehicleType(parsedFares[0].vehicleType);
+                    }
+                } catch (error) {
+                    console.error("Failed to parse currentFares from localStorage", error);
+                    setCurrentFares([]); // Fallback to empty array on error
                 }
             }
         }
-    }, [vehicleType]); // Added vehicleType to dependency array to set default
+    }, [vehicleType]);
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -161,7 +171,7 @@ export default function BookRidePage() {
                         const calculatedFare = selectedFareRule.baseFare + (distanceResult.distance * selectedFareRule.perKmRate);
                         setFare(calculatedFare);
                     } else {
-                        setFare(null); // No fare rule found for selected vehicle type
+                        setFare(null); 
                         toast({
                             title: "Fare Calculation Error",
                             description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
@@ -251,7 +261,13 @@ export default function BookRidePage() {
             };
 
             if (typeof window !== 'undefined') {
-                let existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                let existingBookings = [];
+                try {
+                    existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                } catch (error) {
+                    console.error("Error parsing existing bookings from localStorage", error);
+                    existingBookings = []; // Fallback to empty array on error
+                }
                 existingBookings.push(newBooking);
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
                 localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
