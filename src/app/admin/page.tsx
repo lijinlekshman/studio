@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,10 @@ export default function AdminDashboard() {
             if (storedBookings) {
                 setBookings(JSON.parse(storedBookings));
             }
+            const storedFares = localStorage.getItem('fares');
+            if (storedFares) {
+                setFares(JSON.parse(storedFares));
+            }
         }
     }, []);
 
@@ -62,6 +67,12 @@ export default function AdminDashboard() {
         }
     }, [bookings]);
 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('fares', JSON.stringify(fares));
+        }
+    }, [fares]);
+
   const [isAddCabDialogOpen, setIsAddCabDialogOpen] = useState(false);
   const [newCabModel, setNewCabModel] = useState('');
   const [newCabLicensePlate, setNewCabLicensePlate] = useState('');
@@ -70,18 +81,18 @@ export default function AdminDashboard() {
   const [newFareVehicleType, setNewFareVehicleType] = useState('');
   const [newFareBaseFare, setNewFareBaseFare] = useState('');
   const [newFarePerKmRate, setNewFarePerKmRate] = useState('');
-  const [selectedCab, setSelectedCab] = useState(null);
-  const [selectedFare, setSelectedFare] = useState(null);
+  const [selectedCab, setSelectedCab] = useState<any>(null);
+  const [selectedFare, setSelectedFare] = useState<any>(null);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
-   const [selectedBooking, setSelectedBooking] = useState(null);
+   const [selectedBooking, setSelectedBooking] = useState<any>(null);
     const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
    const router = useRouter();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [editingCabId, setEditingCabId] = useState(null);
+    const [editingCabId, setEditingCabId] = useState<string | null>(null);
     const [editedCabModel, setEditedCabModel] = useState('');
     const [editedCabLicensePlate, setEditedCabLicensePlate] = useState('');
       const [editedCabDriverName, setEditedCabDriverName] = useState('');
-    const [editingFareId, setEditingFareId] = useState(null);
+    const [editingFareId, setEditingFareId] = useState<string | null>(null);
     const [editedFareVehicleType, setEditedFareVehicleType] = useState('');
     const [editedFareBaseFare, setEditedFareBaseFare] = useState('');
     const [editedFarePerKmRate, setEditedFarePerKmRate] = useState('');
@@ -244,9 +255,10 @@ export default function AdminDashboard() {
                     prevBookings.map(booking => {
                         if (booking.cabModel === updatedFare.vehicleType) {
                             // Recalculate fare based on the booking's distance (assuming you have a distance property)
-                            const distance = 50; // Replace with actual distance
-                            const newFare = updatedFare.baseFare + (distance * updatedFare.perKmRate);
-                            return { ...booking, fare: newFare };
+                            // This is a placeholder, you'll need a way to get the actual distance for each booking
+                            const bookingDistance = booking.distance || 50; // Example: use a stored distance or a default
+                            const newFareForBooking = updatedFare.baseFare + (bookingDistance * updatedFare.perKmRate);
+                            return { ...booking, fare: newFareForBooking };
                         }
                         return booking;
                     })
@@ -293,6 +305,7 @@ export default function AdminDashboard() {
     const bookingData = [
         { name: 'Sedan', bookings: bookings.filter(b => b.cabModel === 'Sedan').length },
         { name: 'SUV', bookings: bookings.filter(b => b.cabModel === 'SUV').length },
+        // Add more vehicle types if needed
     ];
 
     const handleAddBooking = (newBooking: any) => {
@@ -333,7 +346,7 @@ export default function AdminDashboard() {
                 <CardDescription>List of all cabs currently in the system.</CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea>
+                <ScrollArea className="w-full overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -407,7 +420,7 @@ export default function AdminDashboard() {
                 <CardDescription>Current fare rates for each vehicle type.</CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea>
+                <ScrollArea className="w-full overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -451,8 +464,8 @@ export default function AdminDashboard() {
                           ) : (
                             <>
                               <TableCell>{fare.vehicleType}</TableCell>
-                              <TableCell>{fare.baseFare}</TableCell>
-                              <TableCell>{fare.perKmRate}</TableCell>
+                              <TableCell>₹{fare.baseFare}</TableCell>
+                              <TableCell>₹{fare.perKmRate}</TableCell>
                               <TableCell className="text-right">
                                 <div className="flex justify-end gap-2">
                                   <Button variant="ghost" size="icon" onClick={() => handleEditFare(fare)}>
@@ -480,7 +493,7 @@ export default function AdminDashboard() {
                 <CardDescription>List of all current bookings.</CardDescription>
               </CardHeader>
               <CardContent>
-                <ScrollArea>
+                <ScrollArea className="w-full overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -501,7 +514,7 @@ export default function AdminDashboard() {
                           <TableCell>{booking.user}</TableCell>
                           <TableCell>{booking.source}</TableCell>
                           <TableCell>{booking.destination}</TableCell>
-                          <TableCell>{booking.fare}</TableCell>
+                          <TableCell>₹{booking.fare}</TableCell>
                           <TableCell>{booking.date}</TableCell>
                           <TableCell>{booking.time}</TableCell>
                           <TableCell className="text-right">
@@ -605,14 +618,16 @@ export default function AdminDashboard() {
                 <CardDescription>A summary of bookings by vehicle type.</CardDescription>
               </CardHeader>
               <CardContent>
-                <BarChart width={400} height={300} data={bookingData}>
+                <div className="w-full h-[300px]">
+                <BarChart width={380} height={300} data={bookingData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="bookings" fill="#3498db" />
+                  <Bar dataKey="bookings" fill="hsl(var(--primary))" />
                 </BarChart>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -627,10 +642,10 @@ export default function AdminDashboard() {
           </DialogHeader>
           {selectedCab && (
             <>
-              <p>Model: {selectedCab.model}</p>
-              <p>License Plate: {selectedCab.licensePlate}</p>
-              <p>Status: {selectedCab.status}</p>
-                <p>Driver Name: {selectedCab.driverName}</p>
+              <p><strong>Model:</strong> {selectedCab.model}</p>
+              <p><strong>License Plate:</strong> {selectedCab.licensePlate}</p>
+              <p><strong>Status:</strong> {selectedCab.status}</p>
+              <p><strong>Driver Name:</strong> {selectedCab.driverName}</p>
             </>
           )}
         </DialogContent>
@@ -643,13 +658,13 @@ export default function AdminDashboard() {
           </DialogHeader>
           {selectedBooking && (
             <>
-                <p>Mobile Number: {selectedBooking.mobileNumber}</p>
-              <p>User: {selectedBooking.user}</p>
-              <p>Source: {selectedBooking.source}</p>
-              <p>Destination: {selectedBooking.destination}</p>
-              <p>Fare: {selectedBooking.fare}</p>
-              <p>Cab Model: {selectedBooking.cabModel}</p>
-              <p>Driver Name: {selectedBooking.driverName}</p>
+                <p><strong>Mobile Number:</strong> {selectedBooking.mobileNumber}</p>
+              <p><strong>User:</strong> {selectedBooking.user}</p>
+              <p><strong>Source:</strong> {selectedBooking.source}</p>
+              <p><strong>Destination:</strong> {selectedBooking.destination}</p>
+              <p><strong>Fare:</strong> ₹{selectedBooking.fare}</p>
+              <p><strong>Cab Model:</strong> {selectedBooking.cabModel}</p>
+              <p><strong>Driver Name:</strong> {selectedBooking.driverName}</p>
             </>
           )}
         </DialogContent>
@@ -657,4 +672,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
