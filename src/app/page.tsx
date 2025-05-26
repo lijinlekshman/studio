@@ -43,7 +43,7 @@ export default function Home() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="rounded-full h-10 w-10 p-0 hover:bg-accent">
                             <Avatar className="h-9 w-9">
-                                <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+                                <AvatarImage src="https://github.com/shadcn.png" alt="User" data-ai-hint="user avatar" />
                                 <AvatarFallback>
                                     <User className="h-5 w-5" />
                                 </AvatarFallback>
@@ -63,6 +63,9 @@ export default function Home() {
                          <DropdownMenuItem onClick={() => router.push('/admin')}>
                                 Admin Portal
                          </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => router.push('/user-login')}>
+                                User Login
+                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -70,7 +73,7 @@ export default function Home() {
             {/* Landing Page Section */}
             <div
                 className="relative w-full h-screen flex items-center justify-center bg-cover bg-center"
-                style={{ backgroundImage: "url('/Images/taxi-bg.jpg')" }}
+                style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}
             >
                 <div className="absolute inset-0 bg-black opacity-40"></div>
                 <div className="relative z-10 text-center">
@@ -87,11 +90,6 @@ export default function Home() {
                     <Link href="/book-ride">
                         <Button className="mt-8 mx-2">
                             Book a Cab <Map className="ml-2" />
-                        </Button>
-                    </Link>
-                    <Link href="/user-login">
-                        <Button className="mt-8 mx-2" variant="secondary">
-                            User Login
                         </Button>
                     </Link>
                 </div>

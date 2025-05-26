@@ -20,6 +20,8 @@ const OTPPage: React.FC = () => {
 
     useEffect(() => {
         setIsClient(true);
+        // This effect should run only once on the client after mount
+        // to safely access searchParams.
         const mobileNumberFromParams = searchParams.get('mobileNumber');
         setClientMobileNumber(mobileNumberFromParams);
     }, []); // Empty dependency array ensures this runs once on mount
@@ -72,11 +74,13 @@ const OTPPage: React.FC = () => {
     };
 
     if (!isClient) {
+        // Render nothing or a loading indicator until client-side hydration is complete
+        // and clientMobileNumber is determined.
         return null; 
     }
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2" style={{ backgroundImage: "url('/Images/taxi-bg.jpg')" }}>
+        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center" style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}>
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center">
                 <Image src="/Images/LetsGo-W-slogan.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo slogan" />
 
