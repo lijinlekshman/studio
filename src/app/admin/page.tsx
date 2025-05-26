@@ -44,27 +44,27 @@ const initialBookings = [
 
 
 export default function AdminDashboard() {
-  const [cabs, setCabs] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const storedCabs = localStorage.getItem('cabs');
-        return storedCabs ? JSON.parse(storedCabs) : initialCabs;
-    }
-    return initialCabs;
-  });
-  const [fares, setFares] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const storedFares = localStorage.getItem('fares');
-        return storedFares ? JSON.parse(storedFares) : initialFares;
-    }
-    return initialFares;
-  });
-  const [bookings, setBookings] = useState(() => {
-    if (typeof window !== 'undefined') {
-        const storedBookings = localStorage.getItem('bookings');
-        return storedBookings ? JSON.parse(storedBookings) : initialBookings;
-    }
-    return initialBookings;
-  });
+  const [cabs, setCabs] = useState(initialCabs);
+  const [fares, setFares] = useState(initialFares);
+  const [bookings, setBookings] = useState(initialBookings);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const storedCabs = localStorage.getItem('cabs');
+            if (storedCabs) {
+                setCabs(JSON.parse(storedCabs));
+            }
+            const storedFares = localStorage.getItem('fares');
+            if (storedFares) {
+                setFares(JSON.parse(storedFares));
+            }
+            const storedBookings = localStorage.getItem('bookings');
+            if (storedBookings) {
+                setBookings(JSON.parse(storedBookings));
+            }
+        }
+    }, []);
+
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
