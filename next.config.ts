@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  output: 'export', // Add this line for static export
+  images: {
+    unoptimized: true // Necessary for static export if not using a custom loader or Vercel/Netlify
+  }
 };
 
 export default nextConfig;
