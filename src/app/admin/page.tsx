@@ -174,13 +174,34 @@ export default function AdminDashboard() {
       model: newCabModel,
       licensePlate: newCabLicensePlate,
       status: 'Active', // Default status
-        driverName: newCabDriverName,
+      driverName: newCabDriverName,
     };
-    setCabs([...cabs, newCab]);
+    
+    const updatedCabs = [...cabs, newCab];
+    setCabs(updatedCabs);
+
+    // Check if a fare rule for this cab model already exists
+    const fareExists = fares.some(fare => fare.vehicleType === newCab.model);
+
+    if (!fareExists) {
+        const newFareRule = {
+            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), // Robust ID generation
+            vehicleType: newCab.model,
+            baseFare: 0, // Placeholder, admin can edit
+            perKmRate: 0, // Placeholder, admin can edit
+        };
+        setFares(prevFares => [...prevFares, newFareRule]);
+        toast({
+            title: "Fare Rule Created",
+            description: `A new fare rule for ${newCab.model} has been created. Please set its rates.`,
+            variant: "default"
+        });
+    }
+
     setIsAddCabDialogOpen(false);
     setNewCabModel('');
     setNewCabLicensePlate('');
-      setNewCabDriverName('');
+    setNewCabDriverName('');
     toast({
       title: "Cab Added",
       description: `Cab ${newCab.model} with license plate ${newCab.licensePlate} has been added successfully.`,
@@ -242,6 +263,17 @@ export default function AdminDashboard() {
             });
             return;
         }
+
+        // Check if fare for this vehicle type already exists
+        if (fares.some(f => f.vehicleType === newFareVehicleType)) {
+            toast({
+                title: "Fare Exists",
+                description: `A fare rule for ${newFareVehicleType} already exists. You can edit it directly.`,
+                variant: "destructive",
+            });
+            return;
+        }
+
 
         const newFare = {
             id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), // Robust ID generation
