@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
@@ -5,20 +6,14 @@ import { Address, Coordinate, getCurrentLocation, getAddressForCoordinate } from
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Map } from 'lucide-react';
+import { Map, ArrowLeft } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { calculateFare } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
-import { Home, User, ArrowLeft } from "lucide-react";
+import { User } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 
@@ -40,7 +35,6 @@ export default function BookRidePage() {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);
 
 
     useEffect(() => {
@@ -52,7 +46,9 @@ export default function BookRidePage() {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('authToken');
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('authToken');
+        }
         setIsAuthenticated(false);
         router.push('/'); // Redirect to home after logout
     };
@@ -159,7 +155,7 @@ export default function BookRidePage() {
         };
 
         estimateFare();
-    }, [source, destination, vehicleType]);
+    }, [source, destination, vehicleType, toast]);
 
     const [sourceInput, setSourceInput] = useState('');
     const [destinationInput, setDestinationInput] = useState('');
@@ -181,7 +177,7 @@ export default function BookRidePage() {
         setDestinationInput(selectedDestination.name);
         setSelectedDestinationValue(selectedDestination.name);
         try {
-            const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
+            const address = await getAddressForCoordinate({ lat: selectedDestination.lat, lng: selectedDestination.lng });
             setDestinationAddress(address);
         } catch (e) {
             console.error(e);
@@ -217,19 +213,13 @@ export default function BookRidePage() {
             };
 
             // Save booking details to local storage
-
-            let existingBookings = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('bookings') || '[]' : '[]');
-            existingBookings.push(newBooking);
             if (typeof window !== 'undefined') {
+                let existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                existingBookings.push(newBooking);
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
-            }
-
-            if (typeof window !== 'undefined') {
                 localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
             }
 
-            // Redirect to user dashboard with booking details
-            //router.push(`/user-dashboard?mobileNumber=${mobileNumber}`);
             router.push(`/otp?mobileNumber=${mobileNumber}`);
 
         } else {
@@ -242,12 +232,12 @@ export default function BookRidePage() {
     };
 
     const handleBookCabClick = () => {
-        if (selectedSourceValue && selectedDestinationValue) {
+        if (selectedSourceValue && selectedDestinationValue && mobileNumber && user && email) {
             bookCab();
         } else {
             toast({
                 title: "Booking Error",
-                description: "Please select both source and destination.",
+                description: "Please fill in all required fields: source, destination, mobile number, user, and email.",
                 variant: "destructive",
             });
         }
@@ -257,15 +247,12 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-             <Link href="/">
-                <Button variant="secondary">
-                  <ArrowLeft className="mr-2" />
-                  Back to Home
+            <div className="absolute top-4 left-4">
+                <Button variant="ghost" onClick={() => router.back()}>
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
-              </Link>
+            </div>
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
-
-
                 <Card className="w-full max-w-md mt-10">
                     <CardHeader>
                         <CardTitle>Book a Ride</CardTitle>
@@ -309,12 +296,16 @@ export default function BookRidePage() {
 
                         <div className="grid gap-2">
                             <label htmlFor="source">Source</label>
-                            <Select onValueChange={(value) => {
-                                const selectedSource = suggestedSources.find(src => src.name === value);
-                                if (selectedSource) {
-                                    handleSourceSelect(selectedSource);
-                                }
-                            }} required value={selectedSourceValue || ""} >
+                            <Select 
+                                onValueChange={(value) => {
+                                    const selected = suggestedSources.find(src => src.name === value);
+                                    if (selected) {
+                                        handleSourceSelect(selected);
+                                    }
+                                }} 
+                                required 
+                                value={selectedSourceValue || ""}
+                            >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select source" />
                                 </SelectTrigger>
@@ -332,12 +323,16 @@ export default function BookRidePage() {
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="destination">Destination</label>
-                            <Select onValueChange={(value) => {
-                                const selectedDestination = suggestedDestinations.find(dest => dest.name === value);
-                                if (selectedDestination) {
-                                    handleDestinationSelect(selectedDestination);
-                                }
-                            }} required value={selectedDestinationValue || ""}>
+                            <Select 
+                                onValueChange={(value) => {
+                                    const selected = suggestedDestinations.find(dest => dest.name === value);
+                                    if (selected) {
+                                        handleDestinationSelect(selected);
+                                    }
+                                }} 
+                                required 
+                                value={selectedDestinationValue || ""}
+                            >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select destination" />
                                 </SelectTrigger>
