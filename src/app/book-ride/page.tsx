@@ -10,11 +10,9 @@ import { Map, ArrowLeft } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateFare } from '@/ai/flows/calculate-fare';
+import { calculateDistance } from '@/ai/flows/calculate-fare'; // Updated import
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
-import { User } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 
 export default function BookRidePage() {
@@ -27,8 +25,8 @@ export default function BookRidePage() {
     const [suggestedSources, setSuggestedSources] = useState<any[]>([]);
     const [suggestedDestinations, setSuggestedDestinations] = useState<any[]>([]);
     const { toast } = useToast();
-    const [vehicleType, setVehicleType] = useState('sedan'); // Default vehicle type
-    const [mobileNumber, setMobileNumber] = useState(''); // Mobile number state
+    const [vehicleType, setVehicleType] = useState('');
+    const [mobileNumber, setMobileNumber] = useState('');
     const router = useRouter();
     const [selectedSourceValue, setSelectedSourceValue] = useState<string | null>(null);
     const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
@@ -36,27 +34,41 @@ export default function BookRidePage() {
     const [email, setEmail] = useState('');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    const [availableCabs, setAvailableCabs] = useState<any[]>([]);
+    const [currentFares, setCurrentFares] = useState<any[]>([]);
 
     useEffect(() => {
-        // Check if the user is authenticated (e.g., check for a token in local storage)
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('authToken');
             setIsAuthenticated(!!token);
+
+            const storedCabs = localStorage.getItem('cabs');
+            if (storedCabs) {
+                setAvailableCabs(JSON.parse(storedCabs));
+            }
+            const storedFares = localStorage.getItem('fares');
+            if (storedFares) {
+                setCurrentFares(JSON.parse(storedFares));
+                 // Set default vehicle type if not set and fares are available
+                if (!vehicleType && JSON.parse(storedFares).length > 0) {
+                    setVehicleType(JSON.parse(storedFares)[0].vehicleType);
+                }
+            }
         }
-    }, []);
+    }, [vehicleType]); // Added vehicleType to dependency array to set default
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('authToken');
         }
         setIsAuthenticated(false);
-        router.push('/'); // Redirect to home after logout
+        router.push('/'); 
     };
 
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
-            const location = await getCurrentLocation(); // Use current location as a fallback
+            const location = await getCurrentLocation(); 
             const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedSources(destinations);
         } catch (error: any) {
@@ -71,7 +83,7 @@ export default function BookRidePage() {
 
     const fetchSuggestedDestinations = useCallback(async () => {
         try {
-            const location = await getCurrentLocation(); // Use current location as a fallback
+            const location = await getCurrentLocation(); 
             const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedDestinations(destinations);
         } catch (error: any) {
@@ -116,71 +128,80 @@ export default function BookRidePage() {
 
     useEffect(() => {
         const estimateFare = async () => {
-            if (source && destination) {
+            if (source && destination && vehicleType && currentFares.length > 0) {
                 try {
-                    const fareDetails = await calculateFare({
+                    const distanceResult = await calculateDistance({
                         sourceLat: source.lat,
                         sourceLng: source.lng,
                         destinationLat: destination.lat,
                         destinationLng: destination.lng,
                     });
-                    let calculatedFare = fareDetails.fare;
+                    
+                    setDistance(distanceResult.distance);
 
-                    // Adjust fare based on vehicle type
-                    switch (vehicleType) {
-                        case 'sedan':
-                            calculatedFare *= 1; // Base fare
-                            break;
-                        case 'suv':
-                            calculatedFare *= 1.5; // 50% higher
-                            break;
-                        case 'mini':
-                            calculatedFare *= 0.8; // 20% lower
-                            break;
-                        default:
-                            break;
+                    const selectedFareRule = currentFares.find(f => f.vehicleType === vehicleType);
+
+                    if (selectedFareRule) {
+                        const calculatedFare = selectedFareRule.baseFare + (distanceResult.distance * selectedFareRule.perKmRate);
+                        setFare(calculatedFare);
+                    } else {
+                        setFare(null); // No fare rule found for selected vehicle type
+                        toast({
+                            title: "Fare Calculation Error",
+                            description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
+                            variant: "destructive",
+                        });
                     }
 
-                    setFare(calculatedFare);
-                    setDistance(fareDetails.distance);
                 } catch (error: any) {
                     toast({
-                        title: "Error calculating fare",
+                        title: "Error calculating fare/distance",
                         description: error.message,
                         variant: "destructive",
                     });
-                    console.error('Error calculating fare:', error);
+                    console.error('Error calculating fare/distance:', error);
+                    setFare(null);
+                    setDistance(null);
                 }
+            } else {
+                setFare(null);
+                setDistance(null);
             }
         };
 
         estimateFare();
-    }, [source, destination, vehicleType, toast]);
+    }, [source, destination, vehicleType, currentFares, toast]);
 
     const [sourceInput, setSourceInput] = useState('');
     const [destinationInput, setDestinationInput] = useState('');
 
-    const handleSourceSelect = async (selectedSource: any) => {
-        setSource({ lat: selectedSource.lat, lng: selectedSource.lng });
-        setSourceInput(selectedSource.name);
-        setSelectedSourceValue(selectedSource.name);
-        try {
-            const address = await getAddressForCoordinate({ lat: selectedSource.lat, lng: selectedSource.lng });
-            setSourceAddress(address);
-        } catch (e) {
-            console.error(e);
+    const handleSourceSelect = async (selectedSourceName: string) => {
+        const selected = suggestedSources.find(src => src.name === selectedSourceName);
+        if (selected) {
+            setSource({ lat: selected.lat, lng: selected.lng });
+            setSourceInput(selected.name);
+            setSelectedSourceValue(selected.name);
+            try {
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
+                setSourceAddress(address);
+            } catch (e) {
+                console.error(e);
+            }
         }
     };
 
-    const handleDestinationSelect = async (selectedDestination: any) => {
-        setDestination({ lat: selectedDestination.lat, lng: selectedDestination.lng });
-        setDestinationInput(selectedDestination.name);
-        setSelectedDestinationValue(selectedDestination.name);
-        try {
-            const address = await getAddressForCoordinate({ lat: selectedDestination.lat, lng: selectedDestination.lng });
-            setDestinationAddress(address);
-        } catch (e) {
-            console.error(e);
+    const handleDestinationSelect = async (selectedDestinationName: string) => {
+         const selected = suggestedDestinations.find(dest => dest.name === selectedDestinationName);
+        if (selected) {
+            setDestination({ lat: selected.lat, lng: selected.lng });
+            setDestinationInput(selected.name);
+            setSelectedDestinationValue(selected.name);
+            try {
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
+                setDestinationAddress(address);
+            } catch (e) {
+                console.error(e);
+            }
         }
     };
 
@@ -189,30 +210,30 @@ export default function BookRidePage() {
     };
 
     const bookCab = () => {
-        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && user && email) {
-            // Get current date and time
+        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && user && email && vehicleType) {
             const bookingDateTime = new Date();
             const bookingDate = bookingDateTime.toLocaleDateString();
             const bookingTime = bookingDateTime.toLocaleTimeString();
 
-            // Store booking details
+            const selectedCabDetails = availableCabs.find(cab => cab.model === vehicleType);
+            const driverName = selectedCabDetails ? selectedCabDetails.driverName : 'Not Assigned';
+
             const newBooking = {
                 id: generateUniqueId(),
                 mobileNumber: mobileNumber,
                 user: user,
-                userName: user, // Added user name
-                email: email,       // Added email
+                userName: user, 
+                email: email,       
                 source: selectedSourceValue,
                 destination: selectedDestinationValue,
                 cabModel: vehicleType,
                 fare: fare.toFixed(2),
-                driverName: 'Anoop', // Placeholder
-                date: bookingDate,   // Add booking date
-                time: bookingTime,   // Add booking time
-                status: 'Confirmed', // Set initial status
+                driverName: driverName, 
+                date: bookingDate,  
+                time: bookingTime,  
+                status: 'Confirmed', 
             };
 
-            // Save booking details to local storage
             if (typeof window !== 'undefined') {
                 let existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
                 existingBookings.push(newBooking);
@@ -223,24 +244,27 @@ export default function BookRidePage() {
             router.push(`/otp?mobileNumber=${mobileNumber}`);
 
         } else {
+            let missingFields = [];
+            if (!source) missingFields.push("source");
+            if (!destination) missingFields.push("destination");
+            if (!mobileNumber) missingFields.push("mobile number");
+            if (fare === null) missingFields.push("fare calculation (ensure source/destination/vehicle type are set)");
+            if (!selectedSourceValue) missingFields.push("source selection");
+            if (!selectedDestinationValue) missingFields.push("destination selection");
+            if (!user) missingFields.push("user name");
+            if (!email) missingFields.push("email");
+            if (!vehicleType) missingFields.push("vehicle type");
+            
             toast({
                 title: "Error Booking Cab",
-                description: "Please select both source and destination, and enter your mobile number, User and Email.",
+                description: `Please fill in all required fields: ${missingFields.join(', ')}.`,
                 variant: "destructive",
             });
         }
     };
 
     const handleBookCabClick = () => {
-        if (selectedSourceValue && selectedDestinationValue && mobileNumber && user && email) {
-            bookCab();
-        } else {
-            toast({
-                title: "Booking Error",
-                description: "Please fill in all required fields: source, destination, mobile number, user, and email.",
-                variant: "destructive",
-            });
-        }
+        bookCab();
     };
 
     
@@ -297,12 +321,7 @@ export default function BookRidePage() {
                         <div className="grid gap-2">
                             <label htmlFor="source">Source</label>
                             <Select 
-                                onValueChange={(value) => {
-                                    const selected = suggestedSources.find(src => src.name === value);
-                                    if (selected) {
-                                        handleSourceSelect(selected);
-                                    }
-                                }} 
+                                onValueChange={(value) => handleSourceSelect(value)} 
                                 required 
                                 value={selectedSourceValue || ""}
                             >
@@ -324,12 +343,7 @@ export default function BookRidePage() {
                         <div className="grid gap-2">
                             <label htmlFor="destination">Destination</label>
                             <Select 
-                                onValueChange={(value) => {
-                                    const selected = suggestedDestinations.find(dest => dest.name === value);
-                                    if (selected) {
-                                        handleDestinationSelect(selected);
-                                    }
-                                }} 
+                                onValueChange={(value) => handleDestinationSelect(value)} 
                                 required 
                                 value={selectedDestinationValue || ""}
                             >
@@ -350,16 +364,23 @@ export default function BookRidePage() {
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="vehicleType">Vehicle Type</label>
-                            <Select onValueChange={setVehicleType} defaultValue={vehicleType} required>
+                            <Select 
+                                onValueChange={setVehicleType} 
+                                value={vehicleType} 
+                                required
+                            >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select vehicle type" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Type</SelectLabel>
-                                        <SelectItem value="sedan">Sedan</SelectItem>
-                                        <SelectItem value="suv">SUV</SelectItem>
-                                        <SelectItem value="mini">Mini</SelectItem>
+                                        {currentFares.map((fareRule) => (
+                                            <SelectItem key={fareRule.id} value={fareRule.vehicleType}>
+                                                {fareRule.vehicleType}
+                                            </SelectItem>
+                                        ))}
+                                        {currentFares.length === 0 && <SelectItem value="" disabled>No vehicle types available</SelectItem>}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -386,11 +407,10 @@ export default function BookRidePage() {
                                 />
                             </div>
                         )}
-                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !user || !email}>Book Cab <Map className="ml-2" /></Button>
+                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !user || !email || !vehicleType || fare === null}>Book Cab <Map className="ml-2" /></Button>
                     </CardContent>
                 </Card>
             </main>
         </div>
     );
 }
-

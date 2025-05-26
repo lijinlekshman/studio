@@ -38,32 +38,33 @@ const initialFares = [
 ];
 
 const initialBookings = [
-    { id: '1', mobileNumber: '9876543210', user: 'Anoop', source: 'Punalur', destination: 'Kollam', fare: 600, cabModel: 'Sedan', driverName: 'Anoop', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
-    { id: '2', mobileNumber: '8765432190', user: 'Gopi', source: 'Kottarakkara', destination: 'Trivandrum', fare: 900, cabModel: 'SUV', driverName: 'Gopi', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
+    { id: '1', mobileNumber: '9876543210', user: 'Anoop', source: 'Punalur', destination: 'Kollam', fare: "600.00", cabModel: 'Sedan', driverName: 'Anoop', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
+    { id: '2', mobileNumber: '8765432190', user: 'Gopi', source: 'Kottarakkara', destination: 'Trivandrum', fare: "900.00", cabModel: 'SUV', driverName: 'Gopi', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
 ];
 
 
 export default function AdminDashboard() {
-  const [cabs, setCabs] = useState(initialCabs);
-  const [fares, setFares] = useState(initialFares);
-  const [bookings, setBookings] = useState(initialBookings);
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const storedCabs = localStorage.getItem('cabs');
-            if (storedCabs) {
-                setCabs(JSON.parse(storedCabs));
-            }
-            const storedBookings = localStorage.getItem('bookings');
-            if (storedBookings) {
-                setBookings(JSON.parse(storedBookings));
-            }
-            const storedFares = localStorage.getItem('fares');
-            if (storedFares) {
-                setFares(JSON.parse(storedFares));
-            }
-        }
-    }, []);
+  const [cabs, setCabs] = useState(() => {
+    if (typeof window !== 'undefined') {
+        const storedCabs = localStorage.getItem('cabs');
+        return storedCabs ? JSON.parse(storedCabs) : initialCabs;
+    }
+    return initialCabs;
+  });
+  const [fares, setFares] = useState(() => {
+    if (typeof window !== 'undefined') {
+        const storedFares = localStorage.getItem('fares');
+        return storedFares ? JSON.parse(storedFares) : initialFares;
+    }
+    return initialFares;
+  });
+  const [bookings, setBookings] = useState(() => {
+    if (typeof window !== 'undefined') {
+        const storedBookings = localStorage.getItem('bookings');
+        return storedBookings ? JSON.parse(storedBookings) : initialBookings;
+    }
+    return initialBookings;
+  });
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -119,6 +120,22 @@ export default function AdminDashboard() {
         }
     }, [router]);
 
+    useEffect(() => { // Effect to refresh bookings from localStorage periodically or on an event
+        const interval = setInterval(() => {
+            if (typeof window !== 'undefined') {
+                const storedBookings = localStorage.getItem('bookings');
+                if (storedBookings) {
+                    const currentBookings = JSON.parse(storedBookings);
+                    // Basic check to see if bookings have changed to avoid unnecessary re-renders
+                    if (JSON.stringify(currentBookings) !== JSON.stringify(bookings)) {
+                        setBookings(currentBookings);
+                    }
+                }
+            }
+        }, 5000); // Refresh every 5 seconds, adjust as needed
+        return () => clearInterval(interval);
+    }, [bookings]); // Rerun if bookings state itself changes
+
     if (!isAuthenticated) {
         return null; // Or a loading spinner, or a message like "Redirecting..."
     }
@@ -134,7 +151,7 @@ export default function AdminDashboard() {
       return;
     }
     const newCab = {
-      id: String(cabs.length + 1), // Simple ID generation
+      id: String(cabs.length > 0 ? Math.max(...cabs.map(c => parseInt(c.id))) + 1 : 1), // Robust ID generation
       model: newCabModel,
       licensePlate: newCabLicensePlate,
       status: 'Active', // Default status
@@ -208,7 +225,7 @@ export default function AdminDashboard() {
         }
 
         const newFare = {
-            id: String(fares.length + 1),
+            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), // Robust ID generation
             vehicleType: newFareVehicleType,
             baseFare: parseFloat(newFareBaseFare),
             perKmRate: parseFloat(newFarePerKmRate),
@@ -259,21 +276,6 @@ export default function AdminDashboard() {
                     baseFare: parseFloat(editedFareBaseFare),
                     perKmRate: parseFloat(editedFarePerKmRate)
                 };
-
-                // Update bookings with the new fare
-                setBookings(prevBookings =>
-                    prevBookings.map(booking => {
-                        if (booking.cabModel === updatedFare.vehicleType) {
-                            // Recalculate fare based on the booking's distance (assuming you have a distance property)
-                            // This is a placeholder, you'll need a way to get the actual distance for each booking
-                            const bookingDistance = (booking as any).distance || 50; // Example: use a stored distance or a default
-                            const newFareForBooking = updatedFare.baseFare + (bookingDistance * updatedFare.perKmRate);
-                            return { ...booking, fare: newFareForBooking };
-                        }
-                        return booking;
-                    })
-                );
-
                 return updatedFare;
             } catch (error:any) {
                 toast({
@@ -293,13 +295,6 @@ export default function AdminDashboard() {
         });
     };
 
-  const handleUpdateFare = (id: string, updatedFare: any) => {
-    setFares(fares.map(fare => fare.id === id ? updatedFare : fare));
-    toast({
-      title: "Fare Updated",
-      description: `Fare for ${updatedFare.vehicleType} has been updated successfully.`,
-    });
-  };
 
   const handlePreview = (item: any) => {
     setSelectedCab(item);
@@ -311,20 +306,11 @@ export default function AdminDashboard() {
         setIsBookingDialogOpen(true);
     };
 
-    // Chart data (example)
-    const bookingData = [
-        { name: 'Sedan', bookings: bookings.filter(b => b.cabModel === 'Sedan').length },
-        { name: 'SUV', bookings: bookings.filter(b => b.cabModel === 'SUV').length },
-        // Add more vehicle types if needed
-    ];
-
-    const handleAddBooking = (newBooking: any) => {
-        setBookings([...bookings, newBooking]);
-        toast({
-            title: "New Booking Added",
-            description: `A new booking from ${newBooking.source} to ${newBooking.destination} has been added.`,
-        });
-    };
+    // Chart data
+    const bookingData = currentFares.map(fareRule => ({
+        name: fareRule.vehicleType,
+        bookings: bookings.filter(b => b.cabModel === fareRule.vehicleType).length
+    }));
 
 
   return (
@@ -512,6 +498,8 @@ export default function AdminDashboard() {
                         <TableHead>Source</TableHead>
                         <TableHead>Destination</TableHead>
                         <TableHead>Fare</TableHead>
+                        <TableHead>Cab Model</TableHead>
+                        <TableHead>Driver</TableHead>
                         <TableHead>Date</TableHead>
                         <TableHead>Time</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -525,6 +513,8 @@ export default function AdminDashboard() {
                           <TableCell>{booking.source}</TableCell>
                           <TableCell>{booking.destination}</TableCell>
                           <TableCell>₹{booking.fare}</TableCell>
+                          <TableCell>{booking.cabModel}</TableCell>
+                          <TableCell>{booking.driverName}</TableCell>
                           <TableCell>{booking.date}</TableCell>
                           <TableCell>{booking.time}</TableCell>
                           <TableCell className="text-right">
@@ -675,6 +665,8 @@ export default function AdminDashboard() {
               <p><strong>Fare:</strong> ₹{selectedBooking.fare}</p>
               <p><strong>Cab Model:</strong> {selectedBooking.cabModel}</p>
               <p><strong>Driver Name:</strong> {selectedBooking.driverName}</p>
+              <p><strong>Date:</strong> {selectedBooking.date}</p>
+              <p><strong>Time:</strong> {selectedBooking.time}</p>
             </>
           )}
         </DialogContent>
@@ -682,6 +674,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-
-    
