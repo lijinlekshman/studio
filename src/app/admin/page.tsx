@@ -307,7 +307,7 @@ export default function AdminDashboard() {
     };
 
     // Chart data
-    const bookingData = currentFares.map(fareRule => ({
+    const bookingData = fares.map(fareRule => ({
         name: fareRule.vehicleType,
         bookings: bookings.filter(b => b.cabModel === fareRule.vehicleType).length
     }));
@@ -674,3 +674,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
