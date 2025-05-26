@@ -38,8 +38,8 @@ const initialFares = [
 ];
 
 const initialBookings = [
-    { id: '1', mobileNumber: '9876543210', user: 'Anoop', source: 'Punalur', destination: 'Kollam', fare: "600.00", cabModel: 'Sedan', driverName: 'Anoop', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
-    { id: '2', mobileNumber: '8765432190', user: 'Gopi', source: 'Kottarakkara', destination: 'Trivandrum', fare: "900.00", cabModel: 'SUV', driverName: 'Gopi', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
+    { id: '1', mobileNumber: '9876543210', user: 'Anoop P', source: 'Punalur', destination: 'Kollam', fare: "600.00", cabModel: 'Sedan', driverName: 'Anoop', date: "8/2/2024", time: "10:00 AM" },
+    { id: '2', mobileNumber: '8765432190', user: 'Gopi K', source: 'Kottarakkara', destination: 'Trivandrum', fare: "900.00", cabModel: 'SUV', driverName: 'Gopi', date: "8/2/2024", time: "11:30 AM" },
 ];
 
 
@@ -50,20 +50,35 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const storedCabs = localStorage.getItem('cabs');
-            if (storedCabs) {
-                setCabs(JSON.parse(storedCabs));
+            try {
+                const storedCabs = localStorage.getItem('cabs');
+                if (storedCabs) {
+                    setCabs(JSON.parse(storedCabs));
+                }
+            } catch (error) {
+                console.error("Failed to parse cabs from localStorage", error);
+                // Optionally clear corrupted item: localStorage.removeItem('cabs');
             }
-            const storedFares = localStorage.getItem('fares');
-            if (storedFares) {
-                setFares(JSON.parse(storedFares));
+
+            try {
+                const storedFares = localStorage.getItem('fares');
+                if (storedFares) {
+                    setFares(JSON.parse(storedFares));
+                }
+            } catch (error) {
+                console.error("Failed to parse fares from localStorage", error);
             }
-            const storedBookings = localStorage.getItem('bookings');
-            if (storedBookings) {
-                setBookings(JSON.parse(storedBookings));
+
+            try {
+                const storedBookings = localStorage.getItem('bookings');
+                if (storedBookings) {
+                    setBookings(JSON.parse(storedBookings));
+                }
+            } catch (error) {
+                console.error("Failed to parse bookings from localStorage", error);
             }
         }
-    }, []);
+    }, []); // Empty dependency array ensures this runs once on mount
 
 
     useEffect(() => {
@@ -125,10 +140,14 @@ export default function AdminDashboard() {
             if (typeof window !== 'undefined') {
                 const storedBookings = localStorage.getItem('bookings');
                 if (storedBookings) {
-                    const currentBookings = JSON.parse(storedBookings);
-                    // Basic check to see if bookings have changed to avoid unnecessary re-renders
-                    if (JSON.stringify(currentBookings) !== JSON.stringify(bookings)) {
-                        setBookings(currentBookings);
+                    try {
+                        const currentBookings = JSON.parse(storedBookings);
+                        // Basic check to see if bookings have changed to avoid unnecessary re-renders
+                        if (JSON.stringify(currentBookings) !== JSON.stringify(bookings)) {
+                            setBookings(currentBookings);
+                        }
+                    } catch (error) {
+                        console.error("Error parsing bookings for refresh interval:", error);
                     }
                 }
             }
