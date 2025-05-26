@@ -1,12 +1,19 @@
 import {genkit} from 'genkit';
 import {googleAI} from '@genkit-ai/googleai';
 
+// Provide a fallback empty string if the API key is not set
+// This can help prevent errors during server-side processing or build time
+// if the environment variable isn't available in that context.
+const apiKey = process.env.GOOGLE_GENAI_API_KEY || "";
+
 export const ai = genkit({
-  promptDir: './prompts',
+  // promptDir: './prompts', // Removed: This might cause FS access issues during static build
   plugins: [
     googleAI({
-      apiKey: process.env.GOOGLE_GENAI_API_KEY,
+      apiKey: apiKey,
     }),
   ],
   model: 'googleai/gemini-2.0-flash',
+  // Consider enabling tracing and metrics in a dedicated Genkit server environment
+  // enableTracingAndMetrics: true,
 });

@@ -1,6 +1,5 @@
 // This file is machine-generated - DO NOT EDIT.
 
-'use server';
 
 /**
  * @fileOverview An AI-powered cab dispatch optimizer.
@@ -10,9 +9,9 @@
  * - OptimizeDispatchOutput - The return type for the optimizeDispatch function.
  */
 
-import {ai} from '@/ai/ai-instance';
-import {z} from 'genkit';
-import {Coordinate} from '@/services/map';
+// import {ai} from '@/ai/ai-instance'; // Commented out for static export
+import {z} from 'zod'; // Changed from 'genkit' to 'zod'
+import type { Coordinate } from '@/services/map'; // Ensure type import
 
 const OptimizeDispatchInputSchema = z.object({
   availableCabs: z
@@ -83,8 +82,15 @@ const OptimizeDispatchOutputSchema = z.object({
 export type OptimizeDispatchOutput = z.infer<typeof OptimizeDispatchOutputSchema>;
 
 export async function optimizeDispatch(input: OptimizeDispatchInput): Promise<OptimizeDispatchOutput> {
-  return optimizeDispatchFlow(input);
+  // NOTE: This flow will not work as intended in a pure static export
+  // For static export, directly returning mock data.
+  console.warn("optimizeDispatch called in static context, returning empty dispatch plan.");
+  return { dispatchPlan: [] }; // Fallback for static export
 }
+
+/*
+// Original Genkit prompt and flow definition - commented out for static export
+import {ai}from '@/ai/ai-instance';
 
 const optimizeDispatchPrompt = ai.definePrompt({
   name: 'optimizeDispatchPrompt',
@@ -183,16 +189,15 @@ Output the dispatch plan as a JSON array of objects, where each object has the f
 `, // Replace with Handlebars template
 });
 
-const optimizeDispatchFlow = ai.defineFlow<
-  typeof OptimizeDispatchInputSchema,
-  typeof OptimizeDispatchOutputSchema
->({
-  name: 'optimizeDispatchFlow',
-  inputSchema: OptimizeDispatchInputSchema,
-  outputSchema: OptimizeDispatchOutputSchema,
-},
+const optimizeDispatchFlow = ai.defineFlow(
+  {
+    name: 'optimizeDispatchFlow',
+    inputSchema: OptimizeDispatchInputSchema,
+    outputSchema: OptimizeDispatchOutputSchema,
+  },
 async input => {
   const {output} = await optimizeDispatchPrompt(input);
   return output!;
 });
+*/
 
