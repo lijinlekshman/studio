@@ -6,11 +6,11 @@ import { Address, Coordinate, getCurrentLocation, getAddressForCoordinate } from
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Map, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Map } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateDistance } from '@/ai/flows/calculate-fare'; // Updated import
+import { calculateDistance } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 
@@ -125,6 +125,22 @@ export default function BookRidePage() {
 
         fetchSourceAddress();
     }, [source]);
+
+    useEffect(() => {
+        const fetchDestinationAddress = async () => {
+            if (destination) {
+                try {
+                    const address = await getAddressForCoordinate(destination);
+                    setDestinationAddress(address);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
+
+        fetchDestinationAddress();
+    }, [destination]);
+
 
     useEffect(() => {
         const estimateFare = async () => {
