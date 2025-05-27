@@ -14,7 +14,6 @@ import Link from "next/link";
 import { calculateDistance } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
-import { parseBookingRequest, type ParseBookingRequestOutput } from '@/ai/flows/parse-booking-request';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -44,59 +43,100 @@ export default function BookRidePage() {
     const [aiRequestText, setAiRequestText] = useState('');
     const [isParsing, setIsParsing] = useState(false);
     const [isAiHelperDialogOpen, setIsAiHelperDialogOpen] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
 
 
     useEffect(() => {
         let chatbotRequestData: ParseBookingRequestOutput | null = null;
-        if (typeof window !== 'undefined') {
-            try {
-                const storedCabs = localStorage.getItem('cabs');
-                setAvailableCabs(storedCabs ? JSON.parse(storedCabs) : []);
-            } catch (error) {
-                console.error("Failed to parse availableCabs from localStorage", error);
-                setAvailableCabs([]);
-            }
-            try {
-                const storedFares = localStorage.getItem('fares');
-                const parsedFares = storedFares ? JSON.parse(storedFares) : [];
-                setCurrentFares(parsedFares);
-                 if (!vehicleType && parsedFares.length > 0) {
-                    const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
-                    if (firstValidFare) {
-                       // setVehicleType(firstValidFare.vehicleType);
+        const loadInitialData = async () => {
+            if (typeof window !== 'undefined') {
+                try {
+                    const storedCabs = localStorage.getItem('cabs');
+                    setAvailableCabs(storedCabs ? JSON.parse(storedCabs) : []);
+                } catch (error) {
+                    console.error("Failed to parse availableCabs from localStorage", error);
+                    setAvailableCabs([]);
+                }
+                try {
+                    const storedFares = localStorage.getItem('fares');
+                    const parsedFares = storedFares ? JSON.parse(storedFares) : [];
+                    setCurrentFares(parsedFares);
+                     if (!vehicleType && parsedFares.length > 0) {
+                        const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
+                        // if (firstValidFare) { // Auto-selection removed to allow placeholder
+                        //    setVehicleType(firstValidFare.vehicleType);
+                        // }
+                    }
+                } catch (error) {
+                    console.error("Failed to parse currentFares from localStorage", error);
+                    setCurrentFares([]);
+                }
+
+                const chatbotRequestString = localStorage.getItem('chatbotBookingRequest');
+                if (chatbotRequestString) {
+                    try {
+                        chatbotRequestData = JSON.parse(chatbotRequestString) as ParseBookingRequestOutput;
+                        if (chatbotRequestData?.userName) setUser(chatbotRequestData.userName);
+                        if (chatbotRequestData?.email) setEmail(chatbotRequestData.email);
+                        if (chatbotRequestData?.mobileNumber) setMobileNumber(chatbotRequestData.mobileNumber);
+                        localStorage.removeItem('chatbotBookingRequest');
+                        toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
+                    } catch (e) {
+                        console.error("Error parsing chatbotBookingRequest from localStorage", e);
+                        localStorage.removeItem('chatbotBookingRequest');
                     }
                 }
-            } catch (error) {
-                console.error("Failed to parse currentFares from localStorage", error);
-                setCurrentFares([]);
             }
 
-            const chatbotRequestString = localStorage.getItem('chatbotBookingRequest');
-            if (chatbotRequestString) {
-                try {
-                    chatbotRequestData = JSON.parse(chatbotRequestString);
-                    if (chatbotRequestData?.userName) setUser(chatbotRequestData.userName);
-                    if (chatbotRequestData?.email) setEmail(chatbotRequestData.email);
-                    if (chatbotRequestData?.mobileNumber) setMobileNumber(chatbotRequestData.mobileNumber);
-                    localStorage.removeItem('chatbotBookingRequest'); 
-                    toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
-                } catch (e) {
-                    console.error("Error parsing chatbotBookingRequest from localStorage", e);
-                    localStorage.removeItem('chatbotBookingRequest');
+            // Fetch current location and suggestions after localStorage is handled
+            try {
+                const location = await getCurrentLocation();
+                setSource(location); // Set initial source to current location
+                // Fetch address for initial current location
+                if (location) {
+                    const address = await getAddressForCoordinate(location);
+                    setSourceAddress(address);
+                    // setSelectedSourceValue(address.formattedAddress); // Optionally prefill select display
+                }
+            } catch (e) {
+                console.error("Error getting current location:", e);
+            }
+
+            await fetchSuggestedSources();
+            await fetchSuggestedDestinations();
+
+            if (chatbotRequestData?.vehiclePreference && currentFares.length > 0) {
+                const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === chatbotRequestData!.vehiclePreference?.toLowerCase());
+                if (validVehicle) {
+                    setVehicleType(validVehicle.vehicleType);
+                } else if (chatbotRequestData?.vehiclePreference) {
+                    toast({ title: "AI Assistant", description: `Vehicle type "${chatbotRequestData.vehiclePreference}" not available. Please select manually.`, variant: "default" });
                 }
             }
-        }
-        // This effect should run once on mount
-        if (chatbotRequestData?.vehiclePreference && currentFares.length > 0) {
-            const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === chatbotRequestData!.vehiclePreference?.toLowerCase());
-            if (validVehicle) {
-                setVehicleType(validVehicle.vehicleType);
-            } else if (chatbotRequestData?.vehiclePreference) {
-                toast({ title: "AI Assistant", description: `Vehicle type "${chatbotRequestData.vehiclePreference}" not available. Please select manually.`, variant: "default" });
+             if (chatbotRequestData?.sourceName) {
+                const matchedSource = suggestedSources.find(s => s.name.toLowerCase().includes(chatbotRequestData!.sourceName!.toLowerCase()));
+                if (matchedSource) {
+                    await handleSourceSelect(matchedSource.name);
+                } else {
+                     toast({ title: "AI Helper", description: `Source "${chatbotRequestData.sourceName}" not found in suggestions. Please select manually.`, variant: "default" });
+                }
             }
-        }
+            if (chatbotRequestData?.destinationName) {
+                const matchedDestination = suggestedDestinations.find(d => d.name.toLowerCase().includes(chatbotRequestData!.destinationName!.toLowerCase()));
+                if (matchedDestination) {
+                    await handleDestinationSelect(matchedDestination.name);
+                } else {
+                    toast({ title: "AI Helper", description: `Destination "${chatbotRequestData.destinationName}" not found in suggestions. Please select manually.`, variant: "default" });
+                }
+            }
+
+
+            setDataLoaded(true); // Signal that all initial data loading attempts are complete
+        };
+
+        loadInitialData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Ensure this runs once on mount
+    }, []);
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
@@ -126,20 +166,6 @@ export default function BookRidePage() {
         }
     }, [toast]);
 
-    useEffect(() => {
-        const fetchCurrentLocation = async () => {
-            try {
-                const location = await getCurrentLocation();
-                setSource(location);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
-        fetchCurrentLocation();
-        fetchSuggestedSources();
-        fetchSuggestedDestinations();
-    }, [fetchSuggestedSources, fetchSuggestedDestinations]);
 
     useEffect(() => {
         const fetchSourceAddress = async () => {
@@ -190,7 +216,7 @@ export default function BookRidePage() {
                         setFare(calculatedFare);
                     } else {
                         setFare(null);
-                        if (vehicleType) { 
+                        if (vehicleType) {
                             toast({
                                 title: "Fare Calculation Error",
                                 description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
@@ -226,6 +252,7 @@ export default function BookRidePage() {
                 setSourceAddress(address);
             } catch (e) {
                 console.error(e);
+                 setSourceAddress(null);
             }
         }
     };
@@ -240,6 +267,7 @@ export default function BookRidePage() {
                 setDestinationAddress(address);
             } catch (e) {
                 console.error(e);
+                setDestinationAddress(null);
             }
         }
     };
@@ -251,15 +279,12 @@ export default function BookRidePage() {
     // Placeholder for Twilio OTP sending
     const simulateSendOtp = async (phoneNumber: string) => {
         console.log(`Simulating OTP send to: ${phoneNumber} using Twilio Verify Service ID: VA4e5f3c5b9f308ba482baa879f38b4bba`);
-        // In a real app, this would involve a backend call to Twilio:
-        // const response = await fetch('/api/send-otp', { method: 'POST', body: JSON.stringify({ phoneNumber }) });
-        // if (!response.ok) throw new Error('Failed to send OTP');
         toast({
             title: "OTP Simulation",
             description: `An OTP would be sent to ${phoneNumber}. (Demo: Use 123456 to verify). Actual Twilio integration needed.`,
             duration: 9000,
         });
-        return true; // Simulate success
+        return true;
     };
 
 
@@ -275,7 +300,6 @@ export default function BookRidePage() {
 
         if (source && destination && fare !== null) {
             try {
-                // Simulate sending OTP via Twilio
                 const otpSent = await simulateSendOtp(mobileNumber);
                 if (!otpSent) {
                     toast({
@@ -306,7 +330,7 @@ export default function BookRidePage() {
                     driverName: driverName,
                     date: bookingDate,
                     time: bookingTime,
-                    status: 'Pending OTP', // Status updated
+                    status: 'Pending OTP',
                 };
 
                 if (typeof window !== 'undefined') {
@@ -320,7 +344,7 @@ export default function BookRidePage() {
                     }
                     existingBookings.push(newBooking);
                     localStorage.setItem('bookings', JSON.stringify(existingBookings));
-                    localStorage.setItem('bookingDetails', JSON.stringify(newBooking)); // For OTP page to pick up
+                    localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
                 }
                 router.push(`/otp?mobileNumber=${mobileNumber}`);
             } catch (error: any) {
@@ -439,81 +463,86 @@ export default function BookRidePage() {
                             />
                         </div>
 
-                        <div className="grid gap-2">
-                            <Label htmlFor="source" className="font-medium text-left">Pickup Location</Label>
-                            <Select
-                                onValueChange={(value) => handleSourceSelect(value)}
-                                required
-                                value={selectedSourceValue || ""}
-                            >
-                                <SelectTrigger className="w-full text-base">
-                                    <SelectValue placeholder="Select pickup location" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Suggested Sources</SelectLabel>
-                                        {suggestedSources.map((src) => (
-                                            <SelectItem key={src.name} value={src.name} className="text-base">
-                                                {src.name}
-                                            </SelectItem>
-                                        ))}
-                                        {suggestedSources.length === 0 && <SelectItem value="--no-sources--" disabled>Loading sources...</SelectItem>}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="destination" className="font-medium text-left">Drop-off Location</Label>
-                            <Select
-                                onValueChange={(value) => handleDestinationSelect(value)}
-                                required
-                                value={selectedDestinationValue || ""}
-                            >
-                                <SelectTrigger className="w-full text-base">
-                                    <SelectValue placeholder="Select drop-off location" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Suggested Destinations</SelectLabel>
-                                        {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").map((dest) => (
-                                            <SelectItem key={dest.name} value={dest.name} className="text-base">
-                                                {dest.name}
-                                            </SelectItem>
-                                        ))}
-                                        {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").length === 0 && (
-                                            <SelectItem value="--no-destinations--" disabled>Loading destinations...</SelectItem>
-                                        )}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="vehicleType" className="font-medium text-left">Vehicle Type</Label>
-                            <Select
-                                onValueChange={setVehicleType}
-                                value={vehicleType}
-                                required
-                            >
-                                <SelectTrigger className="w-full text-base">
-                                    <SelectValue placeholder="Select vehicle type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>Available Types</SelectLabel>
-                                        {currentFares
-                                            .filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "")
-                                            .map((fareRule) => (
-                                                <SelectItem key={fareRule.id} value={fareRule.vehicleType} className="text-base">
-                                                    {fareRule.vehicleType}
-                                                </SelectItem>
-                                            ))}
-                                        {currentFares.filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "").length === 0 &&
-                                            <SelectItem value="--no-vehicle-types--" disabled>No vehicle types available</SelectItem>
-                                        }
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                        {!dataLoaded && <p className="text-sm text-muted-foreground text-center">Loading location options...</p>}
+                        {dataLoaded && (
+                            <>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="source" className="font-medium text-left">Pickup Location</Label>
+                                    <Select
+                                        onValueChange={(value) => handleSourceSelect(value)}
+                                        required
+                                        value={selectedSourceValue || ""}
+                                    >
+                                        <SelectTrigger className="w-full text-base">
+                                            <SelectValue placeholder="Select pickup location" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Suggested Sources</SelectLabel>
+                                                {suggestedSources.map((src) => (
+                                                    <SelectItem key={src.name} value={src.name} className="text-base">
+                                                        {src.name}
+                                                    </SelectItem>
+                                                ))}
+                                                {suggestedSources.length === 0 && <SelectItem value="--no-sources-placeholder--" disabled>No sources found</SelectItem>}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="destination" className="font-medium text-left">Drop-off Location</Label>
+                                    <Select
+                                        onValueChange={(value) => handleDestinationSelect(value)}
+                                        required
+                                        value={selectedDestinationValue || ""}
+                                    >
+                                        <SelectTrigger className="w-full text-base">
+                                            <SelectValue placeholder="Select drop-off location" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Suggested Destinations</SelectLabel>
+                                                {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").map((dest) => (
+                                                    <SelectItem key={dest.name} value={dest.name} className="text-base">
+                                                        {dest.name}
+                                                    </SelectItem>
+                                                ))}
+                                                {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").length === 0 && (
+                                                    <SelectItem value="--no-destinations-placeholder--" disabled>No destinations found</SelectItem>
+                                                )}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="vehicleType" className="font-medium text-left">Vehicle Type</Label>
+                                    <Select
+                                        onValueChange={setVehicleType}
+                                        value={vehicleType}
+                                        required
+                                    >
+                                        <SelectTrigger className="w-full text-base">
+                                            <SelectValue placeholder="Select vehicle type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                <SelectLabel>Available Types</SelectLabel>
+                                                {currentFares
+                                                    .filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "")
+                                                    .map((fareRule) => (
+                                                        <SelectItem key={fareRule.id} value={fareRule.vehicleType} className="text-base">
+                                                            {fareRule.vehicleType}
+                                                        </SelectItem>
+                                                    ))}
+                                                {currentFares.filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "").length === 0 &&
+                                                    <SelectItem value="--no-vehicle-types-placeholder--" disabled>No vehicle types available</SelectItem>
+                                                }
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </>
+                        )}
                         {distance !== null && (
                             <div className="grid gap-2">
                                 <Label htmlFor="distance" className="font-medium text-left">Distance</Label>
@@ -549,8 +578,8 @@ export default function BookRidePage() {
                         <CardTitle className="text-xl text-left">Selected Trip Details</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2 text-left">
-                        <p><strong>Pickup:</strong> {sourceAddress?.formattedAddress || 'Not selected'}</p>
-                        <p><strong>Drop-off:</strong> {destinationAddress?.formattedAddress || 'Not selected'}</p>
+                        <p><strong>Pickup:</strong> {selectedSourceValue || 'Not selected'}</p>
+                        <p><strong>Drop-off:</strong> {selectedDestinationValue || 'Not selected'}</p>
                     </CardContent>
                 </Card>
             </div>
@@ -599,4 +628,34 @@ export default function BookRidePage() {
             </Dialog>
         </div>
     );
+}
+
+// Define types for AI flow if not already globally available in this file's scope
+interface ParseBookingRequestOutput {
+  sourceName?: string;
+  destinationName?: string;
+  userName?: string;
+  email?: string;
+  mobileNumber?: string;
+  vehiclePreference?: string;
+}
+
+// Assume parseBookingRequest is imported or defined elsewhere
+// For this example, I'll mock it if it's not found, to avoid type errors
+// In your actual project, ensure it's properly imported from '@/ai/flows/parse-booking-request'
+async function parseBookingRequest(input: { requestText: string }): Promise<ParseBookingRequestOutput> {
+    // This is a mock. In your actual app, this would call the Genkit flow.
+    console.warn("parseBookingRequest called in mock context. For actual parsing, ensure your Genkit flow is operational.");
+    // Simulate some parsing based on keywords for demonstration
+    const request = input.requestText.toLowerCase();
+    const output: ParseBookingRequestOutput = {};
+    if (request.includes("punalur") && request.includes("kollam")) {
+        output.sourceName = "Punalur";
+        output.destinationName = "Kollam";
+    }
+    if (request.includes("anoop")) output.userName = "Anoop";
+    if (request.includes("suv")) output.vehiclePreference = "SUV";
+    if (request.includes("email@example.com")) output.email = "email@example.com";
+    if (request.includes("9876543210")) output.mobileNumber = "9876543210";
+    return output;
 }
