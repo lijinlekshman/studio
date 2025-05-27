@@ -22,7 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Image from 'next/image';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -38,8 +38,8 @@ const initialFares = [
 ];
 
 const initialBookings = [
-    { id: '1', mobileNumber: '9876543210', user: 'Anoop', source: 'Punalur', destination: 'Kollam', fare: "600.00", cabModel: 'Sedan', driverName: 'Anoop', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
-    { id: '2', mobileNumber: '8765432190', user: 'Gopi', source: 'Kottarakkara', destination: 'Trivandrum', fare: "900.00", cabModel: 'SUV', driverName: 'Gopi', date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() },
+    { id: '1', mobileNumber: '9876543210', user: 'Anoop P', source: 'Punalur', destination: 'Kollam', fare: "600.00", cabModel: 'Sedan', driverName: 'Anoop', date: "8/2/2024", time: "10:00 AM" },
+    { id: '2', mobileNumber: '8765432190', user: 'Gopi K', source: 'Kottarakkara', destination: 'Trivandrum', fare: "900.00", cabModel: 'SUV', driverName: 'Gopi', date: "8/2/2024", time: "11:30 AM" },
 ];
 
 
@@ -50,20 +50,43 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const storedCabs = localStorage.getItem('cabs');
-            if (storedCabs) {
-                setCabs(JSON.parse(storedCabs));
+            try {
+                const storedCabs = localStorage.getItem('cabs');
+                if (storedCabs) {
+                    setCabs(JSON.parse(storedCabs));
+                } else {
+                    setCabs(initialCabs); 
+                }
+            } catch (error) {
+                console.error("Failed to parse cabs from localStorage", error);
+                setCabs(initialCabs);
             }
-            const storedFares = localStorage.getItem('fares');
-            if (storedFares) {
-                setFares(JSON.parse(storedFares));
+
+            try {
+                const storedFares = localStorage.getItem('fares');
+                if (storedFares) {
+                    setFares(JSON.parse(storedFares));
+                } else {
+                    setFares(initialFares);
+                }
+            } catch (error) {
+                console.error("Failed to parse fares from localStorage", error);
+                setFares(initialFares);
             }
-            const storedBookings = localStorage.getItem('bookings');
-            if (storedBookings) {
-                setBookings(JSON.parse(storedBookings));
+
+            try {
+                const storedBookings = localStorage.getItem('bookings');
+                if (storedBookings) {
+                    setBookings(JSON.parse(storedBookings));
+                } else {
+                    setBookings(initialBookings);
+                }
+            } catch (error) {
+                console.error("Failed to parse bookings from localStorage", error);
+                setBookings(initialBookings);
             }
         }
-    }, []);
+    }, []); 
 
 
     useEffect(() => {
@@ -120,27 +143,29 @@ export default function AdminDashboard() {
         }
     }, [router]);
 
-    useEffect(() => { // Effect to refresh bookings from localStorage periodically or on an event
+    useEffect(() => { 
         const interval = setInterval(() => {
             if (typeof window !== 'undefined') {
                 const storedBookings = localStorage.getItem('bookings');
                 if (storedBookings) {
-                    const currentBookings = JSON.parse(storedBookings);
-                    // Basic check to see if bookings have changed to avoid unnecessary re-renders
-                    if (JSON.stringify(currentBookings) !== JSON.stringify(bookings)) {
-                        setBookings(currentBookings);
+                    try {
+                        const currentBookings = JSON.parse(storedBookings);
+                        if (JSON.stringify(currentBookings) !== JSON.stringify(bookings)) {
+                            setBookings(currentBookings);
+                        }
+                    } catch (error) {
+                        console.error("Error parsing bookings for refresh interval:", error);
                     }
                 }
             }
-        }, 5000); // Refresh every 5 seconds, adjust as needed
+        }, 5000); 
         return () => clearInterval(interval);
-    }, [bookings]); // Rerun if bookings state itself changes
+    }, [bookings]); 
 
     if (!isAuthenticated) {
-        return null; // Or a loading spinner, or a message like "Redirecting..."
+        return null; 
     }
 
-  // Function to handle adding a new cab
   const handleAddCab = () => {
     if (!newCabModel || !newCabLicensePlate || !newCabDriverName) {
       toast({
@@ -151,24 +176,43 @@ export default function AdminDashboard() {
       return;
     }
     const newCab = {
-      id: String(cabs.length > 0 ? Math.max(...cabs.map(c => parseInt(c.id))) + 1 : 1), // Robust ID generation
+      id: String(cabs.length > 0 ? Math.max(...cabs.map(c => parseInt(c.id))) + 1 : 1), 
       model: newCabModel,
       licensePlate: newCabLicensePlate,
-      status: 'Active', // Default status
-        driverName: newCabDriverName,
+      status: 'Active', 
+      driverName: newCabDriverName,
     };
-    setCabs([...cabs, newCab]);
+    
+    const updatedCabs = [...cabs, newCab];
+    setCabs(updatedCabs);
+
+    const fareExists = fares.some(fare => fare.vehicleType === newCab.model);
+
+    if (!fareExists) {
+        const newFareRule = {
+            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), 
+            vehicleType: newCab.model,
+            baseFare: 0, 
+            perKmRate: 0, 
+        };
+        setFares(prevFares => [...prevFares, newFareRule]);
+        toast({
+            title: "Fare Rule Created",
+            description: `A new fare rule for ${newCab.model} has been created. Please set its rates.`,
+            variant: "default"
+        });
+    }
+
     setIsAddCabDialogOpen(false);
     setNewCabModel('');
     setNewCabLicensePlate('');
-      setNewCabDriverName('');
+    setNewCabDriverName('');
     toast({
       title: "Cab Added",
       description: `Cab ${newCab.model} with license plate ${newCab.licensePlate} has been added successfully.`,
     });
   };
 
-  // Function to handle deleting a cab
   const handleDeleteCab = (id: string) => {
     setCabs(cabs.filter(cab => cab.id !== id));
     toast({
@@ -177,7 +221,6 @@ export default function AdminDashboard() {
     });
   };
 
-  // Function to handle editing a cab
   const handleEditCab = (cab: any) => {
         setEditingCabId(cab.id);
         setEditedCabModel(cab.model);
@@ -185,7 +228,6 @@ export default function AdminDashboard() {
           setEditedCabDriverName(cab.driverName);
     };
 
-    // Function to handle updating cab status (placeholder)
     const handleUpdateCabStatus = (id: string, status: string) => {
         setCabs(cabs.map(cab => cab.id === id ? { ...cab, status } : cab));
         toast({
@@ -213,7 +255,6 @@ export default function AdminDashboard() {
         });
     };
 
-    // Function to handle adding a new fare
     const handleAddFare = () => {
         if (!newFareVehicleType || !newFareBaseFare || !newFarePerKmRate) {
             toast({
@@ -224,8 +265,18 @@ export default function AdminDashboard() {
             return;
         }
 
+        if (fares.some(f => f.vehicleType === newFareVehicleType)) {
+            toast({
+                title: "Fare Exists",
+                description: `A fare rule for ${newFareVehicleType} already exists. You can edit it directly.`,
+                variant: "destructive",
+            });
+            return;
+        }
+
+
         const newFare = {
-            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), // Robust ID generation
+            id: String(fares.length > 0 ? Math.max(...fares.map(f => parseInt(f.id))) + 1 : 1), 
             vehicleType: newFareVehicleType,
             baseFare: parseFloat(newFareBaseFare),
             perKmRate: parseFloat(newFarePerKmRate),
@@ -242,7 +293,6 @@ export default function AdminDashboard() {
         });
     };
 
-  // Function to handle deleting a fare
   const handleDeleteFare = (id: string) => {
     setFares(fares.filter(fare => fare.id !== id));
     toast({
@@ -306,11 +356,12 @@ export default function AdminDashboard() {
         setIsBookingDialogOpen(true);
     };
 
-    // Chart data
     const bookingData = fares.map(fareRule => ({
         name: fareRule.vehicleType,
         bookings: bookings.filter(b => b.cabModel === fareRule.vehicleType).length
     }));
+
+    const uniqueCabModels = Array.from(new Set(cabs.map(cab => cab.model)));
 
 
   return (
@@ -330,7 +381,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 w-full">
         <ScrollArea className="h-[calc(100vh-150px)]">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left Panel: Data Tables */}
@@ -435,6 +486,7 @@ export default function AdminDashboard() {
                                 <Input
                                   value={editedFareVehicleType}
                                   onChange={(e) => setEditedFareVehicleType(e.target.value)}
+                                  disabled // Vehicle type shouldn't be changed here, but through cab model
                                 />
                               </TableCell>
                               <TableCell>
@@ -592,7 +644,27 @@ export default function AdminDashboard() {
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="vehicleType" className="text-right">Vehicle Type</Label>
-                        <Input id="vehicleType" value={newFareVehicleType} onChange={(e) => setNewFareVehicleType(e.target.value)} className="col-span-3" required />
+                         <Select 
+                            onValueChange={(value) => setNewFareVehicleType(value)} 
+                            value={newFareVehicleType}
+                            required 
+                            
+                          >
+                            <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select Cab Model" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                    <SelectLabel>Available Cab Models</SelectLabel>
+                                    {uniqueCabModels.map((model) => (
+                                        <SelectItem key={model} value={model}>
+                                            {model}
+                                        </SelectItem>
+                                    ))}
+                                    {uniqueCabModels.length === 0 && <SelectItem value="" disabled>No cab models available</SelectItem>}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="baseFare" className="text-right">Base Fare</Label>
@@ -619,14 +691,16 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="w-full h-[300px]">
-                <BarChart width={380} height={300} data={bookingData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="bookings" fill="hsl(var(--primary))" />
-                </BarChart>
+                 <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={bookingData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar dataKey="bookings" fill="hsl(var(--primary))" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>

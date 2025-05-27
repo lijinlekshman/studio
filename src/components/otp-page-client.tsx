@@ -16,26 +16,22 @@ const OTPPageClient: React.FC = () => {
     const searchParams = useSearchParams();
     const { toast } = useToast();
     const [clientMobileNumber, setClientMobileNumber] = useState<string | null>(null);
-    // No need for isClient state here as this component is already client-side rendered due to dynamic import with ssr:false
 
     useEffect(() => {
-        // This effect runs only on the client after mount
         const mobileNumberFromParams = searchParams.get('mobileNumber');
         setClientMobileNumber(mobileNumberFromParams);
-    }, [searchParams]); // searchParams is a stable object from the hook
+    }, [searchParams]);
 
     const verifyOTPAndProceed = () => {
         if (otp === "123456") { // Replace with actual OTP verification logic
-            // Ensure localStorage is accessed only on the client
             if (typeof window !== 'undefined') {
                 const bookingDetailsString = localStorage.getItem('bookingDetails');
                 if (bookingDetailsString) {
                     try {
                         const bookingDetails = JSON.parse(bookingDetailsString);
-                        // "Log in" the user by storing their details
                         const userToLogin = {
                             email: bookingDetails.email,
-                            name: bookingDetails.userName, // Assuming userName is stored in bookingDetails
+                            name: bookingDetails.userName,
                             mobile: bookingDetails.mobileNumber,
                         };
                         localStorage.setItem('loggedInUser', JSON.stringify(userToLogin));
@@ -52,7 +48,7 @@ const OTPPageClient: React.FC = () => {
                             description: "Could not retrieve booking information. Please try again.",
                             variant: "destructive",
                         });
-                        router.push('/'); // Fallback redirect
+                        router.push('/');
                     }
                 } else {
                     toast({
@@ -60,7 +56,7 @@ const OTPPageClient: React.FC = () => {
                         description: "Booking details not found. Please try booking again.",
                         variant: "destructive",
                     });
-                    router.push('/'); // Fallback redirect
+                    router.push('/');
                 }
             }
         } else {
@@ -73,10 +69,12 @@ const OTPPageClient: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center" style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}>
+        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
+            {/* Background image is now applied via globals.css to the body */}
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center">
-                <Image src="/Images/LetsGo-W-slogan.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo slogan" />
-
+                <Link href="/">
+                  <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="max-w-[90%] sm:max-w-[350px] h-auto mb-6" />
+                </Link>
                 <Card className="w-full max-w-md mt-10">
                     <CardHeader>
                         <CardTitle>Verify OTP</CardTitle>

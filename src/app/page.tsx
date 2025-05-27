@@ -13,7 +13,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"; // Removed AvatarImage import
 
 
 export default function Home() {
@@ -43,7 +43,7 @@ export default function Home() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="rounded-full h-10 w-10 p-0 hover:bg-accent">
                             <Avatar className="h-9 w-9">
-                                <AvatarImage src="https://github.com/shadcn.png" alt="User" data-ai-hint="user avatar" />
+                                {/* AvatarImage removed to show User icon from Fallback */}
                                 <AvatarFallback>
                                     <User className="h-5 w-5" />
                                 </AvatarFallback>
@@ -60,9 +60,6 @@ export default function Home() {
                                 Admin Login
                             </DropdownMenuItem>
                         )}
-                         <DropdownMenuItem onClick={() => router.push('/admin')}>
-                                Admin Portal
-                         </DropdownMenuItem>
                          <DropdownMenuItem onClick={() => router.push('/user-login')}>
                                 User Login
                          </DropdownMenuItem>
@@ -73,13 +70,13 @@ export default function Home() {
             {/* Landing Page Section */}
             <div
                 className="relative w-full h-screen flex items-center justify-center bg-cover bg-center"
-                style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}
+                // The body style from globals.css should handle the main background image
             >
-                <div className="absolute inset-0 bg-black opacity-40"></div>
-                <div className="relative z-10 text-center">
-
-                    <Image src="/Images/LetsGo-W-slogan.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo slogan" />
-
+                <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay */}
+                <div className="relative z-10 text-center p-6 bg-white/20 rounded-lg shadow-md max-w-xl mx-auto"> {/* Added bg-white/20, rounded-lg, shadow-md, p-6 and max-w-xl */}
+                    <Link href="/">
+                        <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="mx-auto max-w-[90%] sm:max-w-[300px] h-auto mb-4" />
+                    </Link>
                     <h1 className="text-3xl md:text-5xl font-bold text-white mt-4">
                         Book a Ride with Let'sGo
                     </h1>
