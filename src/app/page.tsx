@@ -43,7 +43,7 @@ export default function Home() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="rounded-full h-10 w-10 p-0 hover:bg-accent">
                             <Avatar className="h-9 w-9">
-                                <AvatarImage src="https://github.com/shadcn.png" alt="User" data-ai-hint="user avatar" />
+                                <AvatarImage src="/Images/logo.png" alt="User Profile" data-ai-hint="user avatar" />
                                 <AvatarFallback>
                                     <User className="h-5 w-5" />
                                 </AvatarFallback>
@@ -70,9 +70,9 @@ export default function Home() {
             {/* Landing Page Section */}
             <div
                 className="relative w-full h-screen flex items-center justify-center bg-cover bg-center"
-                style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}
+                // The body style from globals.css should handle the main background image
             >
-                <div className="absolute inset-0 bg-black opacity-40"></div>
+                <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay */}
                 <div className="relative z-10 text-center">
 
                     <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" />
