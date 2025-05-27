@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -8,7 +9,7 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  output: 'export', // Add this line for static export
+  // output: 'export', // Removed for server-side features
   images: {
     unoptimized: true // Necessary for static export if not using a custom loader or Vercel/Netlify
   },

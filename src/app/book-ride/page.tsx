@@ -7,7 +7,7 @@ import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Map as MapIcon, Bot, ArrowLeft } from 'lucide-react';
+import { Map as MapIcon, Bot, ArrowLeft } from 'lucide-react'; // Map renamed to MapIcon to avoid conflict
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { parseBookingRequest, type ParseBookingRequestOutput } from '@/ai/flows/parse-booking-request';
 
 
 export default function BookRidePage() {
@@ -61,12 +62,6 @@ export default function BookRidePage() {
                     const storedFares = localStorage.getItem('fares');
                     const parsedFares = storedFares ? JSON.parse(storedFares) : [];
                     setCurrentFares(parsedFares);
-                     if (!vehicleType && parsedFares.length > 0) {
-                        const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
-                        // if (firstValidFare) { // Auto-selection removed to allow placeholder
-                        //    setVehicleType(firstValidFare.vehicleType);
-                        // }
-                    }
                 } catch (error) {
                     console.error("Failed to parse currentFares from localStorage", error);
                     setCurrentFares([]);
@@ -79,32 +74,43 @@ export default function BookRidePage() {
                         if (chatbotRequestData?.userName) setUser(chatbotRequestData.userName);
                         if (chatbotRequestData?.email) setEmail(chatbotRequestData.email);
                         if (chatbotRequestData?.mobileNumber) setMobileNumber(chatbotRequestData.mobileNumber);
-                        localStorage.removeItem('chatbotBookingRequest');
+                        localStorage.removeItem('chatbotBookingRequest'); // Clear after use
                         toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
                     } catch (e) {
                         console.error("Error parsing chatbotBookingRequest from localStorage", e);
-                        localStorage.removeItem('chatbotBookingRequest');
+                        localStorage.removeItem('chatbotBookingRequest'); // Clear even on error
                     }
                 }
             }
 
-            // Fetch current location and suggestions after localStorage is handled
             try {
                 const location = await getCurrentLocation();
-                setSource(location); // Set initial source to current location
-                // Fetch address for initial current location
+                setSource(location);
                 if (location) {
                     const address = await getAddressForCoordinate(location);
                     setSourceAddress(address);
-                    // setSelectedSourceValue(address.formattedAddress); // Optionally prefill select display
                 }
             } catch (e) {
                 console.error("Error getting current location:", e);
             }
 
-            await fetchSuggestedSources();
-            await fetchSuggestedDestinations();
+            // Await these individually to ensure they complete
+            try {
+                const sources = await suggestDestinations({ currentLocation: await getCurrentLocation(), pastRideHistory: [] });
+                setSuggestedSources(sources);
+            } catch (error: any) {
+                toast({ title: "Error fetching sources", description: error.message, variant: "destructive" });
+            }
 
+            try {
+                const destinations = await suggestDestinations({ currentLocation: await getCurrentLocation(), pastRideHistory: [] });
+                setSuggestedDestinations(destinations);
+            } catch (error: any) {
+                toast({ title: "Error fetching destinations", description: error.message, variant: "destructive" });
+            }
+
+
+            // Apply chatbot data after suggestions are loaded and currentFares is set
             if (chatbotRequestData?.vehiclePreference && currentFares.length > 0) {
                 const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === chatbotRequestData!.vehiclePreference?.toLowerCase());
                 if (validVehicle) {
@@ -113,7 +119,7 @@ export default function BookRidePage() {
                     toast({ title: "AI Assistant", description: `Vehicle type "${chatbotRequestData.vehiclePreference}" not available. Please select manually.`, variant: "default" });
                 }
             }
-             if (chatbotRequestData?.sourceName) {
+             if (chatbotRequestData?.sourceName && suggestedSources.length > 0) { // Check if suggestedSources is populated
                 const matchedSource = suggestedSources.find(s => s.name.toLowerCase().includes(chatbotRequestData!.sourceName!.toLowerCase()));
                 if (matchedSource) {
                     await handleSourceSelect(matchedSource.name);
@@ -121,7 +127,7 @@ export default function BookRidePage() {
                      toast({ title: "AI Helper", description: `Source "${chatbotRequestData.sourceName}" not found in suggestions. Please select manually.`, variant: "default" });
                 }
             }
-            if (chatbotRequestData?.destinationName) {
+            if (chatbotRequestData?.destinationName && suggestedDestinations.length > 0) { // Check if suggestedDestinations is populated
                 const matchedDestination = suggestedDestinations.find(d => d.name.toLowerCase().includes(chatbotRequestData!.destinationName!.toLowerCase()));
                 if (matchedDestination) {
                     await handleDestinationSelect(matchedDestination.name);
@@ -131,12 +137,12 @@ export default function BookRidePage() {
             }
 
 
-            setDataLoaded(true); // Signal that all initial data loading attempts are complete
+            setDataLoaded(true);
         };
 
         loadInitialData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, []); // Empty dependency array: runs once on mount
+
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
@@ -185,7 +191,7 @@ export default function BookRidePage() {
         const fetchDestinationAddress = async () => {
             if (destination) {
                 try {
-                    const address = await getAddressForCoordinate(destination);
+                    const address = await getAddressForCoordinate(destination); // Corrected to use destination
                     setDestinationAddress(address);
                 } catch (e) {
                     console.error(e);
@@ -216,7 +222,7 @@ export default function BookRidePage() {
                         setFare(calculatedFare);
                     } else {
                         setFare(null);
-                        if (vehicleType) {
+                        if (vehicleType) { // Only show toast if a vehicle type was actually selected but no rule found
                             toast({
                                 title: "Fare Calculation Error",
                                 description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
@@ -234,6 +240,7 @@ export default function BookRidePage() {
                     setDistance(null);
                 }
             } else {
+                // Reset fare and distance if conditions aren't met (e.g., vehicleType is cleared)
                 setFare(null);
                 setDistance(null);
             }
@@ -276,15 +283,18 @@ export default function BookRidePage() {
         return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     };
 
-    // Placeholder for Twilio OTP sending
     const simulateSendOtp = async (phoneNumber: string) => {
         console.log(`Simulating OTP send to: ${phoneNumber} using Twilio Verify Service ID: VA4e5f3c5b9f308ba482baa879f38b4bba`);
+        // In a real app, this would involve a backend call to Twilio:
+        // const response = await fetch('/api/send-otp', { method: 'POST', body: JSON.stringify({ phoneNumber }) });
+        // if (!response.ok) throw new Error('Failed to send OTP');
+        // const data = await response.json(); return data.success;
         toast({
             title: "OTP Simulation",
             description: `An OTP would be sent to ${phoneNumber}. (Demo: Use 123456 to verify). Actual Twilio integration needed.`,
             duration: 9000,
         });
-        return true;
+        return true; // Simulate success
     };
 
 
@@ -330,7 +340,7 @@ export default function BookRidePage() {
                     driverName: driverName,
                     date: bookingDate,
                     time: bookingTime,
-                    status: 'Pending OTP',
+                    status: 'Pending OTP', // Initial status before OTP verification
                 };
 
                 if (typeof window !== 'undefined') {
@@ -340,11 +350,11 @@ export default function BookRidePage() {
                         existingBookings = storedBookings ? JSON.parse(storedBookings) : [];
                     } catch (error) {
                         console.error("Error parsing existing bookings from localStorage", error);
-                        existingBookings = [];
+                        existingBookings = []; // Reset to empty array on error
                     }
                     existingBookings.push(newBooking);
                     localStorage.setItem('bookings', JSON.stringify(existingBookings));
-                    localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
+                    localStorage.setItem('bookingDetails', JSON.stringify(newBooking)); // For OTP page to retrieve
                 }
                 router.push(`/otp?mobileNumber=${mobileNumber}`);
             } catch (error: any) {
@@ -388,7 +398,7 @@ export default function BookRidePage() {
                 if (matchedSource) {
                     await handleSourceSelect(matchedSource.name);
                 } else {
-                    toast({ title: "AI Helper", description: `Source "${parsedData.sourceName}" not found in suggestions. Please select manually.`, variant: "default" });
+                     toast({ title: "AI Helper", description: `Source "${parsedData.sourceName}" not found in suggestions. Please select manually.`, variant: "default" });
                 }
             }
             if (parsedData.destinationName) {
@@ -396,11 +406,11 @@ export default function BookRidePage() {
                 if (matchedDestination) {
                     await handleDestinationSelect(matchedDestination.name);
                 } else {
-                    toast({ title: "AI Helper", description: `Destination "${parsedData.destinationName}" not found in suggestions. Please select manually.`, variant: "default" });
+                     toast({ title: "AI Helper", description: `Destination "${parsedData.destinationName}" not found in suggestions. Please select manually.`, variant: "default" });
                 }
             }
             toast({ title: "AI Helper", description: "Form fields updated based on your request. Please review and complete.", variant: "default" });
-            setIsAiHelperDialogOpen(false);
+            setIsAiHelperDialogOpen(false); // Close dialog on success
         } catch (error: any) {
             toast({ title: "AI Parsing Error", description: error.message || "Could not parse the request.", variant: "destructive" });
         } finally {
@@ -628,34 +638,4 @@ export default function BookRidePage() {
             </Dialog>
         </div>
     );
-}
-
-// Define types for AI flow if not already globally available in this file's scope
-interface ParseBookingRequestOutput {
-  sourceName?: string;
-  destinationName?: string;
-  userName?: string;
-  email?: string;
-  mobileNumber?: string;
-  vehiclePreference?: string;
-}
-
-// Assume parseBookingRequest is imported or defined elsewhere
-// For this example, I'll mock it if it's not found, to avoid type errors
-// In your actual project, ensure it's properly imported from '@/ai/flows/parse-booking-request'
-async function parseBookingRequest(input: { requestText: string }): Promise<ParseBookingRequestOutput> {
-    // This is a mock. In your actual app, this would call the Genkit flow.
-    console.warn("parseBookingRequest called in mock context. For actual parsing, ensure your Genkit flow is operational.");
-    // Simulate some parsing based on keywords for demonstration
-    const request = input.requestText.toLowerCase();
-    const output: ParseBookingRequestOutput = {};
-    if (request.includes("punalur") && request.includes("kollam")) {
-        output.sourceName = "Punalur";
-        output.destinationName = "Kollam";
-    }
-    if (request.includes("anoop")) output.userName = "Anoop";
-    if (request.includes("suv")) output.vehiclePreference = "SUV";
-    if (request.includes("email@example.com")) output.email = "email@example.com";
-    if (request.includes("9876543210")) output.mobileNumber = "9876543210";
-    return output;
 }

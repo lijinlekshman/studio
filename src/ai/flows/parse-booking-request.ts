@@ -1,4 +1,5 @@
 
+'use server';
 /**
  * @fileOverview Parses a natural language booking request into structured data.
  *
@@ -7,7 +8,7 @@
  * - ParseBookingRequestOutput - The return type for the parseBookingRequest function.
  */
 
-// import {ai} from '@/ai/ai-instance'; // Commented out for static export
+import {ai}from '@/ai/ai-instance';
 import {z} from 'zod';
 
 const ParseBookingRequestInputSchema = z.object({
@@ -24,24 +25,6 @@ const ParseBookingRequestOutputSchema = z.object({
   vehiclePreference: z.string().optional().describe('The preferred vehicle type (e.g., "Sedan", "SUV", "Mini").'),
 });
 export type ParseBookingRequestOutput = z.infer<typeof ParseBookingRequestOutputSchema>;
-
-export async function parseBookingRequest(input: ParseBookingRequestInput): Promise<ParseBookingRequestOutput> {
-  // NOTE: This flow will not work as intended in a pure static export
-  // For static export, directly returning mock data.
-  console.warn("parseBookingRequest called in static context, returning empty data.");
-  return {
-    sourceName: undefined,
-    destinationName: undefined,
-    userName: undefined,
-    email: undefined,
-    mobileNumber: undefined,
-    vehiclePreference: undefined,
-  };
-}
-
-/*
-// Original Genkit prompt and flow definition - commented out for static export
-import {ai}from '@/ai/ai-instance';
 
 const prompt = ai.definePrompt({
   name: 'parseBookingRequestPrompt',
@@ -97,8 +80,6 @@ const parseBookingRequestFlow = ai.defineFlow(
   }
 );
 
-// Wrapper function for the flow
-// export async function parseBookingRequest(input: ParseBookingRequestInput): Promise<ParseBookingRequestOutput> {
-//   return parseBookingRequestFlow(input);
-// }
-*/
+export async function parseBookingRequest(input: ParseBookingRequestInput): Promise<ParseBookingRequestOutput> {
+  return parseBookingRequestFlow(input);
+}

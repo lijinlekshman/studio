@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Map, User, Bot } from 'lucide-react';
+import { Map as MapIcon, User, Bot } from 'lucide-react'; // Map renamed to MapIcon
 import Link from "next/link";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -54,12 +54,13 @@ export default function Home() {
         }
         setIsAdminAuthenticated(false);
         toast({ title: "Admin Logged Out" });
-        router.push('/');
+        router.push('/'); // Or to login page
     };
 
     const handleUserLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('loggedInUser');
+            // Optionally remove other user-specific data
             const recentBooking = localStorage.getItem('bookingDetails');
             if (recentBooking) {
                 try {
@@ -72,11 +73,11 @@ export default function Home() {
                     console.error("Error parsing bookingDetails for logout cleanup", e);
                 }
             }
-            localStorage.removeItem('bookingDetails');
+            localStorage.removeItem('bookingDetails'); // Also clear recent booking if it's for the logging out user
         }
         setIsUserLoggedIn(false);
         toast({ title: "User Logged Out" });
-        router.push('/');
+        router.push('/'); // Or to login page
     };
 
     const handleProcessAiRequest = async () => {
@@ -166,7 +167,7 @@ export default function Home() {
 
                     <Link href="/book-ride">
                         <Button size="lg" className="px-6 py-3 text-base sm:text-lg font-semibold">
-                            Book a Cab Now <Map className="ml-2 h-5 w-5" />
+                            Book a Cab Now <MapIcon className="ml-2 h-5 w-5" />
                         </Button>
                     </Link>
                 </div>

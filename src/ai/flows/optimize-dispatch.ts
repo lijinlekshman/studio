@@ -1,6 +1,5 @@
-// This file is machine-generated - DO NOT EDIT.
 
-
+'use server';
 /**
  * @fileOverview An AI-powered cab dispatch optimizer.
  *
@@ -9,8 +8,8 @@
  * - OptimizeDispatchOutput - The return type for the optimizeDispatch function.
  */
 
-// import {ai} from '@/ai/ai-instance'; // Commented out for static export
-import {z} from 'zod'; // Changed from 'genkit' to 'zod'
+import {ai}from '@/ai/ai-instance';
+import {z} from 'zod';
 import type { Coordinate } from '@/services/map'; // Ensure type import
 
 const OptimizeDispatchInputSchema = z.object({
@@ -81,84 +80,13 @@ const OptimizeDispatchOutputSchema = z.object({
 
 export type OptimizeDispatchOutput = z.infer<typeof OptimizeDispatchOutputSchema>;
 
-export async function optimizeDispatch(input: OptimizeDispatchInput): Promise<OptimizeDispatchOutput> {
-  // NOTE: This flow will not work as intended in a pure static export
-  // For static export, directly returning mock data.
-  console.warn("optimizeDispatch called in static context, returning empty dispatch plan.");
-  return { dispatchPlan: [] }; // Fallback for static export
-}
-
-/*
-// Original Genkit prompt and flow definition - commented out for static export
-import {ai}from '@/ai/ai-instance';
-
 const optimizeDispatchPrompt = ai.definePrompt({
   name: 'optimizeDispatchPrompt',
   input: {
-    schema: z.object({
-      availableCabs: z
-        .array(
-          z.object({
-            cabId: z.string().describe('The unique identifier of the cab.'),
-            currentLocation: z
-              .object({
-                lat: z.number().describe('The latitude of the cab.'),
-                lng: z.number().describe('The longitude of the cab.'),
-              })
-              .describe('The current location of the cab.'),
-          })
-        )
-        .describe('A list of available cabs and their current locations.'),
-      requestLocations: z
-        .array(
-          z.object({
-            requestId: z.string().describe('The unique identifier of the request.'),
-            pickupLocation: z
-              .object({
-                lat: z.number().describe('The latitude of the pickup location.'),
-                lng: z.number().describe('The longitude of the pickup location.'),
-              })
-              .describe('The pickup location of the request.'),
-          })
-        )
-        .describe('A list of cab requests and their pickup locations.'),
-      trafficConditions: z
-        .string()
-        .describe('A description of the current traffic conditions in the city.'),
-      demandHotspots: z
-        .array(
-          z.object({
-            location: z
-              .object({
-                lat: z.number().describe('The latitude of the demand hotspot.'),
-                lng: z.number().describe('The longitude of the demand hotspot.'),
-              })
-              .describe('The location of the demand hotspot.'),
-            demandLevel: z
-              .string()
-              .describe('The level of demand in the hotspot (e.g., high, medium, low).'),
-          })
-        )
-        .describe('A list of areas with high demand for cabs.'),
-    }),
+    schema: OptimizeDispatchInputSchema,
   },
   output: {
-    schema: z.object({
-      dispatchPlan: z
-        .array(
-          z.object({
-            requestId: z.string().describe('The ID of the request to dispatch.'),
-            cabId: z.string().describe('The ID of the cab assigned to the request.'),
-            estimatedWaitTime: z
-              .number()
-              .describe('The estimated wait time in minutes for the cab to arrive.'),
-            routeSummary: z
-              .string()
-              .describe('A short human readable summary of the route the driver should take.'),
-          })
-        )
-        .describe('A dispatch plan that optimizes cab assignments.'),
-    }),
+    schema: OptimizeDispatchOutputSchema,
   },
   prompt: `You are an expert AI dispatch system for a cab company. You are tasked with assigning cabs to ride requests to minimize wait times and optimize routes.
 
@@ -186,7 +114,7 @@ Output the dispatch plan as a JSON array of objects, where each object has the f
 - cabId: The ID of the cab assigned to the request
 - estimatedWaitTime: The estimated wait time in minutes for the cab to arrive
 - routeSummary: A short summary of the route the driver should take
-`, // Replace with Handlebars template
+`,
 });
 
 const optimizeDispatchFlow = ai.defineFlow(
@@ -199,5 +127,7 @@ async input => {
   const {output} = await optimizeDispatchPrompt(input);
   return output!;
 });
-*/
 
+export async function optimizeDispatch(input: OptimizeDispatchInput): Promise<OptimizeDispatchOutput> {
+  return optimizeDispatchFlow(input);
+}
