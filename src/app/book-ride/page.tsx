@@ -73,7 +73,7 @@ export default function BookRidePage() {
                 setCurrentFares([]);
             }
         }
-    }, [vehicleType]); // Keep vehicleType dependency to re-evaluate default if it changes externally
+    }, [vehicleType]); 
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -180,7 +180,7 @@ export default function BookRidePage() {
                         setFare(calculatedFare);
                     } else {
                         setFare(null); 
-                        if(vehicleType){ // Only toast if a vehicle type was actually selected but no rule found
+                        if(vehicleType){ 
                            toast({
                                 title: "Fare Calculation Error",
                                 description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
