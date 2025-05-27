@@ -7,13 +7,14 @@ import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Map as MapIcon } from 'lucide-react'; // Renamed Map to MapIcon to avoid conflict
+import { ArrowLeft, Map as MapIcon, Brain } from 'lucide-react'; // Renamed Map to MapIcon to avoid conflict
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateDistance } from '@/ai/flows/calculate-fare'; // Corrected import path
+import { calculateDistance } from '@/ai/flows/calculate-fare'; 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
+import { parseBookingRequest, type ParseBookingRequestOutput } from '@/ai/flows/parse-booking-request';
 
 
 export default function BookRidePage() {
@@ -38,6 +39,10 @@ export default function BookRidePage() {
     const [availableCabs, setAvailableCabs] = useState<any[]>([]);
     const [currentFares, setCurrentFares] = useState<any[]>([]);
     const [mapUrl, setMapUrl] = useState<string>('');
+
+    const [aiRequestText, setAiRequestText] = useState('');
+    const [isParsing, setIsParsing] = useState(false);
+
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -66,7 +71,7 @@ export default function BookRidePage() {
                 setCurrentFares([]);
             }
         }
-    }, [vehicleType]); // Added vehicleType to dependencies
+    }, []); 
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -202,8 +207,7 @@ export default function BookRidePage() {
     }, [source, destination, vehicleType, currentFares, toast]);
 
      useEffect(() => {
-        // Update map URL when source or destination changes
-        const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // IMPORTANT: Replace with your actual API key
+        const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; 
         if (source && destination) {
             setMapUrl(`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${source.lat},${source.lng}&destination=${destination.lat},${destination.lng}&mode=driving`);
         } else if (source) {
@@ -211,7 +215,6 @@ export default function BookRidePage() {
         } else if (destination) {
             setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${destination.lat},${destination.lng}`);
         } else {
-            // Default map view (e.g., a central location or empty)
             setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=India`);
         }
     }, [source, destination]);
@@ -237,7 +240,7 @@ export default function BookRidePage() {
             setDestination({ lat: selected.lat, lng: selected.lng });
             setSelectedDestinationValue(selected.name);
             try {
-                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); // Corrected to use selected.lat, selected.lng
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); 
                 setDestinationAddress(address);
             } catch (e) {
                 console.error(e);
@@ -293,7 +296,7 @@ export default function BookRidePage() {
                 }
                 existingBookings.push(newBooking);
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
-                localStorage.setItem('bookingDetails', JSON.stringify(newBooking)); // For OTP/Dashboard page
+                localStorage.setItem('bookingDetails', JSON.stringify(newBooking)); 
             }
 
             router.push(`/otp?mobileNumber=${mobileNumber}`);
@@ -307,10 +310,57 @@ export default function BookRidePage() {
         }
     };
 
+    const handleParseWithAI = async () => {
+        if (!aiRequestText.trim()) {
+            toast({ title: "AI Helper", description: "Please enter your booking request.", variant: "default" });
+            return;
+        }
+        setIsParsing(true);
+        try {
+            const parsedData: ParseBookingRequestOutput = await parseBookingRequest({ requestText: aiRequestText });
+
+            if (parsedData.userName) setUser(parsedData.userName);
+            if (parsedData.email) setEmail(parsedData.email);
+            if (parsedData.mobileNumber) setMobileNumber(parsedData.mobileNumber);
+            if (parsedData.vehiclePreference) {
+                const validVehicle = currentFares.find(f => f.vehicleType.toLowerCase() === parsedData.vehiclePreference?.toLowerCase());
+                if (validVehicle) {
+                    setVehicleType(validVehicle.vehicleType);
+                } else if (parsedData.vehiclePreference) {
+                     toast({ title: "AI Helper", description: `Vehicle type "${parsedData.vehiclePreference}" not found or not available. Please select manually.`, variant: "default" });
+                }
+            }
+
+            if (parsedData.sourceName) {
+                const matchedSource = suggestedSources.find(s => s.name.toLowerCase().includes(parsedData.sourceName!.toLowerCase()));
+                if (matchedSource) {
+                    await handleSourceSelect(matchedSource.name);
+                } else {
+                    toast({ title: "AI Helper", description: `Source "${parsedData.sourceName}" not found in suggestions. Please select manually.`, variant: "default" });
+                }
+            }
+
+            if (parsedData.destinationName) {
+                const matchedDestination = suggestedDestinations.find(d => d.name.toLowerCase().includes(parsedData.destinationName!.toLowerCase()));
+                if (matchedDestination) {
+                    await handleDestinationSelect(matchedDestination.name);
+                } else {
+                     toast({ title: "AI Helper", description: `Destination "${parsedData.destinationName}" not found in suggestions. Please select manually.`, variant: "default" });
+                }
+            }
+             toast({ title: "AI Helper", description: "Form fields updated based on your request. Please review and complete.", variant: "default" });
+
+        } catch (error: any) {
+            toast({ title: "AI Parsing Error", description: error.message || "Could not parse the request.", variant: "destructive" });
+        } finally {
+            setIsParsing(false);
+        }
+    };
+
 
     return (
         <div className="container mx-auto p-4 min-h-screen">
-            <div className="mb-6">
+            <div className="mb-6 flex justify-between items-center">
                 <Button variant="outline" onClick={() => router.push('/')}>
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
                 </Button>
@@ -321,9 +371,23 @@ export default function BookRidePage() {
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle>Book a Ride</CardTitle>
-                        <CardDescription>Enter your ride details below.</CardDescription>
+                        <CardDescription>Enter your ride details below, or use our AI Helper!</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
+                        <div className="grid gap-2 border p-4 rounded-md shadow-sm">
+                            <label htmlFor="aiRequest" className="text-left font-medium text-primary">AI Booking Helper</label>
+                            <Input
+                                type="text"
+                                id="aiRequest"
+                                placeholder="e.g., Book cab from Punalur to Kollam for Anoop, email@example.com, 9876543210, SUV"
+                                value={aiRequestText}
+                                onChange={(e) => setAiRequestText(e.target.value)}
+                            />
+                            <Button onClick={handleParseWithAI} disabled={isParsing} className="w-full mt-2">
+                                <Brain className="mr-2 h-5 w-5" /> {isParsing ? "Parsing..." : "AI Fill Form"}
+                            </Button>
+                        </div>
+
                          <div className="grid gap-2">
                             <label htmlFor="user" className="text-left font-medium">User Name</label>
                             <Input
@@ -479,17 +543,17 @@ export default function BookRidePage() {
                              </span>
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="flex flex-col h-[calc(100%-4rem)]"> {/* Adjust height to fill card */}
+                    <CardContent className="flex flex-col h-[calc(100%-4rem)]"> 
                         {mapUrl && !mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") ? (
                             <iframe
                                 src={mapUrl}
                                 width="100%"
-                                height="100%" // Fill available space
+                                height="100%" 
                                 style={{ border: 0 }}
                                 allowFullScreen={true}
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
-                                className="flex-grow rounded-md" // Make iframe grow
+                                className="flex-grow rounded-md" 
                             ></iframe>
                         ) : (
                             <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -507,4 +571,3 @@ export default function BookRidePage() {
     );
 }
 
-    
