@@ -1,11 +1,11 @@
 
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash, Map, Plus, Car, User, Save } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Edit, Trash, Map, Plus, Car, User, Save } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input';
+import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import {
   Table,
@@ -20,26 +20,26 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import Image from 'next/image';
+import Image from "next/image";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // Placeholder data for cabs and fares
 const initialCabs = [
-  { id: '1', model: 'Sedan', licensePlate: 'KL 01 AB 1234', status: 'Active', driverName: 'Anoop' },
-  { id: '2', model: 'SUV', licensePlate: 'KL 02 CD 5678', status: 'Inactive', driverName: 'Gopi' },
+  { id: "1", model: "Sedan", licensePlate: "KL 01 AB 1234", status: "Active", driverName: "Anoop" },
+  { id: "2", model: "SUV", licensePlate: "KL 02 CD 5678", status: "Inactive", driverName: "Gopi" },
 ];
 
 const initialFares = [
-  { id: '1', vehicleType: 'Sedan', baseFare: 50, perKmRate: 10 },
-  { id: '2', vehicleType: 'SUV', baseFare: 75, perKmRate: 15 },
+  { id: "1", vehicleType: "Sedan", baseFare: 50, perKmRate: 10 },
+  { id: "2", vehicleType: "SUV", baseFare: 75, perKmRate: 15 },
 ];
 
 const initialBookings = [
-    { id: '1', mobileNumber: '9876543210', user: 'Anoop P', source: 'Punalur', destination: 'Kollam', fare: "600.00", cabModel: 'Sedan', driverName: 'Anoop', date: "8/2/2024", time: "10:00 AM" },
-    { id: '2', mobileNumber: '8765432190', user: 'Gopi K', source: 'Kottarakkara', destination: 'Trivandrum', fare: "900.00", cabModel: 'SUV', driverName: 'Gopi', date: "8/2/2024", time: "11:30 AM" },
+    { id: "1", mobileNumber: "9876543210", user: "Anoop P", source: "Punalur", destination: "Kollam", fare: "600.00", cabModel: "Sedan", driverName: "Anoop", date: "8/2/2024", time: "10:00 AM" },
+    { id: "2", mobileNumber: "8765432190", user: "Gopi K", source: "Kottarakkara", destination: "Trivandrum", fare: "900.00", cabModel: "SUV", driverName: "Gopi", date: "8/2/2024", time: "11:30 AM" },
 ];
 
 
@@ -49,9 +49,9 @@ export default function AdminDashboard() {
   const [bookings, setBookings] = useState(initialBookings);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
             try {
-                const storedCabs = localStorage.getItem('cabs');
+                const storedCabs = localStorage.getItem("cabs");
                 if (storedCabs) {
                     setCabs(JSON.parse(storedCabs));
                 } else {
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
             }
 
             try {
-                const storedFares = localStorage.getItem('fares');
+                const storedFares = localStorage.getItem("fares");
                 if (storedFares) {
                     setFares(JSON.parse(storedFares));
                 } else {
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
             }
 
             try {
-                const storedBookings = localStorage.getItem('bookings');
+                const storedBookings = localStorage.getItem("bookings");
                 if (storedBookings) {
                     setBookings(JSON.parse(storedBookings));
                 } else {
@@ -90,31 +90,31 @@ export default function AdminDashboard() {
 
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('cabs', JSON.stringify(cabs));
+        if (typeof window !== "undefined") {
+            localStorage.setItem("cabs", JSON.stringify(cabs));
         }
     }, [cabs]);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('bookings', JSON.stringify(bookings));
+        if (typeof window !== "undefined") {
+            localStorage.setItem("bookings", JSON.stringify(bookings));
         }
     }, [bookings]);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('fares', JSON.stringify(fares));
+        if (typeof window !== "undefined") {
+            localStorage.setItem("fares", JSON.stringify(fares));
         }
     }, [fares]);
 
   const [isAddCabDialogOpen, setIsAddCabDialogOpen] = useState(false);
-  const [newCabModel, setNewCabModel] = useState('');
-  const [newCabLicensePlate, setNewCabLicensePlate] = useState('');
-   const [newCabDriverName, setNewCabDriverName] = useState('');
+  const [newCabModel, setNewCabModel] = useState("");
+  const [newCabLicensePlate, setNewCabLicensePlate] = useState("");
+   const [newCabDriverName, setNewCabDriverName] = useState("");
   const [isAddFareDialogOpen, setIsAddFareDialogOpen] = useState(false);
-  const [newFareVehicleType, setNewFareVehicleType] = useState('');
-  const [newFareBaseFare, setNewFareBaseFare] = useState('');
-  const [newFarePerKmRate, setNewFarePerKmRate] = useState('');
+  const [newFareVehicleType, setNewFareVehicleType] = useState("");
+  const [newFareBaseFare, setNewFareBaseFare] = useState("");
+  const [newFarePerKmRate, setNewFarePerKmRate] = useState("");
   const [selectedCab, setSelectedCab] = useState<any>(null);
   const [selectedFare, setSelectedFare] = useState<any>(null);
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
@@ -123,30 +123,30 @@ export default function AdminDashboard() {
    const router = useRouter();
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [editingCabId, setEditingCabId] = useState<string | null>(null);
-    const [editedCabModel, setEditedCabModel] = useState('');
-    const [editedCabLicensePlate, setEditedCabLicensePlate] = useState('');
-      const [editedCabDriverName, setEditedCabDriverName] = useState('');
+    const [editedCabModel, setEditedCabModel] = useState("");
+    const [editedCabLicensePlate, setEditedCabLicensePlate] = useState("");
+      const [editedCabDriverName, setEditedCabDriverName] = useState("");
     const [editingFareId, setEditingFareId] = useState<string | null>(null);
-    const [editedFareVehicleType, setEditedFareVehicleType] = useState('');
-    const [editedFareBaseFare, setEditedFareBaseFare] = useState('');
-    const [editedFarePerKmRate, setEditedFarePerKmRate] = useState('');
+    const [editedFareVehicleType, setEditedFareVehicleType] = useState("");
+    const [editedFareBaseFare, setEditedFareBaseFare] = useState("");
+    const [editedFarePerKmRate, setEditedFarePerKmRate] = useState("");
 
     useEffect(() => {
         // Check if the user is authenticated (e.g., check for a token in local storage)
-        if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('authToken');
+        if (typeof window !== "undefined") {
+            const token = localStorage.getItem("authToken");
             if (token) {
                 setIsAuthenticated(true);
             } else {
-                router.push('/login'); // Redirect to login if not authenticated
+                router.push("/login"); // Redirect to login if not authenticated
             }
         }
     }, [router]);
 
     useEffect(() => { 
         const interval = setInterval(() => {
-            if (typeof window !== 'undefined') {
-                const storedBookings = localStorage.getItem('bookings');
+            if (typeof window !== "undefined") {
+                const storedBookings = localStorage.getItem("bookings");
                 if (storedBookings) {
                     try {
                         const currentBookings = JSON.parse(storedBookings);
@@ -179,7 +179,7 @@ export default function AdminDashboard() {
       id: String(cabs.length > 0 ? Math.max(...cabs.map(c => parseInt(c.id))) + 1 : 1), 
       model: newCabModel,
       licensePlate: newCabLicensePlate,
-      status: 'Active', 
+      status: "Active", 
       driverName: newCabDriverName,
     };
     
@@ -204,9 +204,9 @@ export default function AdminDashboard() {
     }
 
     setIsAddCabDialogOpen(false);
-    setNewCabModel('');
-    setNewCabLicensePlate('');
-    setNewCabDriverName('');
+    setNewCabModel("");
+    setNewCabLicensePlate("");
+    setNewCabDriverName("");
     toast({
       title: "Cab Added",
       description: `Cab ${newCab.model} with license plate ${newCab.licensePlate} has been added successfully.`,
@@ -284,9 +284,9 @@ export default function AdminDashboard() {
 
         setFares([...fares, newFare]);
         setIsAddFareDialogOpen(false);
-        setNewFareVehicleType('');
-        setNewFareBaseFare('');
-        setNewFarePerKmRate('');
+        setNewFareVehicleType("");
+        setNewFareBaseFare("");
+        setNewFarePerKmRate("");
         toast({
             title: "Fare Added",
             description: `Fare for ${newFare.vehicleType} has been added successfully.`,
@@ -752,4 +752,6 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+    
 
