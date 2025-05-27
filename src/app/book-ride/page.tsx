@@ -47,7 +47,7 @@ export default function BookRidePage() {
                 if (storedCabs) {
                     setAvailableCabs(JSON.parse(storedCabs));
                 } else {
-                    setAvailableCabs([]); 
+                    setAvailableCabs([]);
                 }
             } catch (error) {
                 console.error("Failed to parse availableCabs from localStorage", error);
@@ -72,20 +72,20 @@ export default function BookRidePage() {
                 setCurrentFares([]);
             }
         }
-    }, [vehicleType]); 
+    }, [vehicleType]);
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('authToken');
         }
         setIsAuthenticated(false);
-        router.push('/'); 
+        router.push('/');
     };
 
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
-            const location = await getCurrentLocation(); 
+            const location = await getCurrentLocation();
             const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedSources(destinations);
         } catch (error: any) {
@@ -100,10 +100,10 @@ export default function BookRidePage() {
 
     const fetchSuggestedDestinations = useCallback(async () => {
         try {
-            const location = await getCurrentLocation(); 
+            const location = await getCurrentLocation();
             const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedDestinations(destinations);
-        } catch (error: any) { 
+        } catch (error: any) {
             toast({
                 title: "Error fetching destinations",
                 description: error.message,
@@ -147,7 +147,7 @@ export default function BookRidePage() {
         const fetchDestinationAddress = async () => {
             if (destination) {
                 try {
-                    const address = await getAddressForCoordinate(destination); 
+                    const address = await getAddressForCoordinate(destination);
                     setDestinationAddress(address);
                 } catch (e) {
                     console.error(e);
@@ -169,7 +169,7 @@ export default function BookRidePage() {
                         destinationLat: destination.lat,
                         destinationLng: destination.lng,
                     });
-                    
+
                     setDistance(distanceResult.distance);
 
                     const selectedFareRule = currentFares.find(f => f.vehicleType === vehicleType);
@@ -178,8 +178,8 @@ export default function BookRidePage() {
                         const calculatedFare = selectedFareRule.baseFare + (distanceResult.distance * selectedFareRule.perKmRate);
                         setFare(calculatedFare);
                     } else {
-                        setFare(null); 
-                        if(vehicleType){ 
+                        setFare(null);
+                        if(vehicleType){
                            toast({
                                 title: "Fare Calculation Error",
                                 description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
@@ -232,7 +232,7 @@ export default function BookRidePage() {
             setDestinationInput(selected.name);
             setSelectedDestinationValue(selected.name);
             try {
-                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); 
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
                 setDestinationAddress(address);
             } catch (e) {
                 console.error(e);
@@ -257,16 +257,16 @@ export default function BookRidePage() {
                 id: generateUniqueId(),
                 mobileNumber: mobileNumber,
                 user: user,
-                userName: user, 
-                email: email,       
+                userName: user,
+                email: email,
                 source: selectedSourceValue,
                 destination: selectedDestinationValue,
                 cabModel: vehicleType,
                 fare: fare.toFixed(2),
-                driverName: driverName, 
-                date: bookingDate,  
-                time: bookingTime,  
-                status: 'Confirmed', 
+                driverName: driverName,
+                date: bookingDate,
+                time: bookingTime,
+                status: 'Confirmed',
             };
 
             if (typeof window !== 'undefined') {
@@ -275,7 +275,7 @@ export default function BookRidePage() {
                     existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
                 } catch (error) {
                     console.error("Error parsing existing bookings from localStorage", error);
-                    existingBookings = []; 
+                    existingBookings = [];
                 }
                 existingBookings.push(newBooking);
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
@@ -295,7 +295,7 @@ export default function BookRidePage() {
             if (!user) missingFields.push("user name");
             if (!email) missingFields.push("email");
             if (!vehicleType) missingFields.push("vehicle type");
-            
+
             toast({
                 title: "Error Booking Cab",
                 description: `Please fill in all required fields: ${missingFields.join(', ')}.`,
@@ -308,15 +308,11 @@ export default function BookRidePage() {
         bookCab();
     };
 
-    
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <div className="absolute top-4 left-4">
-                <Button variant="ghost" onClick={() => router.push('/')}>
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                </Button>
-            </div>
+
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
                 <Card className="w-full max-w-md mt-10">
                     <CardHeader>
@@ -361,9 +357,9 @@ export default function BookRidePage() {
 
                         <div className="grid gap-2">
                             <label htmlFor="source">Source</label>
-                            <Select 
-                                onValueChange={(value) => handleSourceSelect(value)} 
-                                required 
+                            <Select
+                                onValueChange={(value) => handleSourceSelect(value)}
+                                required
                                 value={selectedSourceValue || ""}
                             >
                                 <SelectTrigger className="w-full">
@@ -383,9 +379,9 @@ export default function BookRidePage() {
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="destination">Destination</label>
-                            <Select 
-                                onValueChange={(value) => handleDestinationSelect(value)} 
-                                required 
+                            <Select
+                                onValueChange={(value) => handleDestinationSelect(value)}
+                                required
                                 value={selectedDestinationValue || ""}
                             >
                                 <SelectTrigger className="w-full">
@@ -408,9 +404,9 @@ export default function BookRidePage() {
                         </div>
                         <div className="grid gap-2">
                             <label htmlFor="vehicleType">Vehicle Type</label>
-                            <Select 
-                                onValueChange={setVehicleType} 
-                                value={vehicleType} 
+                            <Select
+                                onValueChange={setVehicleType}
+                                value={vehicleType}
                                 required
                             >
                                 <SelectTrigger className="w-full">
@@ -426,7 +422,7 @@ export default function BookRidePage() {
                                                 {fareRule.vehicleType}
                                             </SelectItem>
                                         ))}
-                                        {currentFares.filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "").length === 0 && 
+                                        {currentFares.filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "").length === 0 &&
                                             <SelectItem value="--no-vehicle-types--" disabled>No vehicle types available</SelectItem>
                                         }
                                     </SelectGroup>
@@ -462,4 +458,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
