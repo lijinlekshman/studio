@@ -2,7 +2,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Address, Coordinate, getCurrentLocation, getAddressForCoordinate } from '@/services/map';
+import type { Address, Coordinate } from '@/services/map';
+import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +11,7 @@ import { ArrowLeft, Map } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateDistance } from '@/ai/flows/calculate-fare';
+import { calculateFare } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 
@@ -163,7 +164,7 @@ export default function BookRidePage() {
         const estimateFare = async () => {
             if (source && destination && vehicleType && currentFares.length > 0) {
                 try {
-                    const distanceResult = await calculateDistance({
+                    const distanceResult = await calculateFare({
                         sourceLat: source.lat,
                         sourceLng: source.lng,
                         destinationLat: destination.lat,
@@ -312,6 +313,13 @@ export default function BookRidePage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
+            <div className="w-full max-w-md p-4">
+                <Link href="/" passHref>
+                    <Button variant="outline" className="mb-4">
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
+                    </Button>
+                </Link>
+            </div>
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
                 <Card className="w-full max-w-md mt-10">
