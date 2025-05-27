@@ -86,8 +86,7 @@
     @apply text-foreground;
     font-family: Arial, Helvetica, sans-serif;
     background-color: hsl(var(--background)); /* Fallback color */
-    /* Ensure your image is in the public/Images/ folder */
-    background-image: url('/Images/attractive-taxi-bg.jpg');
+    background-image: url('/Images/new-taxi-background.jpg'); /* Updated image path */
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
