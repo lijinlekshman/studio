@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Image from 'next/image';
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label"; // Added import for Label
 
 const OTPPageClient: React.FC = () => {
     const [otp, setOtp] = useState('');
@@ -109,7 +110,8 @@ const OTPPageClient: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center" style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}>
+        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
+            {/* Background image is now applied via globals.css to the body */}
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 text-center">
                 <Link href="/">
                   <Image 
@@ -154,3 +156,4 @@ const OTPPageClient: React.FC = () => {
 };
 
 export default OTPPageClient;
+
