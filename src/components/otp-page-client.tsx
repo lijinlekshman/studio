@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Image from 'next/image';
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { Label } from "@/components/ui/label"; // Added import for Label
+import { Label } from "@/components/ui/label";
 
 const OTPPageClient: React.FC = () => {
     const [otp, setOtp] = useState('');
@@ -17,8 +17,10 @@ const OTPPageClient: React.FC = () => {
     const searchParams = useSearchParams();
     const { toast } = useToast();
     const [clientMobileNumber, setClientMobileNumber] = useState<string | null>(null);
+    const [isClient, setIsClient] = useState(false);
 
     useEffect(() => {
+        setIsClient(true); // Component has mounted
         if (typeof window !== 'undefined') {
             const mobileNumberFromParams = searchParams.get('mobileNumber');
             setClientMobileNumber(mobileNumberFromParams);
@@ -62,12 +64,15 @@ const OTPPageClient: React.FC = () => {
                 if (bookingDetailsString) {
                     try {
                         const bookingDetails = JSON.parse(bookingDetailsString);
-                        // Update booking status to Confirmed
+                        const updatedBookingDetails = { ...bookingDetails, status: 'Confirmed Trip!' }; // Update status here
+
+                        // Update booking status in the main bookings array
                         let allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
                         allBookings = allBookings.map((b: any) => 
-                            b.id === bookingDetails.id ? { ...b, status: 'Confirmed' } : b
+                            b.id === bookingDetails.id ? updatedBookingDetails : b
                         );
                         localStorage.setItem('bookings', JSON.stringify(allBookings));
+                        localStorage.setItem('bookingDetails', JSON.stringify(updatedBookingDetails)); // Save updated details for dashboard
                         
                         // Log in the user
                         const userToLogin = {
@@ -109,9 +114,16 @@ const OTPPageClient: React.FC = () => {
         }
     };
 
+    if (!isClient) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center" style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}>
+          <p>Loading...</p>
+        </div>
+      );
+    }
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
-            {/* Background image is now applied via globals.css to the body */}
+        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center" style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}>
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 text-center">
                 <Link href="/">
                   <Image 
@@ -156,4 +168,3 @@ const OTPPageClient: React.FC = () => {
 };
 
 export default OTPPageClient;
-
