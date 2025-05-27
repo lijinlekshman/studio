@@ -72,7 +72,7 @@ const OTPPageClient: React.FC = () => {
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
             {/* Background image is now applied via globals.css to the body */}
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center">
-                <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" />
+                <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="max-w-[90%] sm:max-w-[350px] h-auto mb-6" />
 
                 <Card className="w-full max-w-md mt-10">
                     <CardHeader>
@@ -107,3 +107,4 @@ const OTPPageClient: React.FC = () => {
 };
 
 export default OTPPageClient;
+
