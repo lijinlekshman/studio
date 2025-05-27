@@ -18,17 +18,57 @@ const OTPPageClient: React.FC = () => {
     const [clientMobileNumber, setClientMobileNumber] = useState<string | null>(null);
 
     useEffect(() => {
-        const mobileNumberFromParams = searchParams.get('mobileNumber');
-        setClientMobileNumber(mobileNumberFromParams);
+        if (typeof window !== 'undefined') {
+            const mobileNumberFromParams = searchParams.get('mobileNumber');
+            setClientMobileNumber(mobileNumberFromParams);
+        }
     }, [searchParams]);
 
-    const verifyOTPAndProceed = () => {
-        if (otp === "123456") { // Replace with actual OTP verification logic
+    // Placeholder for Twilio OTP verification
+    const simulateVerifyOtp = async (phoneNumber: string | null, otpCode: string) => {
+        console.log(`Simulating OTP verification for: ${phoneNumber} with OTP: ${otpCode} using Twilio Verify Service ID: VA4e5f3c5b9f308ba482baa879f38b4bba`);
+        // In a real app, this would involve a backend call to Twilio:
+        // const response = await fetch('/api/verify-otp', { method: 'POST', body: JSON.stringify({ phoneNumber, otpCode }) });
+        // if (!response.ok) throw new Error('Failed to verify OTP');
+        // const data = await response.json(); return data.success;
+        
+        if (otpCode === "123456") { // Demo OTP
+            toast({
+                title: "OTP Verification Simulated",
+                description: "OTP successfully verified (Demo).",
+            });
+            return true;
+        }
+        return false;
+    };
+
+    const verifyOTPAndProceed = async () => {
+        if (!clientMobileNumber) {
+            toast({
+                title: "Error",
+                description: "Mobile number not found. Please try booking again.",
+                variant: "destructive",
+            });
+            router.push('/book-ride');
+            return;
+        }
+
+        const isVerified = await simulateVerifyOtp(clientMobileNumber, otp);
+
+        if (isVerified) {
             if (typeof window !== 'undefined') {
                 const bookingDetailsString = localStorage.getItem('bookingDetails');
                 if (bookingDetailsString) {
                     try {
                         const bookingDetails = JSON.parse(bookingDetailsString);
+                        // Update booking status to Confirmed
+                        let allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                        allBookings = allBookings.map((b: any) => 
+                            b.id === bookingDetails.id ? { ...b, status: 'Confirmed' } : b
+                        );
+                        localStorage.setItem('bookings', JSON.stringify(allBookings));
+                        
+                        // Log in the user
                         const userToLogin = {
                             email: bookingDetails.email,
                             name: bookingDetails.userName,
@@ -42,7 +82,7 @@ const OTPPageClient: React.FC = () => {
                         });
                         router.push(`/user-dashboard`);
                     } catch (error) {
-                        console.error("Error parsing bookingDetails from localStorage", error);
+                        console.error("Error processing bookingDetails from localStorage", error);
                         toast({
                             title: "Error",
                             description: "Could not retrieve booking information. Please try again.",
@@ -53,7 +93,7 @@ const OTPPageClient: React.FC = () => {
                 } else {
                     toast({
                         title: "Error",
-                        description: "Booking details not found. Please try booking again.",
+                        description: "Booking details not found after OTP. Please try booking again.",
                         variant: "destructive",
                     });
                     router.push('/');
@@ -69,8 +109,7 @@ const OTPPageClient: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
-            {/* Background image is now applied via globals.css to the body */}
+        <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center" style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}>
             <main className="flex flex-col items-center justify-center w-full flex-1 px-4 text-center">
                 <Link href="/">
                   <Image 
@@ -79,7 +118,7 @@ const OTPPageClient: React.FC = () => {
                     height={100} 
                     alt="Let'sGo Rides" 
                     data-ai-hint="logo" 
-                    className="max-w-[200px] h-auto sm:max-w-[250px] md:max-w-[300px] mb-6" />
+                    className="mx-auto max-w-[200px] h-auto sm:max-w-[250px] md:max-w-[300px] mb-6" />
                 </Link>
                 <Card className="w-full max-w-sm mt-8 sm:mt-10">
                     <CardHeader>
@@ -90,7 +129,7 @@ const OTPPageClient: React.FC = () => {
                     </CardHeader>
                     <CardContent className="grid gap-4">
                         <div className="grid gap-2 text-left">
-                            <label htmlFor="otp">OTP</label>
+                            <Label htmlFor="otp">OTP</Label>
                             <Input
                                 type="text"
                                 id="otp"

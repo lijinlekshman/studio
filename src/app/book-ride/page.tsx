@@ -37,7 +37,6 @@ export default function BookRidePage() {
     const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
-    // const [isAuthenticated, setIsAuthenticated] = useState(false); // No longer needed here
 
     const [availableCabs, setAvailableCabs] = useState<any[]>([]);
     const [currentFares, setCurrentFares] = useState<any[]>([]);
@@ -50,9 +49,6 @@ export default function BookRidePage() {
     useEffect(() => {
         let chatbotRequestData: ParseBookingRequestOutput | null = null;
         if (typeof window !== 'undefined') {
-            // const token = localStorage.getItem('authToken'); // Not needed for auth on this page specifically
-            // setIsAuthenticated(!!token);
-
             try {
                 const storedCabs = localStorage.getItem('cabs');
                 setAvailableCabs(storedCabs ? JSON.parse(storedCabs) : []);
@@ -67,7 +63,7 @@ export default function BookRidePage() {
                  if (!vehicleType && parsedFares.length > 0) {
                     const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
                     if (firstValidFare) {
-                       // setVehicleType(firstValidFare.vehicleType); // Keep this commented if chatbot might set it
+                       // setVehicleType(firstValidFare.vehicleType);
                     }
                 }
             } catch (error) {
@@ -82,8 +78,7 @@ export default function BookRidePage() {
                     if (chatbotRequestData?.userName) setUser(chatbotRequestData.userName);
                     if (chatbotRequestData?.email) setEmail(chatbotRequestData.email);
                     if (chatbotRequestData?.mobileNumber) setMobileNumber(chatbotRequestData.mobileNumber);
-                    // Vehicle preference will be set after currentFares are loaded
-                    localStorage.removeItem('chatbotBookingRequest'); // Clear after attempting to read
+                    localStorage.removeItem('chatbotBookingRequest'); 
                     toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
                 } catch (e) {
                     console.error("Error parsing chatbotBookingRequest from localStorage", e);
@@ -92,7 +87,6 @@ export default function BookRidePage() {
             }
         }
         // This effect should run once on mount
-        // For vehicle preference from chatbot after fares are loaded:
         if (chatbotRequestData?.vehiclePreference && currentFares.length > 0) {
             const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === chatbotRequestData!.vehiclePreference?.toLowerCase());
             if (validVehicle) {
@@ -102,7 +96,7 @@ export default function BookRidePage() {
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, []); // Ensure this runs once on mount
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
@@ -196,7 +190,7 @@ export default function BookRidePage() {
                         setFare(calculatedFare);
                     } else {
                         setFare(null);
-                        if (vehicleType) { // Only toast if a vehicle type was actually selected
+                        if (vehicleType) { 
                             toast({
                                 title: "Fare Calculation Error",
                                 description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
@@ -254,7 +248,22 @@ export default function BookRidePage() {
         return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     };
 
-    const bookCab = () => {
+    // Placeholder for Twilio OTP sending
+    const simulateSendOtp = async (phoneNumber: string) => {
+        console.log(`Simulating OTP send to: ${phoneNumber} using Twilio Verify Service ID: VA4e5f3c5b9f308ba482baa879f38b4bba`);
+        // In a real app, this would involve a backend call to Twilio:
+        // const response = await fetch('/api/send-otp', { method: 'POST', body: JSON.stringify({ phoneNumber }) });
+        // if (!response.ok) throw new Error('Failed to send OTP');
+        toast({
+            title: "OTP Simulation",
+            description: `An OTP would be sent to ${phoneNumber}. (Demo: Use 123456 to verify). Actual Twilio integration needed.`,
+            duration: 9000,
+        });
+        return true; // Simulate success
+    };
+
+
+    const bookCab = async () => {
         if (!user || !email || !mobileNumber || !selectedSourceValue || !selectedDestinationValue || !vehicleType || fare === null) {
             toast({
                 title: "Missing Information",
@@ -265,43 +274,62 @@ export default function BookRidePage() {
         }
 
         if (source && destination && fare !== null) {
-            const bookingDateTime = new Date();
-            const bookingDate = bookingDateTime.toLocaleDateString();
-            const bookingTime = bookingDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            const selectedCabDetails = availableCabs.find(cab => cab.model === vehicleType);
-            const driverName = selectedCabDetails ? selectedCabDetails.driverName : 'Not Assigned';
-
-            const newBooking = {
-                id: generateUniqueId(),
-                mobileNumber: mobileNumber,
-                user: user,
-                userName: user,
-                email: email,
-                source: selectedSourceValue,
-                destination: selectedDestinationValue,
-                cabModel: vehicleType,
-                fare: fare.toFixed(2),
-                driverName: driverName,
-                date: bookingDate,
-                time: bookingTime,
-                status: 'Confirmed',
-            };
-
-            if (typeof window !== 'undefined') {
-                let existingBookings = [];
-                try {
-                    const storedBookings = localStorage.getItem('bookings');
-                    existingBookings = storedBookings ? JSON.parse(storedBookings) : [];
-                } catch (error) {
-                    console.error("Error parsing existing bookings from localStorage", error);
-                    existingBookings = [];
+            try {
+                // Simulate sending OTP via Twilio
+                const otpSent = await simulateSendOtp(mobileNumber);
+                if (!otpSent) {
+                    toast({
+                        title: "OTP Error",
+                        description: "Failed to send OTP. Please try again.",
+                        variant: "destructive",
+                    });
+                    return;
                 }
-                existingBookings.push(newBooking);
-                localStorage.setItem('bookings', JSON.stringify(existingBookings));
-                localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
+
+                const bookingDateTime = new Date();
+                const bookingDate = bookingDateTime.toLocaleDateString();
+                const bookingTime = bookingDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const selectedCabDetails = availableCabs.find(cab => cab.model === vehicleType);
+                const driverName = selectedCabDetails ? selectedCabDetails.driverName : 'Not Assigned';
+
+                const newBooking = {
+                    id: generateUniqueId(),
+                    mobileNumber: mobileNumber,
+                    user: user,
+                    userName: user,
+                    email: email,
+                    source: selectedSourceValue,
+                    destination: selectedDestinationValue,
+                    cabModel: vehicleType,
+                    fare: fare.toFixed(2),
+                    driverName: driverName,
+                    date: bookingDate,
+                    time: bookingTime,
+                    status: 'Pending OTP', // Status updated
+                };
+
+                if (typeof window !== 'undefined') {
+                    let existingBookings = [];
+                    try {
+                        const storedBookings = localStorage.getItem('bookings');
+                        existingBookings = storedBookings ? JSON.parse(storedBookings) : [];
+                    } catch (error) {
+                        console.error("Error parsing existing bookings from localStorage", error);
+                        existingBookings = [];
+                    }
+                    existingBookings.push(newBooking);
+                    localStorage.setItem('bookings', JSON.stringify(existingBookings));
+                    localStorage.setItem('bookingDetails', JSON.stringify(newBooking)); // For OTP page to pick up
+                }
+                router.push(`/otp?mobileNumber=${mobileNumber}`);
+            } catch (error: any) {
+                 toast({
+                    title: "Booking Error",
+                    description: error.message || "Could not initiate booking.",
+                    variant: "destructive",
+                });
             }
-            router.push(`/otp?mobileNumber=${mobileNumber}`);
         } else {
             toast({
                 title: "Error Booking Cab",
@@ -527,7 +555,6 @@ export default function BookRidePage() {
                 </Card>
             </div>
 
-            {/* AI Assistant Dialog Trigger */}
             <Dialog open={isAiHelperDialogOpen} onOpenChange={setIsAiHelperDialogOpen}>
                 <DialogTrigger asChild>
                     <Button
