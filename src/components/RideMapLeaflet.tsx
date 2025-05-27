@@ -1,148 +1,64 @@
-
-'use client';
-
-import React, { useEffect, useState, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L, { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
-
-// Fix for default Leaflet marker icon issue with bundlers like Webpack
-// @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-});
-
-interface Coordinate {
-  lat: number;
-  lng: number;
-}
-
-interface RideMapLeafletProps {
-  source: Coordinate | null;
-  destination: Coordinate | null;
-}
-
-// Helper component to adjust map view
-const ChangeView = ({ bounds }: { bounds: LatLngBoundsExpression | null }) => {
-  const map = useMap();
-  useEffect(() => {
-    // Ensure map and its container are fully available
-    if (map && map.getContainer()) {
-        if (bounds) {
-          try {
-            map.fitBounds(bounds, { padding: [50, 50] });
-          } catch (e) {
-            console.error("Error fitting bounds:", e);
-            // Fallback or error handling if fitBounds fails
-          }
-        } else {
-          // Only set view if no bounds and map instance exists
-          map.setView([10.8505, 76.2711], 7); // Default to Kerala
-        }
-    }
-  }, [map, bounds]); // map and bounds are dependencies
-  return null;
-};
-
-
-const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true); // Set to true only after component mounts on the client
-  }, []);
-
-  const styleMemo = useMemo(() => ({
-    height: '100%',
-    width: '100%',
-    borderRadius: '0.375rem' // Tailwind rounded-md
-  }), []);
-
-  // IMPORTANT: Replace YOUR-X-RapidAPI-KEY with your actual RapidAPI key for maptiles.p.rapidapi.com
-  const tileLayerUrl = "https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=YOUR-X-RapidAPI-KEY";
-  const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Maptiles API';
-
-  const bounds = useMemo<LatLngBoundsExpression | null>(() => {
-    const markers: LatLngExpression[] = [];
-    if (source) {
-      markers.push([source.lat, source.lng]);
-    }
-    if (destination) {
-      markers.push([destination.lat, destination.lng]);
-    }
-    if (markers.length > 0) {
-      return L.latLngBounds(markers);
-    }
-    return null;
-  }, [source, destination]);
-
-  const centerPosition = useMemo<LatLngExpression>(() => {
-    // Default to a central point in Kerala if no source or destination
-    return source ? [source.lat, source.lng] : (destination ? [destination.lat, destination.lng] : [10.8505, 76.2711]);
-  }, [source, destination]);
-
-  const zoomLevel = useMemo<number>(() => {
-    // Zoom in if source or destination is set, otherwise show a broader view
-    return source || destination ? 13 : 7;
-  }, [source, destination]);
-
-  // Create a key that changes when source or destination changes, forcing React to re-create the MapContainer
-  const mapKey = useMemo(() => {
-    return `map-${source?.lat}-${source?.lng}-${destination?.lat}-${destination?.lng}`;
-  }, [source, destination]);
-
-
-  if (!isClient) {
-    // If not on the client yet, render a placeholder or nothing
-    return <p>Initializing map...</p>;
+{
+  "name": "nextn",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 9002",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@genkit-ai/googleai": "^1.0.4",
+    "@genkit-ai/next": "^1.0.4",
+    "@hookform/resolvers": "^4.1.3",
+    "@radix-ui/react-accordion": "^1.2.3",
+    "@radix-ui/react-alert-dialog": "^1.1.6",
+    "@radix-ui/react-avatar": "^1.1.3",
+    "@radix-ui/react-checkbox": "^1.1.4",
+    "@radix-ui/react-dialog": "^1.1.6",
+    "@radix-ui/react-dropdown-menu": "^2.1.6",
+    "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-menubar": "^1.1.6",
+    "@radix-ui/react-popover": "^1.1.6",
+    "@radix-ui/react-progress": "^1.1.2",
+    "@radix-ui/react-radio-group": "^1.2.3",
+    "@radix-ui/react-scroll-area": "^1.2.3",
+    "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-separator": "^1.1.2",
+    "@radix-ui/react-slider": "^1.2.3",
+    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-switch": "^1.1.3",
+    "@radix-ui/react-tabs": "^1.1.3",
+    "@radix-ui/react-toast": "^1.2.6",
+    "@radix-ui/react-tooltip": "^1.1.8",
+    "@tanstack-query-firebase/react": "^1.0.5",
+    "@tanstack/react-query": "^5.66.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "firebase": "^11.3.0",
+    "genkit": "^1.0.4",
+    "lucide-react": "^0.475.0",
+    "next": "15.2.3",
+    "patch-package": "^8.0.0",
+    "react": "^18.3.1",
+    "react-day-picker": "^8.10.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.2",
+    "recharts": "^2.15.1",
+    "tailwind-merge": "^3.0.1",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "genkit-cli": "^1.0.4",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
-
-  return (
-    <MapContainer
-      key={mapKey} // Crucial for forcing React to unmount/remount on significant changes
-      center={centerPosition}
-      zoom={zoomLevel}
-      scrollWheelZoom={true}
-      style={styleMemo}
-    >
-      <TileLayer
-        attribution={attribution}
-        url={tileLayerUrl}
-      />
-      {source && (
-        <Marker position={[source.lat, source.lng]}>
-          <Popup>Pickup Location</Popup>
-        </Marker>
-      )}
-      {destination && (
-        <Marker position={[destination.lat, destination.lng]}>
-          <Popup>Drop-off Location</Popup>
-        </Marker>
-      )}
-      <ChangeView bounds={bounds} />
-       {/* Display a warning if the API key placeholder is still present */}
-      {tileLayerUrl.includes("YOUR-X-RapidAPI-KEY") && (
-        <div style={{
-          position: 'absolute',
-          top: '10px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'yellow',
-          padding: '5px 10px',
-          zIndex: 1000, // Ensure it's on top
-          border: '1px solid orange',
-          borderRadius: '4px',
-          fontSize: '12px',
-          textAlign: 'center'
-        }}>
-          <strong>Warning:</strong> Please replace "YOUR-X-RapidAPI-KEY" in the map component with your actual RapidAPI key for maptiles.
-        </div>
-      )}
-    </MapContainer>
-  );
-};
-
-export default RideMapLeaflet;
+}

@@ -18,12 +18,6 @@ import { parseBookingRequest, type ParseBookingRequestOutput } from '@/ai/flows/
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import dynamic from 'next/dynamic';
-
-const RideMapLeaflet = dynamic(() => import('@/components/RideMapLeaflet'), {
-    ssr: false,
-    loading: () => <p>Loading map...</p>,
-});
 
 
 export default function BookRidePage() {
@@ -261,7 +255,7 @@ export default function BookRidePage() {
         if (source && destination && fare !== null) {
             const bookingDateTime = new Date();
             const bookingDate = bookingDateTime.toLocaleDateString();
-            const bookingTime = bookingDateTime.toLocaleTimeString();
+            const bookingTime = bookingDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             const selectedCabDetails = availableCabs.find(cab => cab.model === vehicleType);
             const driverName = selectedCabDetails ? selectedCabDetails.driverName : 'Not Assigned';
@@ -364,8 +358,8 @@ export default function BookRidePage() {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left Column: Booking Form */}
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-8"> {/* Changed to single column */}
+                {/* Booking Form */}
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle>Book a Ride</CardTitle>
@@ -549,28 +543,18 @@ export default function BookRidePage() {
                     </CardContent>
                 </Card>
 
-                {/* Right Column: Map Display */}
-                <Card className="w-full h-full min-h-[400px] md:min-h-0">
+                {/* Map Display Section Removed */}
+                {/* Selected locations can be displayed below if needed */}
+                 <Card className="mt-4">
                     <CardHeader>
-                        <CardTitle>Ride Map</CardTitle>
-                        <CardDescription>
-                            Map will display selected pickup and drop-off locations.
-                            <br />
-                             <span className="text-sm text-muted-foreground">
-                                (Map data provided by OpenStreetMap contributors and maptiles.p.rapidapi.com. Ensure you have a valid RapidAPI key.)
-                            </span>
-                        </CardDescription>
+                        <CardTitle>Selected Locations</CardTitle>
                     </CardHeader>
-                    <CardContent className="flex flex-col h-[calc(100%-4rem)]">
-                         <RideMapLeaflet source={source} destination={destination} />
-                        <div className="mt-4 text-sm">
-                            <p><strong>Pickup:</strong> {sourceAddress?.formattedAddress || 'Not selected'}</p>
-                            <p><strong>Drop-off:</strong> {destinationAddress?.formattedAddress || 'Not selected'}</p>
-                        </div>
+                    <CardContent>
+                        <p><strong>Pickup:</strong> {sourceAddress?.formattedAddress || 'Not selected'}</p>
+                        <p><strong>Drop-off:</strong> {destinationAddress?.formattedAddress || 'Not selected'}</p>
                     </CardContent>
                 </Card>
             </div>
         </div>
     );
 }
-
