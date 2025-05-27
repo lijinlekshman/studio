@@ -91,8 +91,8 @@ export default function Home() {
                 localStorage.setItem('chatbotBookingRequest', JSON.stringify(parsedData));
             }
             toast({ title: "AI Assistant", description: "Request processed. Redirecting to booking page..." });
-            setIsSheetOpen(false);
-            setAiRequestText('');
+            setIsSheetOpen(false); // Close sheet on success
+            setAiRequestText(''); // Clear text area
             router.push('/book-ride');
         } catch (error: any) {
             toast({ title: "AI Processing Error", description: error.message || "Could not process the request.", variant: "destructive" });
@@ -206,7 +206,7 @@ export default function Home() {
                     </div>
                     <SheetFooter>
                         <SheetClose asChild>
-                             <Button type="button" variant="outline" onClick={() => { setAiRequestText(''); setIsSheetOpen(false); }}>Cancel</Button>
+                             <Button type="button" variant="outline" onClick={() => setAiRequestText('')}>Cancel</Button>
                         </SheetClose>
                         <Button type="button" onClick={handleProcessAiRequest} disabled={isParsingAi}>
                             {isParsingAi ? "Processing..." : "Process Request"}
@@ -217,4 +217,6 @@ export default function Home() {
         </div>
     );
 }
+    
+
     
