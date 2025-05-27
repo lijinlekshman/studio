@@ -7,33 +7,33 @@
 
 @layer base {
   :root {
-    --background: 60 100% 98%; /* Light Yellow */
-    --foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --card: 60 100% 98%; /* Light Yellow */
-    --card-foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --popover: 60 100% 98%; /* Light Yellow */
-    --popover-foreground: 24 7.7% 9.8%; /* Dark Gray */
+    --background: 50 100% 97%; /* Very light creamy yellow */
+    --foreground: 24 10% 15%;  /* Dark Gray for text */
+    --card: 0 0% 100%;         /* Pure white for cards */
+    --card-foreground: 24 10% 15%; /* Dark Gray text on cards */
+    --popover: 0 0% 100%;      /* Pure white for popovers */
+    --popover-foreground: 24 10% 15%; /* Dark Gray text on popovers */
     --primary: 47 98.2% 57.3%; /* Yellow */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 0 0% 96%; /* Light Gray */
+    --primary-foreground: 24 7.7% 9.8%; /* Dark Gray for text on primary yellow buttons */
+    --secondary: 220 15% 96%; /* Light Gray-Blue */
     --secondary-foreground: 24 7.7% 9.8%; /* Dark Gray */
-    --muted: 0 0% 96%; /* Light Gray */
-    --muted-foreground: 25 5.3% 44.7%; /* Medium Gray */
+    --muted: 220 15% 96%; /* Light Gray-Blue */
+    --muted-foreground: 220 10% 45%; /* Medium Gray-Blue */
     --accent: 49 99.4% 50.6%; /* Yellow */
-    --accent-foreground: 0 0% 100%; /* White */
+    --accent-foreground: 24 7.7% 9.8%; /* Dark Gray for text on accent yellow */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 20 5.9% 90%; /* Light Gray */
-    --input: 0 0% 96%; /* Light Gray */
-    --ring: 47 98.2% 57.3%; /* Yellow */
+    --border: 220 15% 90%; /* Lighter Gray-Blue border */
+    --input: 0 0% 100%; /* White input background */
+    --ring: 47 98.2% 57.3%; /* Yellow for focus ring */
     --radius: 0.5rem;
-    --sidebar-background: 60 100% 98%;
-    --sidebar-foreground: 24 7.7% 9.8%;
+    --sidebar-background: 50 100% 97%;
+    --sidebar-foreground: 24 10% 15%;
     --sidebar-primary: 47 98.2% 57.3%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary-foreground: 24 7.7% 9.8%;
     --sidebar-accent: 49 99.4% 50.6%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 20 5.9% 90%;
+    --sidebar-accent-foreground: 24 7.7% 9.8%;
+    --sidebar-border: 220 15% 90%;
     --sidebar-ring: 47 98.2% 57.3%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -44,30 +44,30 @@
 
   .dark {
     --background: 24 7.7% 9.8%; /* Dark Gray */
-    --foreground: 60 100% 98%; /* Light Yellow */
-    --card: 24 7.7% 9.8%; /* Dark Gray */
-    --card-foreground: 60 100% 98%; /* Light Yellow */
-    --popover: 24 7.7% 9.8%; /* Dark Gray */
-    --popover-foreground: 60 100% 98%; /* Light Yellow */
+    --foreground: 50 100% 97%; /* Light Yellow for text in dark mode */
+    --card: 24 8% 12%; /* Darker Gray for cards in dark mode */
+    --card-foreground: 50 100% 97%;
+    --popover: 24 8% 12%;
+    --popover-foreground: 50 100% 97%;
     --primary: 47 98.2% 57.3%; /* Yellow */
-    --primary-foreground: 0 0% 100%; /* White */
-    --secondary: 25 5.3% 24.7%; /* Darker Gray */
-    --secondary-foreground: 60 100% 98%; /* Light Yellow */
-    --muted: 25 5.3% 24.7%; /* Darker Gray */
+    --primary-foreground: 24 7.7% 9.8%; /* Dark Gray for text on primary yellow buttons */
+    --secondary: 25 5.3% 20%; /* Darker Gray */
+    --secondary-foreground: 50 100% 97%;
+    --muted: 25 5.3% 20%;
     --muted-foreground: 0 0% 63.9%; /* Light Gray */
     --accent: 49 99.4% 50.6%; /* Yellow */
-    --accent-foreground: 0 0% 100%; /* White */
+    --accent-foreground: 24 7.7% 9.8%; /* Dark Gray for text on accent yellow */
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 25 5.3% 24.7%; /* Darker Gray */
-    --input: 25 5.3% 24.7%; /* Darker Gray */
+    --border: 25 5.3% 24.7%; /* Darker Gray border */
+    --input: 25 5.3% 18%; /* Darker Gray input */
     --ring: 47 98.2% 57.3%; /* Yellow */
-    --sidebar-background: 25 5.3% 24.7%;
-    --sidebar-foreground: 60 100% 98%;
+    --sidebar-background: 25 5.3% 15%;
+    --sidebar-foreground: 50 100% 97%;
     --sidebar-primary: 47 98.2% 57.3%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary-foreground: 24 7.7% 9.8%;
     --sidebar-accent: 49 99.4% 50.6%;
-    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-accent-foreground: 24 7.7% 9.8%;
     --sidebar-border: 25 5.3% 24.7%;
     --sidebar-ring: 47 98.2% 57.3%;
     --chart-1: 220 70% 50%;
@@ -84,7 +84,7 @@
   }
   body {
     @apply text-foreground;
-    font-family: Arial, Helvetica, sans-serif;
+    /* font-family: Arial, Helvetica, sans-serif; <- Removed to allow Next/Font (Geist Sans) to take precedence */
     background-color: hsl(var(--background)); /* Fallback color */
     background-image: url('/Images/new-taxi-background.jpg'); /* Path relative to public folder */
     background-size: cover;
@@ -93,5 +93,3 @@
     background-position: center;
   }
 }
-
-/* Leaflet CSS import removed */
