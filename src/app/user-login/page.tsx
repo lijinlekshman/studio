@@ -59,8 +59,7 @@ const UserLoginPage: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center"
-         style={{ backgroundImage: "url('/Images/attractive-taxi-bg.jpg')" }}>
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
       <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center">
         <Image src="/Images/letsGo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo letsGo" />
         <Card className="w-full max-w-md mt-10">
