@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react'; // Removed useRef
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
@@ -29,9 +29,9 @@ interface RideMapLeafletProps {
 const ChangeView = ({ bounds }: { bounds: LatLngBoundsExpression | null }) => {
   const map = useMap();
   useEffect(() => {
-    if (bounds) {
+    if (map && bounds) {
       map.fitBounds(bounds, { padding: [50, 50] });
-    } else {
+    } else if (map) {
       // Default view if no bounds (e.g., center of Kerala or India)
       map.setView([10.8505, 76.2711], 7); // Default to Kerala
     }
@@ -41,7 +41,7 @@ const ChangeView = ({ bounds }: { bounds: LatLngBoundsExpression | null }) => {
 
 
 const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) => {
-  const mapRef = useRef<L.Map | null>(null);
+  // const mapRef = useRef<L.Map | null>(null); // Removed mapRef and whenCreated
 
   const tileLayerUrl = "https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=YOUR-X-RapidAPI-KEY";
   // IMPORTANT: Replace YOUR-X-RapidAPI-KEY with your actual RapidAPI key for maptiles.p.rapidapi.com
@@ -69,7 +69,7 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
       zoom={source || destination ? 13 : 7}
       scrollWheelZoom={true}
       style={{ height: '100%', width: '100%', borderRadius: '0.375rem' }} //  rounded-md
-      whenCreated={(mapInstance) => { mapRef.current = mapInstance; }}
+      // whenCreated={(mapInstance) => { mapRef.current = mapInstance; }} // Removed
     >
       <TileLayer
         attribution={attribution}
@@ -109,4 +109,3 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
 };
 
 export default RideMapLeaflet;
-
