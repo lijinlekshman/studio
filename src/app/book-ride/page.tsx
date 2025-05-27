@@ -2,16 +2,16 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import type { Address, Coordinate } from '@/services/map';
+import type { Address, Coordinate } from '@/services/map'; // Ensure type import
 import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Map } from 'lucide-react';
+import { ArrowLeft, Map as MapIcon } from 'lucide-react'; // Renamed Map to MapIcon to avoid conflict
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateDistance } from '@/ai/flows/calculate-fare'; // Changed import
+import { calculateDistance } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 
@@ -37,6 +37,7 @@ export default function BookRidePage() {
 
     const [availableCabs, setAvailableCabs] = useState<any[]>([]);
     const [currentFares, setCurrentFares] = useState<any[]>([]);
+    const [mapUrl, setMapUrl] = useState<string>('');
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -45,35 +46,27 @@ export default function BookRidePage() {
 
             try {
                 const storedCabs = localStorage.getItem('cabs');
-                if (storedCabs) {
-                    setAvailableCabs(JSON.parse(storedCabs));
-                } else {
-                    setAvailableCabs([]);
-                }
+                setAvailableCabs(storedCabs ? JSON.parse(storedCabs) : []);
             } catch (error) {
                 console.error("Failed to parse availableCabs from localStorage", error);
                 setAvailableCabs([]);
             }
             try {
                 const storedFares = localStorage.getItem('fares');
-                if (storedFares) {
-                    const parsedFares = JSON.parse(storedFares);
-                    setCurrentFares(parsedFares);
-                    if (!vehicleType && parsedFares.length > 0) {
-                        const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
-                        if (firstValidFare) {
-                            setVehicleType(firstValidFare.vehicleType);
-                        }
+                const parsedFares = storedFares ? JSON.parse(storedFares) : [];
+                setCurrentFares(parsedFares);
+                if (!vehicleType && parsedFares.length > 0) {
+                    const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
+                    if (firstValidFare) {
+                        setVehicleType(firstValidFare.vehicleType);
                     }
-                } else {
-                    setCurrentFares([]);
                 }
             } catch (error) {
                 console.error("Failed to parse currentFares from localStorage", error);
                 setCurrentFares([]);
             }
         }
-    }, [vehicleType]);
+    }, [vehicleType]); // Added vehicleType to dependencies
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -148,7 +141,7 @@ export default function BookRidePage() {
         const fetchDestinationAddress = async () => {
             if (destination) {
                 try {
-                    const address = await getAddressForCoordinate(destination); // Corrected to use destination coordinates
+                    const address = await getAddressForCoordinate(destination);
                     setDestinationAddress(address);
                 } catch (e) {
                     console.error(e);
@@ -164,7 +157,7 @@ export default function BookRidePage() {
         const estimateFare = async () => {
             if (source && destination && vehicleType && currentFares.length > 0) {
                 try {
-                    const distanceResult = await calculateDistance({ // Changed function call
+                    const distanceResult = await calculateDistance({
                         sourceLat: source.lat,
                         sourceLng: source.lng,
                         destinationLat: destination.lat,
@@ -208,14 +201,26 @@ export default function BookRidePage() {
         estimateFare();
     }, [source, destination, vehicleType, currentFares, toast]);
 
-    const [sourceInput, setSourceInput] = useState('');
-    const [destinationInput, setDestinationInput] = useState('');
+     useEffect(() => {
+        // Update map URL when source or destination changes
+        const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; // IMPORTANT: Replace with your actual API key
+        if (source && destination) {
+            setMapUrl(`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${source.lat},${source.lng}&destination=${destination.lat},${destination.lng}&mode=driving`);
+        } else if (source) {
+            setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${source.lat},${source.lng}`);
+        } else if (destination) {
+            setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${destination.lat},${destination.lng}`);
+        } else {
+            // Default map view (e.g., a central location or empty)
+            setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=India`);
+        }
+    }, [source, destination]);
+
 
     const handleSourceSelect = async (selectedSourceName: string) => {
         const selected = suggestedSources.find(src => src.name === selectedSourceName);
         if (selected) {
             setSource({ lat: selected.lat, lng: selected.lng });
-            setSourceInput(selected.name);
             setSelectedSourceValue(selected.name);
             try {
                 const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
@@ -230,7 +235,6 @@ export default function BookRidePage() {
          const selected = suggestedDestinations.find(dest => dest.name === selectedDestinationName);
         if (selected) {
             setDestination({ lat: selected.lat, lng: selected.lng });
-            setDestinationInput(selected.name);
             setSelectedDestinationValue(selected.name);
             try {
                 const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
@@ -246,7 +250,16 @@ export default function BookRidePage() {
     };
 
     const bookCab = () => {
-        if (source && destination && mobileNumber && fare && selectedSourceValue && selectedDestinationValue && user && email && vehicleType) {
+        if (!user || !email || !mobileNumber || !selectedSourceValue || !selectedDestinationValue || !vehicleType || fare === null) {
+            toast({
+                title: "Missing Information",
+                description: "Please fill in all required fields: User, Email, Mobile, Source, Destination, and Vehicle Type.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        if (source && destination && fare !== null) {
             const bookingDateTime = new Date();
             const bookingDate = bookingDateTime.toLocaleDateString();
             const bookingTime = bookingDateTime.toLocaleTimeString();
@@ -280,65 +293,50 @@ export default function BookRidePage() {
                 }
                 existingBookings.push(newBooking);
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
-                localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
+                localStorage.setItem('bookingDetails', JSON.stringify(newBooking)); // For OTP/Dashboard page
             }
 
             router.push(`/otp?mobileNumber=${mobileNumber}`);
 
         } else {
-            let missingFields = [];
-            if (!source) missingFields.push("source");
-            if (!destination) missingFields.push("destination");
-            if (!mobileNumber) missingFields.push("mobile number");
-            if (fare === null) missingFields.push("fare calculation (ensure source/destination/vehicle type are set)");
-            if (!selectedSourceValue) missingFields.push("source selection");
-            if (!selectedDestinationValue) missingFields.push("destination selection");
-            if (!user) missingFields.push("user name");
-            if (!email) missingFields.push("email");
-            if (!vehicleType) missingFields.push("vehicle type");
-
             toast({
                 title: "Error Booking Cab",
-                description: `Please fill in all required fields: ${missingFields.join(', ')}.`,
+                description: "Please ensure source, destination, and all user details are correctly set.",
                 variant: "destructive",
             });
         }
     };
 
-    const handleBookCabClick = () => {
-        bookCab();
-    };
-
-
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <div className="w-full max-w-md p-4">
-                <Button variant="outline" className="mb-4" onClick={() => router.push('/')}>
+        <div className="container mx-auto p-4 min-h-screen">
+            <div className="mb-6">
+                <Button variant="outline" onClick={() => router.push('/')}>
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
                 </Button>
             </div>
 
-            <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
-                <Card className="w-full max-w-md mt-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Left Column: Booking Form */}
+                <Card className="w-full">
                     <CardHeader>
                         <CardTitle>Book a Ride</CardTitle>
-                        <CardDescription>Enter your source and destination to book a cab.</CardDescription>
+                        <CardDescription>Enter your ride details below.</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
                          <div className="grid gap-2">
-                            <label htmlFor="user">User</label>
+                            <label htmlFor="user" className="text-left font-medium">User Name</label>
                             <Input
                                 type="text"
                                 id="user"
-                                placeholder="Enter your user"
+                                placeholder="Enter your name"
                                 value={user}
                                 onChange={(e) => setUser(e.target.value)}
                                 required
                             />
                         </div>
                          <div className="grid gap-2">
-                            <label htmlFor="email">Email</label>
+                            <label htmlFor="email" className="text-left font-medium">Email</label>
                             <Input
                                 type="email"
                                 id="email"
@@ -350,7 +348,7 @@ export default function BookRidePage() {
                         </div>
 
                         <div className="grid gap-2">
-                            <label htmlFor="mobileNumber">Mobile Number</label>
+                            <label htmlFor="mobileNumber" className="text-left font-medium">Mobile Number</label>
                             <Input
                                 type="tel"
                                 id="mobileNumber"
@@ -362,7 +360,7 @@ export default function BookRidePage() {
                         </div>
 
                         <div className="grid gap-2">
-                            <label htmlFor="source">Source</label>
+                            <label htmlFor="source" className="text-left font-medium">Source</label>
                             <Select
                                 onValueChange={(value) => handleSourceSelect(value)}
                                 required
@@ -384,7 +382,7 @@ export default function BookRidePage() {
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <label htmlFor="destination">Destination</label>
+                            <label htmlFor="destination" className="text-left font-medium">Destination</label>
                             <Select
                                 onValueChange={(value) => handleDestinationSelect(value)}
                                 required
@@ -396,12 +394,12 @@ export default function BookRidePage() {
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Destination</SelectLabel>
-                                        {suggestedDestinations.map((dest) => (
+                                        {suggestedDestinations.filter(d => d.name).map((dest) => (
                                             <SelectItem key={dest.name} value={dest.name}>
                                                 {dest.name}
                                             </SelectItem>
                                         ))}
-                                        {suggestedDestinations.length === 0 && (
+                                        {suggestedDestinations.filter(d => d.name).length === 0 && (
                                             <SelectItem value="--no-destinations--" disabled>No destinations available</SelectItem>
                                         )}
                                     </SelectGroup>
@@ -409,7 +407,7 @@ export default function BookRidePage() {
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <label htmlFor="vehicleType">Vehicle Type</label>
+                            <label htmlFor="vehicleType" className="text-left font-medium">Vehicle Type</label>
                             <Select
                                 onValueChange={setVehicleType}
                                 value={vehicleType}
@@ -437,18 +435,19 @@ export default function BookRidePage() {
                         </div>
                         {fare !== null && (
                             <div className="grid gap-2">
-                                <label htmlFor="fare">Estimated Fare</label>
+                                <label htmlFor="fare" className="text-left font-medium">Estimated Fare</label>
                                 <Input
                                     type="text"
                                     id="fare"
                                     value={`₹${fare.toFixed(2)}`}
                                     disabled
+                                    className="font-semibold"
                                 />
                             </div>
                         )}
                         {distance !== null && (
                             <div className="grid gap-2">
-                                <label htmlFor="distance">Distance</label>
+                                <label htmlFor="distance" className="text-left font-medium">Distance</label>
                                 <Input
                                     type="text"
                                     id="distance"
@@ -457,11 +456,49 @@ export default function BookRidePage() {
                                 />
                             </div>
                         )}
-                        <Button onClick={handleBookCabClick} disabled={!source || !destination || !mobileNumber || !user || !email || !vehicleType || fare === null}>Book Cab <Map className="ml-2" /></Button>
+                        <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber || !user || !email || !vehicleType || fare === null} className="w-full">
+                            Book Cab <MapIcon className="ml-2 h-5 w-5" />
+                        </Button>
                     </CardContent>
                 </Card>
-            </main>
+
+                {/* Right Column: Map Display */}
+                <Card className="w-full h-full min-h-[400px] md:min-h-0">
+                    <CardHeader>
+                        <CardTitle>Ride Map</CardTitle>
+                        <CardDescription>
+                            {mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") && (
+                                <span className="text-destructive font-semibold">Replace 'YOUR_GOOGLE_MAPS_API_KEY' in the code with your actual Google Maps API key for the map to display.</span>
+                            )}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col h-[calc(100%-4rem)]"> {/* Adjust height to fill card */}
+                        {mapUrl && !mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") ? (
+                            <iframe
+                                src={mapUrl}
+                                width="100%"
+                                height="100%" // Fill available space
+                                style={{ border: 0 }}
+                                allowFullScreen={true}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                className="flex-grow rounded-md" // Make iframe grow
+                            ></iframe>
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                <p>{mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") ? "Please configure Google Maps API Key." : "Select source/destination to see map."}</p>
+                            </div>
+                        )}
+                        <div className="mt-4 text-sm">
+                            <p><strong>Pickup:</strong> {sourceAddress?.formattedAddress || 'Not selected'}</p>
+                            <p><strong>Drop-off:</strong> {destinationAddress?.formattedAddress || 'Not selected'}</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }
 
+        
+    
