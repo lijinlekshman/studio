@@ -87,12 +87,19 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
     return source || destination ? 13 : 7;
   }, [source, destination]);
 
+  // Create a key that changes when source or destination changes
+  const mapKey = useMemo(() => {
+    return `map-${source?.lat}-${source?.lng}-${destination?.lat}-${destination?.lng}`;
+  }, [source, destination]);
+
+
   if (!isClient) {
     return <p>Initializing map...</p>;
   }
 
   return (
     <MapContainer
+      key={mapKey} // Add key here
       center={centerPosition}
       zoom={zoomLevel}
       scrollWheelZoom={true}
@@ -136,3 +143,4 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
 };
 
 export default RideMapLeaflet;
+
