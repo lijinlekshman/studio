@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react'; // Added useState
+import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
@@ -29,11 +29,16 @@ interface RideMapLeafletProps {
 const ChangeView = ({ bounds }: { bounds: LatLngBoundsExpression | null }) => {
   const map = useMap();
   useEffect(() => {
-    if (map && bounds) {
-      map.fitBounds(bounds, { padding: [50, 50] });
-    } else if (map) {
-      // Default view if no bounds (e.g., center of Kerala or India)
-      map.setView([10.8505, 76.2711], 7); // Default to Kerala
+    if (map && map.getContainer()) { // Check if map container is available
+        if (bounds) {
+          try {
+            map.fitBounds(bounds, { padding: [50, 50] });
+          } catch (e) {
+            console.error("Error fitting bounds:", e);
+          }
+        } else {
+          map.setView([10.8505, 76.2711], 7); // Default to Kerala
+        }
     }
   }, [map, bounds]);
   return null;
