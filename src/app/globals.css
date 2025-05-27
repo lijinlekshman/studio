@@ -93,3 +93,24 @@
     background-position: center;
   }
 }
+
+/* Leaflet Overrides if necessary */
+.leaflet-container {
+  font-family: 'Geist', sans-serif; /* Or your app's primary font */
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius);
+  background-color: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* Tailwind shadow-md */
+}
+
+.leaflet-popup-content {
+  margin: 0.75rem; /* p-3 */
+  font-size: 0.875rem; /* text-sm */
+}
+
+.leaflet-popup-tip {
+   background-color: hsl(var(--popover));
+}

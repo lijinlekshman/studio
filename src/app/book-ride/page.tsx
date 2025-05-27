@@ -7,7 +7,7 @@ import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Map as MapIcon, Brain, Bot, MessageSquare } from 'lucide-react'; // Added Bot
+import { ArrowLeft, Map as MapIcon, Bot } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
@@ -18,6 +18,12 @@ import { parseBookingRequest, type ParseBookingRequestOutput } from '@/ai/flows/
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import dynamic from 'next/dynamic';
+
+const RideMapLeaflet = dynamic(() => import('@/components/RideMapLeaflet'), {
+    ssr: false,
+    loading: () => <p>Loading map...</p>,
+});
 
 
 export default function BookRidePage() {
@@ -41,7 +47,6 @@ export default function BookRidePage() {
 
     const [availableCabs, setAvailableCabs] = useState<any[]>([]);
     const [currentFares, setCurrentFares] = useState<any[]>([]);
-    const [mapUrl, setMapUrl] = useState<string>('');
 
     const [aiRequestText, setAiRequestText] = useState('');
     const [isParsing, setIsParsing] = useState(false);
@@ -210,19 +215,6 @@ export default function BookRidePage() {
         estimateFare();
     }, [source, destination, vehicleType, currentFares, toast]);
 
-    useEffect(() => {
-        const apiKey = "YOUR_GOOGLE_MAPS_API_KEY";
-        if (source && destination) {
-            setMapUrl(`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${source.lat},${source.lng}&destination=${destination.lat},${destination.lng}&mode=driving`);
-        } else if (source) {
-            setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${source.lat},${source.lng}`);
-        } else if (destination) {
-            setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${destination.lat},${destination.lng}`);
-        } else {
-            setMapUrl(`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=India`);
-        }
-    }, [source, destination]);
-
 
     const handleSourceSelect = async (selectedSourceName: string) => {
         const selected = suggestedSources.find(src => src.name === selectedSourceName);
@@ -293,7 +285,8 @@ export default function BookRidePage() {
             if (typeof window !== 'undefined') {
                 let existingBookings = [];
                 try {
-                    existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                    const storedBookings = localStorage.getItem('bookings');
+                    existingBookings = storedBookings ? JSON.parse(storedBookings) : [];
                 } catch (error) {
                     console.error("Error parsing existing bookings from localStorage", error);
                     existingBookings = [];
@@ -561,35 +554,15 @@ export default function BookRidePage() {
                     <CardHeader>
                         <CardTitle>Ride Map</CardTitle>
                         <CardDescription>
-                            {mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") && (
-                                <span className="text-destructive font-semibold">
-                                    The current map uses Google Maps Embed. Replace 'YOUR_GOOGLE_MAPS_API_KEY'
-                                    in the code with your actual Google Maps API key for this map to display.
-                                </span>
-                            )}
+                            Map will display selected pickup and drop-off locations.
                             <br />
-                            <span className="text-sm text-muted-foreground">
-                                (Alternative map sources like `maptiles.p.rapidapi.com` for map tiles could be used with a dedicated mapping library e.g., Leaflet, instead of the current iframe embed.)
+                             <span className="text-sm text-muted-foreground">
+                                (Map data provided by OpenStreetMap contributors and maptiles.p.rapidapi.com. Ensure you have a valid RapidAPI key.)
                             </span>
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col h-[calc(100%-4rem)]">
-                        {mapUrl && !mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") ? (
-                            <iframe
-                                src={mapUrl}
-                                width="100%"
-                                height="100%"
-                                style={{ border: 0 }}
-                                allowFullScreen={true}
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                className="flex-grow rounded-md"
-                            ></iframe>
-                        ) : (
-                            <div className="flex items-center justify-center h-full text-muted-foreground">
-                                <p>{mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") ? "Please configure Google Maps API Key." : "Select source/destination to see map."}</p>
-                            </div>
-                        )}
+                         <RideMapLeaflet source={source} destination={destination} />
                         <div className="mt-4 text-sm">
                             <p><strong>Pickup:</strong> {sourceAddress?.formattedAddress || 'Not selected'}</p>
                             <p><strong>Drop-off:</strong> {destinationAddress?.formattedAddress || 'Not selected'}</p>
@@ -600,3 +573,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
