@@ -13,7 +13,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"; // Removed AvatarImage import
 
 
 export default function Home() {
@@ -43,7 +43,7 @@ export default function Home() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="rounded-full h-10 w-10 p-0 hover:bg-accent">
                             <Avatar className="h-9 w-9">
-                                <AvatarImage src="/Images/logo.png" alt="User Profile" data-ai-hint="logo" />
+                                {/* AvatarImage removed to show User icon from Fallback */}
                                 <AvatarFallback>
                                     <User className="h-5 w-5" />
                                 </AvatarFallback>
