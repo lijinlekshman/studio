@@ -20,9 +20,9 @@ import {
     SheetDescription,
     SheetHeader,
     SheetTitle,
-    SheetTrigger,
     SheetFooter,
     SheetClose,
+    SheetTrigger, // Added missing import
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -91,8 +91,8 @@ export default function Home() {
                 localStorage.setItem('chatbotBookingRequest', JSON.stringify(parsedData));
             }
             toast({ title: "AI Assistant", description: "Request processed. Redirecting to booking page..." });
-            setIsSheetOpen(false); 
-            setAiRequestText(''); 
+            setIsSheetOpen(false);
+            setAiRequestText('');
             router.push('/book-ride');
         } catch (error: any) {
             toast({ title: "AI Processing Error", description: error.message || "Could not process the request.", variant: "destructive" });
@@ -138,30 +138,41 @@ export default function Home() {
                 </DropdownMenu>
             </div>
 
+            {/* Hero Section */}
             <div
                 className="relative w-full h-screen flex items-center justify-center bg-cover bg-center"
-                // style={{ backgroundImage: "url('/Images/taxi-bg.jpg')" }} // Background applied via globals.css
+                // The background image is applied via globals.css to the body
             >
-                <div className="absolute inset-0 bg-black opacity-40"></div>
-                <div className="relative z-10 text-center p-6 bg-white/20 rounded-lg shadow-md max-w-xl mx-auto">
-                    <Link href="/">
-                        <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="mx-auto max-w-[90%] sm:max-w-[300px] h-auto mb-4" />
+                <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay */}
+                
+                {/* Centered Content Box */}
+                <div className="relative z-10 text-center p-8 sm:p-10 bg-white/20 backdrop-blur-sm rounded-xl shadow-xl max-w-lg sm:max-w-xl md:max-w-2xl mx-auto">
+                    <Link href="/" className="block mb-6 sm:mb-8">
+                        <Image 
+                            src="/Images/logo.png" 
+                            width={300} // Adjusted base width
+                            height={75}  // Adjusted base height
+                            alt="Let'sGo Rides" 
+                            data-ai-hint="logo" 
+                            className="mx-auto max-w-[200px] h-auto sm:max-w-[250px] md:max-w-[300px]" 
+                        />
                     </Link>
-                    <h1 className="text-3xl md:text-5xl font-bold text-white mt-4">
-                        Book a Ride with Let'sGo
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-tight">
+                        Book Your Ride with Let'sGo
                     </h1>
-                    <p className="text-md md:text-lg text-white mt-2">
-                        Your trusted partner for safe and comfortable rides.
+                    <p className="text-lg sm:text-xl text-gray-200 mb-8">
+                        Your trusted partner for safe, reliable, and comfortable rides.
                     </p>
 
                     <Link href="/book-ride">
-                        <Button className="mt-8 mx-2">
-                            Book a Cab <Map className="ml-2" />
+                        <Button size="lg" className="mt-4 px-8 py-3 text-lg font-semibold">
+                            Book a Cab Now <Map className="ml-2 h-5 w-5" />
                         </Button>
                     </Link>
                 </div>
             </div>
 
+            {/* Chatbot Sheet Trigger */}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
                     <Button
@@ -173,7 +184,7 @@ export default function Home() {
                         <Bot className="h-7 w-7" />
                     </Button>
                 </SheetTrigger>
-                <SheetContent className="flex flex-col"> {/* Make sheet content a flex column */}
+                <SheetContent className="flex flex-col">
                     <SheetHeader>
                         <SheetTitle>AI Booking Assistant</SheetTitle>
                         <SheetDescription>
@@ -181,15 +192,15 @@ export default function Home() {
                             For example: "Book a cab from Punalur to Kollam for Anoop, email@example.com, 9876543210, SUV preferred"
                         </SheetDescription>
                     </SheetHeader>
-                    <div className="flex-grow py-4"> {/* This div will expand */}
+                    <div className="flex-grow py-4">
                         <div className="grid w-full gap-1.5 h-full">
-                            <Label htmlFor="ai-request-text" className="sr-only">Your Request</Label> {/* sr-only as placeholder is descriptive */}
+                            <Label htmlFor="ai-request-text" className="sr-only">Your Request</Label>
                             <Textarea
                                 placeholder="Type your booking request here..."
                                 id="ai-request-text"
                                 value={aiRequestText}
                                 onChange={(e) => setAiRequestText(e.target.value)}
-                                className="h-full resize-none" // Make textarea take full height of its container and non-resizable
+                                className="h-full resize-none"
                             />
                         </div>
                     </div>
@@ -206,3 +217,5 @@ export default function Home() {
         </div>
     );
 }
+
+    
