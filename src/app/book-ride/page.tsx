@@ -103,7 +103,7 @@ export default function BookRidePage() {
             const location = await getCurrentLocation(); 
             const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedDestinations(destinations);
-        } catch (error: any) { // Fixed syntax error here
+        } catch (error: any) { 
             toast({
                 title: "Error fetching destinations",
                 description: error.message,
@@ -147,7 +147,7 @@ export default function BookRidePage() {
         const fetchDestinationAddress = async () => {
             if (destination) {
                 try {
-                    const address = await getAddressForCoordinate(destination); // Corrected to use destination
+                    const address = await getAddressForCoordinate(destination); 
                     setDestinationAddress(address);
                 } catch (e) {
                     console.error(e);
@@ -232,7 +232,7 @@ export default function BookRidePage() {
             setDestinationInput(selected.name);
             setSelectedDestinationValue(selected.name);
             try {
-                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); // Corrected to use selected.lat, selected.lng
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); 
                 setDestinationAddress(address);
             } catch (e) {
                 console.error(e);
@@ -462,3 +462,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
