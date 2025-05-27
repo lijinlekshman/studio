@@ -75,7 +75,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-black opacity-40"></div>
                 <div className="relative z-10 text-center">
 
-                    <Image src="/Images/letsGo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo letsGo" />
+                    <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" />
 
                     <h1 className="text-3xl md:text-5xl font-bold text-white mt-4">
                         Book a Ride with Let'sGo
