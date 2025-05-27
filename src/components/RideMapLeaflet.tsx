@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
@@ -37,6 +37,7 @@ const ChangeView = ({ bounds }: { bounds: LatLngBoundsExpression | null }) => {
             console.error("Error fitting bounds:", e);
           }
         } else {
+          // Only set view if no bounds and map instance exists
           map.setView([10.8505, 76.2711], 7); // Default to Kerala
         }
     }
@@ -52,37 +53,50 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
     setIsClient(true);
   }, []);
 
+  const styleMemo = useMemo(() => ({
+    height: '100%',
+    width: '100%',
+    borderRadius: '0.375rem' // Tailwind rounded-md
+  }), []);
+
   const tileLayerUrl = "https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=YOUR-X-RapidAPI-KEY";
   // IMPORTANT: Replace YOUR-X-RapidAPI-KEY with your actual RapidAPI key for maptiles.p.rapidapi.com
   // Using a placeholder key will result in map tiles not loading.
 
   const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Maptiles API';
 
-  let bounds: LatLngBoundsExpression | null = null;
-  const markers: LatLngExpression[] = [];
+  const bounds = useMemo<LatLngBoundsExpression | null>(() => {
+    const markers: LatLngExpression[] = [];
+    if (source) {
+      markers.push([source.lat, source.lng]);
+    }
+    if (destination) {
+      markers.push([destination.lat, destination.lng]);
+    }
+    if (markers.length > 0) {
+      return L.latLngBounds(markers);
+    }
+    return null;
+  }, [source, destination]);
 
-  if (source) {
-    markers.push([source.lat, source.lng]);
-  }
-  if (destination) {
-    markers.push([destination.lat, destination.lng]);
-  }
+  const centerPosition = useMemo<LatLngExpression>(() => {
+    return source ? [source.lat, source.lng] : (destination ? [destination.lat, destination.lng] : [10.8505, 76.2711]);
+  }, [source, destination]);
 
-  if (markers.length > 0) {
-    bounds = L.latLngBounds(markers);
-  }
+  const zoomLevel = useMemo<number>(() => {
+    return source || destination ? 13 : 7;
+  }, [source, destination]);
 
   if (!isClient) {
-    // This message might be briefly visible or superseded by the dynamic import's loading prop.
     return <p>Initializing map...</p>;
   }
 
   return (
     <MapContainer
-      center={source ? [source.lat, source.lng] : (destination ? [destination.lat, destination.lng] : [10.8505, 76.2711])} // Default to Kerala, India
-      zoom={source || destination ? 13 : 7}
+      center={centerPosition}
+      zoom={zoomLevel}
       scrollWheelZoom={true}
-      style={{ height: '100%', width: '100%', borderRadius: '0.375rem' }} //  rounded-md
+      style={styleMemo}
     >
       <TileLayer
         attribution={attribution}
