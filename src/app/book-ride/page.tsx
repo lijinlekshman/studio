@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import type { Address, Coordinate } from '@/services/map'; // Ensure type import
+import type { Address, Coordinate } from '@/services/map';
 import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,8 +73,47 @@ export default function BookRidePage() {
                 console.error("Failed to parse currentFares from localStorage", error);
                 setCurrentFares([]);
             }
+
+            // Check for chatbot pre-filled data
+            const chatbotRequestString = localStorage.getItem('chatbotBookingRequest');
+            if (chatbotRequestString) {
+                try {
+                    const chatbotData: ParseBookingRequestOutput = JSON.parse(chatbotRequestString);
+                    if (chatbotData.userName) setUser(chatbotData.userName);
+                    if (chatbotData.email) setEmail(chatbotData.email);
+                    if (chatbotData.mobileNumber) setMobileNumber(chatbotData.mobileNumber);
+                    if (chatbotData.vehiclePreference) {
+                        const validVehicle = currentFares.find(f => f.vehicleType.toLowerCase() === chatbotData.vehiclePreference?.toLowerCase());
+                        if (validVehicle) {
+                            setVehicleType(validVehicle.vehicleType);
+                        } else if (chatbotData.vehiclePreference) {
+                            toast({ title: "AI Assistant", description: `Vehicle type "${chatbotData.vehiclePreference}" not available. Please select manually.`, variant: "default" });
+                        }
+                    }
+
+                    // Asynchronously set source and destination if names are provided
+                    // This needs to happen after suggestedSources/Destinations are populated
+                    // For simplicity, we'll let users select them manually if AI provided names.
+                    // A more robust solution would wait for suggestions then try to match.
+                    if (chatbotData.sourceName) {
+                         toast({ title: "AI Assistant", description: `Source set to: ${chatbotData.sourceName}. Please verify from dropdown.`, variant: "default" });
+                         // Ideally, find and select from suggestedSources here
+                    }
+                    if (chatbotData.destinationName) {
+                         toast({ title: "AI Assistant", description: `Destination set to: ${chatbotData.destinationName}. Please verify from dropdown.`, variant: "default" });
+                         // Ideally, find and select from suggestedDestinations here
+                    }
+                    
+                    localStorage.removeItem('chatbotBookingRequest'); // Clear after use
+                    toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
+
+                } catch (e) {
+                    console.error("Error parsing chatbotBookingRequest from localStorage", e);
+                    localStorage.removeItem('chatbotBookingRequest'); // Clear if invalid
+                }
+            }
         }
-    }, [vehicleType]);
+    }, []); // Removed vehicleType from dependencies to avoid issues, fares load once.
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -358,8 +397,7 @@ export default function BookRidePage() {
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-8"> {/* Changed to single column */}
-                {/* Booking Form */}
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle>Book a Ride</CardTitle>
@@ -543,8 +581,6 @@ export default function BookRidePage() {
                     </CardContent>
                 </Card>
 
-                {/* Map Display Section Removed */}
-                {/* Selected locations can be displayed below if needed */}
                  <Card className="mt-4">
                     <CardHeader>
                         <CardTitle>Selected Locations</CardTitle>
