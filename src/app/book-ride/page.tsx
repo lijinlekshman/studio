@@ -7,7 +7,7 @@ import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Map as MapIcon, Bot } from 'lucide-react';
+import { Map as MapIcon, Bot, ArrowLeft } from 'lucide-react'; // Added ArrowLeft
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
@@ -74,7 +74,6 @@ export default function BookRidePage() {
                 setCurrentFares([]);
             }
 
-            // Check for chatbot pre-filled data
             const chatbotRequestString = localStorage.getItem('chatbotBookingRequest');
             if (chatbotRequestString) {
                 try {
@@ -90,30 +89,21 @@ export default function BookRidePage() {
                             toast({ title: "AI Assistant", description: `Vehicle type "${chatbotData.vehiclePreference}" not available. Please select manually.`, variant: "default" });
                         }
                     }
-
-                    // Asynchronously set source and destination if names are provided
-                    // This needs to happen after suggestedSources/Destinations are populated
-                    // For simplicity, we'll let users select them manually if AI provided names.
-                    // A more robust solution would wait for suggestions then try to match.
                     if (chatbotData.sourceName) {
                          toast({ title: "AI Assistant", description: `Source set to: ${chatbotData.sourceName}. Please verify from dropdown.`, variant: "default" });
-                         // Ideally, find and select from suggestedSources here
                     }
                     if (chatbotData.destinationName) {
                          toast({ title: "AI Assistant", description: `Destination set to: ${chatbotData.destinationName}. Please verify from dropdown.`, variant: "default" });
-                         // Ideally, find and select from suggestedDestinations here
                     }
-                    
-                    localStorage.removeItem('chatbotBookingRequest'); // Clear after use
+                    localStorage.removeItem('chatbotBookingRequest');
                     toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
-
                 } catch (e) {
                     console.error("Error parsing chatbotBookingRequest from localStorage", e);
-                    localStorage.removeItem('chatbotBookingRequest'); // Clear if invalid
+                    localStorage.removeItem('chatbotBookingRequest');
                 }
             }
         }
-    }, []); // Removed vehicleType from dependencies to avoid issues, fares load once.
+    }, [currentFares, toast, vehicleType]);
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -135,7 +125,6 @@ export default function BookRidePage() {
                 description: error.message,
                 variant: "destructive",
             });
-            console.error('Error fetching sources:', error);
         }
     }, [toast]);
 
@@ -150,7 +139,6 @@ export default function BookRidePage() {
                 description: error.message,
                 variant: "destructive",
             });
-            console.error('Error fetching destinations:', error);
         }
     }, [toast]);
 
@@ -180,7 +168,6 @@ export default function BookRidePage() {
                 }
             }
         };
-
         fetchSourceAddress();
     }, [source]);
 
@@ -195,7 +182,6 @@ export default function BookRidePage() {
                 }
             }
         };
-
         fetchDestinationAddress();
     }, [destination]);
 
@@ -228,14 +214,12 @@ export default function BookRidePage() {
                             });
                         }
                     }
-
                 } catch (error: any) {
                     toast({
                         title: "Error calculating fare/distance",
                         description: error.message,
                         variant: "destructive",
                     });
-                    console.error('Error calculating fare/distance:', error);
                     setFare(null);
                     setDistance(null);
                 }
@@ -244,7 +228,6 @@ export default function BookRidePage() {
                 setDistance(null);
             }
         };
-
         estimateFare();
     }, [source, destination, vehicleType, currentFares, toast]);
 
@@ -328,9 +311,7 @@ export default function BookRidePage() {
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
                 localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
             }
-
             router.push(`/otp?mobileNumber=${mobileNumber}`);
-
         } else {
             toast({
                 title: "Error Booking Cab",
@@ -360,7 +341,6 @@ export default function BookRidePage() {
                     toast({ title: "AI Helper", description: `Vehicle type "${parsedData.vehiclePreference}" not found or not available. Please select manually.`, variant: "default" });
                 }
             }
-
             if (parsedData.sourceName) {
                 const matchedSource = suggestedSources.find(s => s.name.toLowerCase().includes(parsedData.sourceName!.toLowerCase()));
                 if (matchedSource) {
@@ -369,7 +349,6 @@ export default function BookRidePage() {
                     toast({ title: "AI Helper", description: `Source "${parsedData.sourceName}" not found in suggestions. Please select manually.`, variant: "default" });
                 }
             }
-
             if (parsedData.destinationName) {
                 const matchedDestination = suggestedDestinations.find(d => d.name.toLowerCase().includes(parsedData.destinationName!.toLowerCase()));
                 if (matchedDestination) {
@@ -379,8 +358,7 @@ export default function BookRidePage() {
                 }
             }
             toast({ title: "AI Helper", description: "Form fields updated based on your request. Please review and complete.", variant: "default" });
-            setIsAiHelperDialogOpen(false); // Close dialog after parsing
-
+            setIsAiHelperDialogOpen(false);
         } catch (error: any) {
             toast({ title: "AI Parsing Error", description: error.message || "Could not parse the request.", variant: "destructive" });
         } finally {
@@ -388,24 +366,25 @@ export default function BookRidePage() {
         }
     };
 
-
     return (
-        <div className="container mx-auto p-4 min-h-screen">
-            <div className="mb-6 flex justify-between items-center">
+        <div className="container mx-auto p-4 min-h-screen flex flex-col items-center">
+            <div className="w-full max-w-4xl mb-6 flex justify-start">
                 <Button variant="outline" onClick={() => router.push('/')}>
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
                 </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-8">
-                <Card className="w-full">
+            <div className="w-full max-w-lg space-y-6">
+                <Card>
                     <CardHeader>
-                        <CardTitle>Book a Ride</CardTitle>
-                        <CardDescription>Enter your ride details below, or use our AI Assistant!</CardDescription>
+                        <CardTitle className="text-2xl font-bold text-center">Book Your Ride</CardTitle>
+                        <CardDescription className="text-center">
+                            Fill in the details below or use our AI Assistant to get started!
+                        </CardDescription>
                     </CardHeader>
-                    <CardContent className="grid gap-4">
+                    <CardContent className="grid gap-6">
                         <div className="grid gap-2">
-                            <label htmlFor="user" className="text-left font-medium">User Name</label>
+                            <Label htmlFor="user" className="font-medium">User Name</Label>
                             <Input
                                 type="text"
                                 id="user"
@@ -413,10 +392,11 @@ export default function BookRidePage() {
                                 value={user}
                                 onChange={(e) => setUser(e.target.value)}
                                 required
+                                className="text-base"
                             />
                         </div>
                         <div className="grid gap-2">
-                            <label htmlFor="email" className="text-left font-medium">Email</label>
+                            <Label htmlFor="email" className="font-medium">Email</Label>
                             <Input
                                 type="email"
                                 id="email"
@@ -424,11 +404,12 @@ export default function BookRidePage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                className="text-base"
                             />
                         </div>
 
                         <div className="grid gap-2">
-                            <label htmlFor="mobileNumber" className="text-left font-medium">Mobile Number</label>
+                            <Label htmlFor="mobileNumber" className="font-medium">Mobile Number</Label>
                             <Input
                                 type="tel"
                                 id="mobileNumber"
@@ -436,73 +417,75 @@ export default function BookRidePage() {
                                 value={mobileNumber}
                                 onChange={(e) => setMobileNumber(e.target.value)}
                                 required
+                                className="text-base"
                             />
                         </div>
 
                         <div className="grid gap-2">
-                            <label htmlFor="source" className="text-left font-medium">Source</label>
+                            <Label htmlFor="source" className="font-medium">Pickup Location</Label>
                             <Select
                                 onValueChange={(value) => handleSourceSelect(value)}
                                 required
                                 value={selectedSourceValue || ""}
                             >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select source" />
+                                <SelectTrigger className="w-full text-base">
+                                    <SelectValue placeholder="Select pickup location" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Source</SelectLabel>
+                                        <SelectLabel>Suggested Sources</SelectLabel>
                                         {suggestedSources.map((src) => (
-                                            <SelectItem key={src.name} value={src.name}>
+                                            <SelectItem key={src.name} value={src.name} className="text-base">
                                                 {src.name}
                                             </SelectItem>
                                         ))}
+                                        {suggestedSources.length === 0 && <SelectItem value="--no-sources--" disabled>Loading sources...</SelectItem>}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <label htmlFor="destination" className="text-left font-medium">Destination</label>
+                            <Label htmlFor="destination" className="font-medium">Drop-off Location</Label>
                             <Select
                                 onValueChange={(value) => handleDestinationSelect(value)}
                                 required
                                 value={selectedDestinationValue || ""}
                             >
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select destination" />
+                                <SelectTrigger className="w-full text-base">
+                                    <SelectValue placeholder="Select drop-off location" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Destination</SelectLabel>
+                                        <SelectLabel>Suggested Destinations</SelectLabel>
                                         {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").map((dest) => (
-                                            <SelectItem key={dest.name} value={dest.name}>
+                                            <SelectItem key={dest.name} value={dest.name} className="text-base">
                                                 {dest.name}
                                             </SelectItem>
                                         ))}
                                         {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").length === 0 && (
-                                            <SelectItem value="--no-destinations--" disabled>No destinations available</SelectItem>
+                                            <SelectItem value="--no-destinations--" disabled>Loading destinations...</SelectItem>
                                         )}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <label htmlFor="vehicleType" className="text-left font-medium">Vehicle Type</label>
+                            <Label htmlFor="vehicleType" className="font-medium">Vehicle Type</Label>
                             <Select
                                 onValueChange={setVehicleType}
                                 value={vehicleType}
                                 required
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full text-base">
                                     <SelectValue placeholder="Select vehicle type" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Type</SelectLabel>
+                                        <SelectLabel>Available Types</SelectLabel>
                                         {currentFares
                                             .filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "")
                                             .map((fareRule) => (
-                                                <SelectItem key={fareRule.id} value={fareRule.vehicleType}>
+                                                <SelectItem key={fareRule.id} value={fareRule.vehicleType} className="text-base">
                                                     {fareRule.vehicleType}
                                                 </SelectItem>
                                             ))}
@@ -513,84 +496,91 @@ export default function BookRidePage() {
                                 </SelectContent>
                             </Select>
                         </div>
-                        {fare !== null && (
-                            <div className="grid gap-2">
-                                <label htmlFor="fare" className="text-left font-medium">Estimated Fare</label>
-                                <Input
-                                    type="text"
-                                    id="fare"
-                                    value={`₹${fare.toFixed(2)}`}
-                                    disabled
-                                    className="font-semibold"
-                                />
-                            </div>
-                        )}
                         {distance !== null && (
                             <div className="grid gap-2">
-                                <label htmlFor="distance" className="text-left font-medium">Distance</label>
+                                <Label htmlFor="distance" className="font-medium">Distance</Label>
                                 <Input
                                     type="text"
                                     id="distance"
                                     value={`${distance.toFixed(2)} km`}
                                     disabled
+                                    className="text-base font-medium"
                                 />
                             </div>
                         )}
-                        <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber || !user || !email || !vehicleType || fare === null} className="w-full">
-                            Book Cab <MapIcon className="ml-2 h-5 w-5" />
+                        {fare !== null && (
+                            <div className="grid gap-2">
+                                <Label htmlFor="fare" className="font-medium">Estimated Fare</Label>
+                                <Input
+                                    type="text"
+                                    id="fare"
+                                    value={`₹${fare.toFixed(2)}`}
+                                    disabled
+                                    className="text-xl font-bold text-primary"
+                                />
+                            </div>
+                        )}
+                        <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber || !user || !email || !vehicleType || fare === null} className="w-full py-3 text-lg">
+                            Confirm Booking <MapIcon className="ml-2 h-5 w-5" />
                         </Button>
-
-                        <div className="mt-4 flex justify-center">
-                             <Dialog open={isAiHelperDialogOpen} onOpenChange={setIsAiHelperDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" size="icon" className="rounded-full w-12 h-12">
-                                        <Bot className="h-6 w-6" />
-                                        <span className="sr-only">AI Booking Assistant</span>
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[425px]">
-                                    <DialogHeader>
-                                        <DialogTitle>AI Booking Assistant</DialogTitle>
-                                        <DialogDescription>
-                                            Type your booking request below, and the AI will try to fill the form for you.
-                                            e.g., "Book a cab from Punalur to Kollam for Anoop, email@example.com, 9876543210, SUV"
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="grid gap-4 py-4">
-                                        <div className="grid grid-cols-1 items-center gap-4">
-                                            <Label htmlFor="aiRequestText" className="sr-only">
-                                                Booking Request
-                                            </Label>
-                                            <Textarea
-                                                id="aiRequestText"
-                                                value={aiRequestText}
-                                                onChange={(e) => setAiRequestText(e.target.value)}
-                                                placeholder="Enter your booking request..."
-                                                rows={4}
-                                            />
-                                        </div>
-                                    </div>
-                                    <DialogFooter>
-                                        <Button onClick={handleParseWithAI} disabled={isParsing}>
-                                            {isParsing ? "Processing..." : "Process Request"}
-                                        </Button>
-                                    </DialogFooter>
-                                </DialogContent>
-                            </Dialog>
-                        </div>
                     </CardContent>
                 </Card>
 
-                 <Card className="mt-4">
+                 <Card className="mt-6 w-full">
                     <CardHeader>
-                        <CardTitle>Selected Locations</CardTitle>
+                        <CardTitle className="text-xl">Selected Trip Details</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-2">
                         <p><strong>Pickup:</strong> {sourceAddress?.formattedAddress || 'Not selected'}</p>
                         <p><strong>Drop-off:</strong> {destinationAddress?.formattedAddress || 'Not selected'}</p>
                     </CardContent>
                 </Card>
             </div>
+
+            {/* AI Assistant Dialog Trigger */}
+            <Dialog open={isAiHelperDialogOpen} onOpenChange={setIsAiHelperDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="fixed bottom-6 right-6 z-30 rounded-full w-14 h-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                        aria-label="Open AI Booking Assistant"
+                    >
+                        <Bot className="h-7 w-7" />
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>AI Booking Assistant</DialogTitle>
+                        <DialogDescription>
+                            Type your booking request below, and the AI will try to fill the form for you.
+                            e.g., "Book a cab from Punalur to Kollam for Anoop, email@example.com, 9876543210, SUV"
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-1 items-center gap-4">
+                            <Label htmlFor="aiRequestText" className="sr-only">
+                                Your Booking Request
+                            </Label>
+                            <Textarea
+                                id="aiRequestText"
+                                value={aiRequestText}
+                                onChange={(e) => setAiRequestText(e.target.value)}
+                                placeholder="Enter your booking request here..."
+                                rows={5}
+                                className="text-base"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsAiHelperDialogOpen(false)}>Cancel</Button>
+                        <Button onClick={handleParseWithAI} disabled={isParsing}>
+                            {isParsing ? "Processing..." : "Process with AI"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
+
