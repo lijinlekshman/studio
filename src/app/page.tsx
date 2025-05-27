@@ -22,7 +22,7 @@ import {
     SheetTitle,
     SheetFooter,
     SheetClose,
-    SheetTrigger, // Added missing import
+    SheetTrigger,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -146,26 +146,26 @@ export default function Home() {
                 <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay */}
                 
                 {/* Centered Content Box */}
-                <div className="relative z-10 text-center p-8 sm:p-10 bg-white/20 backdrop-blur-sm rounded-xl shadow-xl max-w-lg sm:max-w-xl md:max-w-2xl mx-auto">
-                    <Link href="/" className="block mb-6 sm:mb-8">
+                <div className="relative z-10 text-center p-6 sm:p-8 md:p-10 bg-white/20 backdrop-blur-sm rounded-xl shadow-xl max-w-md sm:max-w-lg md:max-w-2xl mx-auto">
+                    <Link href="/" className="block mb-4 sm:mb-6">
                         <Image 
                             src="/Images/logo.png" 
-                            width={300} // Adjusted base width
-                            height={75}  // Adjusted base height
+                            width={300} 
+                            height={75}  
                             alt="Let'sGo Rides" 
                             data-ai-hint="logo" 
-                            className="mx-auto max-w-[200px] h-auto sm:max-w-[250px] md:max-w-[300px]" 
+                            className="mx-auto max-w-[180px] h-auto sm:max-w-[220px] md:max-w-[250px]" 
                         />
                     </Link>
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-tight">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-3 sm:mb-4 leading-tight">
                         Book Your Ride with Let'sGo
                     </h1>
-                    <p className="text-lg sm:text-xl text-gray-200 mb-8">
+                    <p className="text-base sm:text-lg text-gray-200 mb-6 sm:mb-8">
                         Your trusted partner for safe, reliable, and comfortable rides.
                     </p>
 
                     <Link href="/book-ride">
-                        <Button size="lg" className="mt-4 px-8 py-3 text-lg font-semibold">
+                        <Button size="lg" className="px-6 py-3 text-base sm:text-lg font-semibold">
                             Book a Cab Now <Map className="ml-2 h-5 w-5" />
                         </Button>
                     </Link>
@@ -178,13 +178,13 @@ export default function Home() {
                     <Button
                         variant="outline"
                         size="icon"
-                        className="fixed bottom-6 right-6 z-30 rounded-full w-14 h-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 rounded-full w-12 h-12 sm:w-14 sm:h-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
                         aria-label="Open Chatbot"
                     >
-                        <Bot className="h-7 w-7" />
+                        <Bot className="h-6 w-6 sm:h-7 sm:w-7" />
                     </Button>
                 </SheetTrigger>
-                <SheetContent className="flex flex-col">
+                <SheetContent className="flex flex-col w-full sm:max-w-md">
                     <SheetHeader>
                         <SheetTitle>AI Booking Assistant</SheetTitle>
                         <SheetDescription>
@@ -200,7 +200,7 @@ export default function Home() {
                                 id="ai-request-text"
                                 value={aiRequestText}
                                 onChange={(e) => setAiRequestText(e.target.value)}
-                                className="h-full resize-none"
+                                className="h-full resize-none text-sm"
                             />
                         </div>
                     </div>
@@ -217,5 +217,4 @@ export default function Home() {
         </div>
     );
 }
-
     

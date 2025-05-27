@@ -29,17 +29,23 @@ const LoginPage: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
       {/* Background image is now applied via globals.css to the body */}
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center">
+      <main className="flex flex-col items-center justify-center w-full flex-1 px-4 text-center">
         <Link href="/">
-          <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="max-w-[90%] sm:max-w-[350px] h-auto mb-6" />
+          <Image 
+            src="/Images/logo.png" 
+            width={400} 
+            height={100} 
+            alt="Let'sGo Rides" 
+            data-ai-hint="logo" 
+            className="max-w-[200px] h-auto sm:max-w-[250px] md:max-w-[300px] mb-6" />
         </Link>
-        <Card className="w-full max-w-md mt-10">
+        <Card className="w-full max-w-sm mt-8 sm:mt-10">
           <CardHeader>
-            <CardTitle>Login</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">Admin Login</CardTitle>
             <CardDescription>Enter your credentials to access the admin portal.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-            <div className="grid gap-2">
+            <div className="grid gap-2 text-left">
               <label htmlFor="username">Username</label>
               <Input
                 type="text"
@@ -48,9 +54,10 @@ const LoginPage: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                className="text-sm"
               />
             </div>
-            <div className="grid gap-2">
+            <div className="grid gap-2 text-left">
               <label htmlFor="password">Password</label>
               <Input
                 type="password"
@@ -59,9 +66,10 @@ const LoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="text-sm"
               />
             </div>
-            <Button onClick={handleLogin}>Login</Button>
+            <Button onClick={handleLogin} className="w-full">Login</Button>
           </CardContent>
         </Card>
         <Link href="/" className="mt-4 text-sm text-muted-foreground hover:text-foreground">

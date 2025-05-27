@@ -37,7 +37,7 @@ export default function BookRidePage() {
     const [selectedDestinationValue, setSelectedDestinationValue] = useState<string | null>(null);
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // const [isAuthenticated, setIsAuthenticated] = useState(false); // No longer needed here
 
     const [availableCabs, setAvailableCabs] = useState<any[]>([]);
     const [currentFares, setCurrentFares] = useState<any[]>([]);
@@ -48,9 +48,10 @@ export default function BookRidePage() {
 
 
     useEffect(() => {
+        let chatbotRequestData: ParseBookingRequestOutput | null = null;
         if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('authToken');
-            setIsAuthenticated(!!token);
+            // const token = localStorage.getItem('authToken'); // Not needed for auth on this page specifically
+            // setIsAuthenticated(!!token);
 
             try {
                 const storedCabs = localStorage.getItem('cabs');
@@ -63,10 +64,10 @@ export default function BookRidePage() {
                 const storedFares = localStorage.getItem('fares');
                 const parsedFares = storedFares ? JSON.parse(storedFares) : [];
                 setCurrentFares(parsedFares);
-                if (!vehicleType && parsedFares.length > 0) {
+                 if (!vehicleType && parsedFares.length > 0) {
                     const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
                     if (firstValidFare) {
-                        setVehicleType(firstValidFare.vehicleType);
+                       // setVehicleType(firstValidFare.vehicleType); // Keep this commented if chatbot might set it
                     }
                 }
             } catch (error) {
@@ -77,26 +78,12 @@ export default function BookRidePage() {
             const chatbotRequestString = localStorage.getItem('chatbotBookingRequest');
             if (chatbotRequestString) {
                 try {
-                    const chatbotData: ParseBookingRequestOutput = JSON.parse(chatbotRequestString);
-                    if (chatbotData.userName) setUser(chatbotData.userName);
-                    if (chatbotData.email) setEmail(chatbotData.email);
-                    if (chatbotData.mobileNumber) setMobileNumber(chatbotData.mobileNumber);
-                    if (chatbotData.vehiclePreference) {
-                        // Check against the currentFares loaded from localStorage
-                        const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === chatbotData.vehiclePreference?.toLowerCase());
-                        if (validVehicle) {
-                            setVehicleType(validVehicle.vehicleType);
-                        } else if (chatbotData.vehiclePreference) {
-                            toast({ title: "AI Assistant", description: `Vehicle type "${chatbotData.vehiclePreference}" not available. Please select manually.`, variant: "default" });
-                        }
-                    }
-                    if (chatbotData.sourceName) {
-                         toast({ title: "AI Assistant", description: `Source set to: ${chatbotData.sourceName}. Please verify from dropdown.`, variant: "default" });
-                    }
-                    if (chatbotData.destinationName) {
-                         toast({ title: "AI Assistant", description: `Destination set to: ${chatbotData.destinationName}. Please verify from dropdown.`, variant: "default" });
-                    }
-                    localStorage.removeItem('chatbotBookingRequest'); // Clear after use
+                    chatbotRequestData = JSON.parse(chatbotRequestString);
+                    if (chatbotRequestData?.userName) setUser(chatbotRequestData.userName);
+                    if (chatbotRequestData?.email) setEmail(chatbotRequestData.email);
+                    if (chatbotRequestData?.mobileNumber) setMobileNumber(chatbotRequestData.mobileNumber);
+                    // Vehicle preference will be set after currentFares are loaded
+                    localStorage.removeItem('chatbotBookingRequest'); // Clear after attempting to read
                     toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
                 } catch (e) {
                     console.error("Error parsing chatbotBookingRequest from localStorage", e);
@@ -104,17 +91,18 @@ export default function BookRidePage() {
                 }
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Changed dependency array to [] to run once on mount
-
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('authToken');
+        // This effect should run once on mount
+        // For vehicle preference from chatbot after fares are loaded:
+        if (chatbotRequestData?.vehiclePreference && currentFares.length > 0) {
+            const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === chatbotRequestData!.vehiclePreference?.toLowerCase());
+            if (validVehicle) {
+                setVehicleType(validVehicle.vehicleType);
+            } else if (chatbotRequestData?.vehiclePreference) {
+                toast({ title: "AI Assistant", description: `Vehicle type "${chatbotRequestData.vehiclePreference}" not available. Please select manually.`, variant: "default" });
+            }
         }
-        setIsAuthenticated(false);
-        router.push('/');
-    };
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const fetchSuggestedSources = useCallback(async () => {
         try {
@@ -370,14 +358,14 @@ export default function BookRidePage() {
 
     return (
         <div className="container mx-auto p-4 min-h-screen flex flex-col items-center">
-            <div className="w-full max-w-4xl mb-6 flex justify-start">
+            <div className="w-full max-w-2xl mb-6 flex justify-start">
                 <Button variant="outline" onClick={() => router.push('/')}>
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
                 </Button>
             </div>
 
             <div className="w-full max-w-lg space-y-6">
-                <Card>
+                <Card className="shadow-xl">
                     <CardHeader>
                         <CardTitle className="text-2xl font-bold text-center">Book Your Ride</CardTitle>
                         <CardDescription className="text-center">
@@ -386,7 +374,7 @@ export default function BookRidePage() {
                     </CardHeader>
                     <CardContent className="grid gap-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="user" className="font-medium">User Name</Label>
+                            <Label htmlFor="user" className="font-medium text-left">User Name</Label>
                             <Input
                                 type="text"
                                 id="user"
@@ -398,7 +386,7 @@ export default function BookRidePage() {
                             />
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="email" className="font-medium">Email</Label>
+                            <Label htmlFor="email" className="font-medium text-left">Email</Label>
                             <Input
                                 type="email"
                                 id="email"
@@ -411,7 +399,7 @@ export default function BookRidePage() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="mobileNumber" className="font-medium">Mobile Number</Label>
+                            <Label htmlFor="mobileNumber" className="font-medium text-left">Mobile Number</Label>
                             <Input
                                 type="tel"
                                 id="mobileNumber"
@@ -424,7 +412,7 @@ export default function BookRidePage() {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="source" className="font-medium">Pickup Location</Label>
+                            <Label htmlFor="source" className="font-medium text-left">Pickup Location</Label>
                             <Select
                                 onValueChange={(value) => handleSourceSelect(value)}
                                 required
@@ -447,7 +435,7 @@ export default function BookRidePage() {
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="destination" className="font-medium">Drop-off Location</Label>
+                            <Label htmlFor="destination" className="font-medium text-left">Drop-off Location</Label>
                             <Select
                                 onValueChange={(value) => handleDestinationSelect(value)}
                                 required
@@ -472,7 +460,7 @@ export default function BookRidePage() {
                             </Select>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="vehicleType" className="font-medium">Vehicle Type</Label>
+                            <Label htmlFor="vehicleType" className="font-medium text-left">Vehicle Type</Label>
                             <Select
                                 onValueChange={setVehicleType}
                                 value={vehicleType}
@@ -500,7 +488,7 @@ export default function BookRidePage() {
                         </div>
                         {distance !== null && (
                             <div className="grid gap-2">
-                                <Label htmlFor="distance" className="font-medium">Distance</Label>
+                                <Label htmlFor="distance" className="font-medium text-left">Distance</Label>
                                 <Input
                                     type="text"
                                     id="distance"
@@ -512,7 +500,7 @@ export default function BookRidePage() {
                         )}
                         {fare !== null && (
                             <div className="grid gap-2">
-                                <Label htmlFor="fare" className="font-medium">Estimated Fare</Label>
+                                <Label htmlFor="fare" className="font-medium text-left">Estimated Fare</Label>
                                 <Input
                                     type="text"
                                     id="fare"
@@ -528,11 +516,11 @@ export default function BookRidePage() {
                     </CardContent>
                 </Card>
 
-                 <Card className="mt-6 w-full">
+                 <Card className="mt-6 w-full shadow-lg">
                     <CardHeader>
-                        <CardTitle className="text-xl">Selected Trip Details</CardTitle>
+                        <CardTitle className="text-xl text-left">Selected Trip Details</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-y-2 text-left">
                         <p><strong>Pickup:</strong> {sourceAddress?.formattedAddress || 'Not selected'}</p>
                         <p><strong>Drop-off:</strong> {destinationAddress?.formattedAddress || 'Not selected'}</p>
                     </CardContent>
@@ -545,10 +533,10 @@ export default function BookRidePage() {
                     <Button
                         variant="outline"
                         size="icon"
-                        className="fixed bottom-6 right-6 z-30 rounded-full w-14 h-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 rounded-full w-12 h-12 sm:w-14 sm:h-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
                         aria-label="Open AI Booking Assistant"
                     >
-                        <Bot className="h-7 w-7" />
+                        <Bot className="h-6 w-6 sm:h-7 sm:w-7" />
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
@@ -570,7 +558,7 @@ export default function BookRidePage() {
                                 onChange={(e) => setAiRequestText(e.target.value)}
                                 placeholder="Enter your booking request here..."
                                 rows={5}
-                                className="text-base"
+                                className="text-sm"
                             />
                         </div>
                     </div>
@@ -585,4 +573,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-

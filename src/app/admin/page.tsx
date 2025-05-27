@@ -132,13 +132,12 @@ export default function AdminDashboard() {
     const [editedFarePerKmRate, setEditedFarePerKmRate] = useState("");
 
     useEffect(() => {
-        // Check if the user is authenticated (e.g., check for a token in local storage)
         if (typeof window !== "undefined") {
             const token = localStorage.getItem("authToken");
             if (token) {
                 setIsAuthenticated(true);
             } else {
-                router.push("/login"); // Redirect to login if not authenticated
+                router.push("/login"); 
             }
         }
     }, [router]);
@@ -163,7 +162,7 @@ export default function AdminDashboard() {
     }, [bookings]); 
 
     if (!isAuthenticated) {
-        return null; 
+        return <div className="flex items-center justify-center min-h-screen"><p>Loading...</p></div>; 
     }
 
   const handleAddCab = () => {
@@ -365,29 +364,28 @@ export default function AdminDashboard() {
 
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          
-          <h1 className="text-3xl font-bold text-gray-900">
-            Let'sGo Rides Admin Dashboard
+    <div className="flex flex-col min-h-screen bg-background"> {/* Changed to bg-background for theme consistency */}
+      <header className="bg-card shadow sticky top-0 z-50"> {/* Made header sticky */}
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-0">
+            Let'sGo Rides Admin
           </h1>
           <Link href="/">
-            <Button variant="secondary">
-              <ArrowLeft className="mr-2" />
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="mr-1.5 h-4 w-4" />
               Back to Home
             </Button>
           </Link>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 w-full">
-        <ScrollArea className="h-[calc(100vh-150px)]">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Panel: Data Tables */}
-          <div className="md:col-span-2 space-y-6">
+      <main className="flex-1 max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 w-full">
+        <ScrollArea className="h-[calc(100vh-120px)] sm:h-[calc(100vh-100px)]"> {/* Adjusted height */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Panel: Data Tables (takes more space on larger screens) */}
+          <div className="lg:col-span-2 space-y-6">
             {/* Added Cabs Table */}
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Added Cabs</CardTitle>
                 <CardDescription>List of all cabs currently in the system.</CardDescription>
@@ -397,10 +395,10 @@ export default function AdminDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Model</TableHead>
-                        <TableHead>License Plate</TableHead>
-                          <TableHead>Driver Name</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="text-xs">Model</TableHead>
+                        <TableHead className="text-xs">License Plate</TableHead>
+                        <TableHead className="text-xs">Driver Name</TableHead>
+                        <TableHead className="text-right text-xs">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -412,18 +410,21 @@ export default function AdminDashboard() {
                                 <Input
                                   value={editedCabModel}
                                   onChange={(e) => setEditedCabModel(e.target.value)}
+                                  className="text-xs h-8"
                                 />
                               </TableCell>
                               <TableCell>
                                 <Input
                                   value={editedCabLicensePlate}
                                   onChange={(e) => setEditedCabLicensePlate(e.target.value)}
+                                  className="text-xs h-8"
                                 />
                               </TableCell>
                                 <TableCell>
                                     <Input
                                         value={editedCabDriverName}
                                         onChange={(e) => setEditedCabDriverName(e.target.value)}
+                                        className="text-xs h-8"
                                     />
                                 </TableCell>
                               <TableCell className="text-right">
@@ -434,11 +435,11 @@ export default function AdminDashboard() {
                             </>
                           ) : (
                             <>
-                              <TableCell>{cab.model}</TableCell>
-                              <TableCell>{cab.licensePlate}</TableCell>
-                                <TableCell>{cab.driverName}</TableCell>
+                              <TableCell className="text-xs">{cab.model}</TableCell>
+                              <TableCell className="text-xs">{cab.licensePlate}</TableCell>
+                                <TableCell className="text-xs">{cab.driverName}</TableCell>
                               <TableCell className="text-right">
-                                <div className="flex justify-end gap-2">
+                                <div className="flex justify-end gap-1">
                                   <Button variant="ghost" size="icon" onClick={() => handleEditCab(cab)}>
                                     <Edit className="h-4 w-4" />
                                   </Button>
@@ -461,7 +462,7 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Updated Fare Table */}
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Updated Fares</CardTitle>
                 <CardDescription>Current fare rates for each vehicle type.</CardDescription>
@@ -471,10 +472,10 @@ export default function AdminDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Vehicle Type</TableHead>
-                        <TableHead>Base Fare</TableHead>
-                        <TableHead>Per KM Rate</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="text-xs">Vehicle Type</TableHead>
+                        <TableHead className="text-xs">Base Fare</TableHead>
+                        <TableHead className="text-xs">Per KM Rate</TableHead>
+                        <TableHead className="text-right text-xs">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -486,7 +487,8 @@ export default function AdminDashboard() {
                                 <Input
                                   value={editedFareVehicleType}
                                   onChange={(e) => setEditedFareVehicleType(e.target.value)}
-                                  disabled // Vehicle type shouldn't be changed here, but through cab model
+                                  disabled 
+                                  className="text-xs h-8"
                                 />
                               </TableCell>
                               <TableCell>
@@ -494,6 +496,7 @@ export default function AdminDashboard() {
                                   type="number"
                                   value={editedFareBaseFare}
                                   onChange={(e) => setEditedFareBaseFare(e.target.value)}
+                                  className="text-xs h-8"
                                 />
                               </TableCell>
                               <TableCell>
@@ -501,6 +504,7 @@ export default function AdminDashboard() {
                                   type="number"
                                   value={editedFarePerKmRate}
                                   onChange={(e) => setEditedFarePerKmRate(e.target.value)}
+                                  className="text-xs h-8"
                                 />
                               </TableCell>
                               <TableCell className="text-right">
@@ -511,11 +515,11 @@ export default function AdminDashboard() {
                             </>
                           ) : (
                             <>
-                              <TableCell>{fare.vehicleType}</TableCell>
-                              <TableCell>₹{fare.baseFare}</TableCell>
-                              <TableCell>₹{fare.perKmRate}</TableCell>
+                              <TableCell className="text-xs">{fare.vehicleType}</TableCell>
+                              <TableCell className="text-xs">₹{fare.baseFare}</TableCell>
+                              <TableCell className="text-xs">₹{fare.perKmRate}</TableCell>
                               <TableCell className="text-right">
-                                <div className="flex justify-end gap-2">
+                                <div className="flex justify-end gap-1">
                                   <Button variant="ghost" size="icon" onClick={() => handleEditFare(fare)}>
                                     <Edit className="h-4 w-4" />
                                   </Button>
@@ -535,7 +539,7 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Bookings Table */}
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Bookings</CardTitle>
                 <CardDescription>List of all current bookings.</CardDescription>
@@ -545,30 +549,30 @@ export default function AdminDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Mobile Number</TableHead>
-                        <TableHead>User</TableHead>
-                        <TableHead>Source</TableHead>
-                        <TableHead>Destination</TableHead>
-                        <TableHead>Fare</TableHead>
-                        <TableHead>Cab Model</TableHead>
-                        <TableHead>Driver</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Time</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead className="text-xs">Mobile</TableHead>
+                        <TableHead className="text-xs">User</TableHead>
+                        <TableHead className="text-xs">Source</TableHead>
+                        <TableHead className="text-xs">Destination</TableHead>
+                        <TableHead className="text-xs">Fare</TableHead>
+                        <TableHead className="text-xs">Cab</TableHead>
+                        <TableHead className="text-xs">Driver</TableHead>
+                        <TableHead className="text-xs">Date</TableHead>
+                        <TableHead className="text-xs">Time</TableHead>
+                        <TableHead className="text-right text-xs">View</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {bookings.map((booking) => (
                         <TableRow key={booking.id}>
-                            <TableCell>{booking.mobileNumber}</TableCell>
-                          <TableCell>{booking.user}</TableCell>
-                          <TableCell>{booking.source}</TableCell>
-                          <TableCell>{booking.destination}</TableCell>
-                          <TableCell>₹{booking.fare}</TableCell>
-                          <TableCell>{booking.cabModel}</TableCell>
-                          <TableCell>{booking.driverName}</TableCell>
-                          <TableCell>{booking.date}</TableCell>
-                          <TableCell>{booking.time}</TableCell>
+                            <TableCell className="text-xs">{booking.mobileNumber}</TableCell>
+                          <TableCell className="text-xs">{booking.user}</TableCell>
+                          <TableCell className="text-xs">{booking.source}</TableCell>
+                          <TableCell className="text-xs">{booking.destination}</TableCell>
+                          <TableCell className="text-xs">₹{booking.fare}</TableCell>
+                          <TableCell className="text-xs">{booking.cabModel}</TableCell>
+                          <TableCell className="text-xs">{booking.driverName}</TableCell>
+                          <TableCell className="text-xs">{booking.date}</TableCell>
+                          <TableCell className="text-xs">{booking.time}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end">
                               <Button variant="ghost" size="icon" onClick={() => handleViewBooking(booking)}>
@@ -586,15 +590,15 @@ export default function AdminDashboard() {
           </div>
 
           {/* Right Panel: Management Cards */}
-          <div className="md:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6">
             {/* Add New Cab Card */}
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Manage Cabs</CardTitle>
-                <CardDescription>Add, edit, or remove cabs from the system.</CardDescription>
+                <CardDescription>Add, edit, or remove cabs.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => setIsAddCabDialogOpen(true)}>
+                <Button onClick={() => setIsAddCabDialogOpen(true)} className="w-full sm:w-auto">
                   <Plus className="mr-2" /> Add New Cab
                 </Button>
                 <Dialog open={isAddCabDialogOpen} onOpenChange={setIsAddCabDialogOpen}>
@@ -605,16 +609,16 @@ export default function AdminDashboard() {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="model" className="text-right">Model</Label>
-                        <Input id="model" value={newCabModel} onChange={(e) => setNewCabModel(e.target.value)} className="col-span-3" required />
+                        <Label htmlFor="model" className="text-right text-xs sm:text-sm">Model</Label>
+                        <Input id="model" value={newCabModel} onChange={(e) => setNewCabModel(e.target.value)} className="col-span-3 text-xs sm:text-sm h-8" required />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="licensePlate" className="text-right">License Plate</Label>
-                        <Input id="licensePlate" value={newCabLicensePlate} onChange={(e) => setNewCabLicensePlate(e.target.value)} className="col-span-3" required />
+                        <Label htmlFor="licensePlate" className="text-right text-xs sm:text-sm">License Plate</Label>
+                        <Input id="licensePlate" value={newCabLicensePlate} onChange={(e) => setNewCabLicensePlate(e.target.value)} className="col-span-3 text-xs sm:text-sm h-8" required />
                       </div>
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="driverName" className="text-right">Driver Name</Label>
-                            <Input id="driverName" value={newCabDriverName} onChange={(e) => setNewCabDriverName(e.target.value)} className="col-span-3" required />
+                            <Label htmlFor="driverName" className="text-right text-xs sm:text-sm">Driver Name</Label>
+                            <Input id="driverName" value={newCabDriverName} onChange={(e) => setNewCabDriverName(e.target.value)} className="col-span-3 text-xs sm:text-sm h-8" required />
                         </div>
                     </div>
                     <DialogFooter>
@@ -626,31 +630,30 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Update Fare Card */}
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Manage Fares</CardTitle>
-                <CardDescription>Update base fares and per kilometer rates for different vehicle types.</CardDescription>
+                <CardDescription>Update rates for vehicle types.</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => setIsAddFareDialogOpen(true)}>
+                <Button onClick={() => setIsAddFareDialogOpen(true)} className="w-full sm:w-auto">
                   <Plus className="mr-2" /> Add New Fare
                 </Button>
                 <Dialog open={isAddFareDialogOpen} onOpenChange={setIsAddFareDialogOpen}>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Add New Fare</DialogTitle>
-                      <DialogDescription>Enter the fare details for the new vehicle type.</DialogDescription>
+                      <DialogDescription>Enter fare details for a vehicle type.</DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="vehicleType" className="text-right">Vehicle Type</Label>
+                        <Label htmlFor="vehicleType" className="text-right text-xs sm:text-sm">Vehicle Type</Label>
                          <Select 
                             onValueChange={(value) => setNewFareVehicleType(value)} 
                             value={newFareVehicleType}
                             required 
-                            
                           >
-                            <SelectTrigger className="col-span-3">
+                            <SelectTrigger className="col-span-3 text-xs sm:text-sm h-8">
                                 <SelectValue placeholder="Select Cab Model" />
                             </SelectTrigger>
                             <SelectContent>
@@ -659,24 +662,24 @@ export default function AdminDashboard() {
                                     {uniqueCabModels
                                         .filter(model => model && model.trim() !== "")
                                         .map((model) => (
-                                        <SelectItem key={model} value={model}>
+                                        <SelectItem key={model} value={model} className="text-xs sm:text-sm">
                                             {model}
                                         </SelectItem>
                                     ))}
                                     {uniqueCabModels.filter(model => model && model.trim() !== "").length === 0 && 
-                                        <SelectItem value="--no-cab-models--" disabled>No cab models available</SelectItem>
+                                        <SelectItem value="--no-cab-models--" disabled className="text-xs sm:text-sm">No cab models available</SelectItem>
                                     }
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="baseFare" className="text-right">Base Fare</Label>
-                        <Input id="baseFare" type="number" value={newFareBaseFare} onChange={(e) => setNewFareBaseFare(e.target.value)} className="col-span-3" required />
+                        <Label htmlFor="baseFare" className="text-right text-xs sm:text-sm">Base Fare</Label>
+                        <Input id="baseFare" type="number" value={newFareBaseFare} onChange={(e) => setNewFareBaseFare(e.target.value)} className="col-span-3 text-xs sm:text-sm h-8" required />
                       </div>
                       <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="perKmRate" className="text-right">Per KM Rate</Label>
-                        <Input id="perKmRate" type="number" value={newFarePerKmRate} onChange={(e) => setNewFarePerKmRate(e.target.value)} className="col-span-3" required />
+                        <Label htmlFor="perKmRate" className="text-right text-xs sm:text-sm">Per KM Rate</Label>
+                        <Input id="perKmRate" type="number" value={newFarePerKmRate} onChange={(e) => setNewFarePerKmRate(e.target.value)} className="col-span-3 text-xs sm:text-sm h-8" required />
                       </div>
                     </div>
                     <DialogFooter>
@@ -688,21 +691,21 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Booking Summary Chart */}
-            <Card>
+            <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle>Booking Summary</CardTitle>
-                <CardDescription>A summary of bookings by vehicle type.</CardDescription>
+                <CardDescription>Bookings by vehicle type.</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="w-full h-[300px]">
+                <div className="w-full h-[250px] sm:h-[300px]">
                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={bookingData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                    <BarChart data={bookingData} margin={{ top: 5, right: 20, left: -25, bottom: 5 }}> {/* Adjusted left margin */}
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="bookings" fill="hsl(var(--primary))" />
+                      <XAxis dataKey="name" tick={{fontSize: 10}} />
+                      <YAxis tick={{fontSize: 10}} />
+                      <Tooltip wrapperStyle={{fontSize: "12px"}} />
+                      <Legend wrapperStyle={{fontSize: "12px"}} />
+                      <Bar dataKey="bookings" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -714,37 +717,37 @@ export default function AdminDashboard() {
       </main>
 
       <Dialog open={isPreviewDialogOpen} onOpenChange={() => setIsPreviewDialogOpen(false)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-xs">
           <DialogHeader>
             <DialogTitle>Cab Details</DialogTitle>
           </DialogHeader>
           {selectedCab && (
             <>
-              <p><strong>Model:</strong> {selectedCab.model}</p>
-              <p><strong>License Plate:</strong> {selectedCab.licensePlate}</p>
-              <p><strong>Status:</strong> {selectedCab.status}</p>
-              <p><strong>Driver Name:</strong> {selectedCab.driverName}</p>
+              <p className="text-sm"><strong>Model:</strong> {selectedCab.model}</p>
+              <p className="text-sm"><strong>License Plate:</strong> {selectedCab.licensePlate}</p>
+              <p className="text-sm"><strong>Status:</strong> {selectedCab.status}</p>
+              <p className="text-sm"><strong>Driver Name:</strong> {selectedCab.driverName}</p>
             </>
           )}
         </DialogContent>
       </Dialog>
 
       <Dialog open={isBookingDialogOpen} onOpenChange={() => setIsBookingDialogOpen(false)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-xs">
           <DialogHeader>
             <DialogTitle>Booking Details</DialogTitle>
           </DialogHeader>
           {selectedBooking && (
             <>
-                <p><strong>Mobile Number:</strong> {selectedBooking.mobileNumber}</p>
-              <p><strong>User:</strong> {selectedBooking.user}</p>
-              <p><strong>Source:</strong> {selectedBooking.source}</p>
-              <p><strong>Destination:</strong> {selectedBooking.destination}</p>
-              <p><strong>Fare:</strong> ₹{selectedBooking.fare}</p>
-              <p><strong>Cab Model:</strong> {selectedBooking.cabModel}</p>
-              <p><strong>Driver Name:</strong> {selectedBooking.driverName}</p>
-              <p><strong>Date:</strong> {selectedBooking.date}</p>
-              <p><strong>Time:</strong> {selectedBooking.time}</p>
+                <p className="text-sm"><strong>Mobile Number:</strong> {selectedBooking.mobileNumber}</p>
+              <p className="text-sm"><strong>User:</strong> {selectedBooking.user}</p>
+              <p className="text-sm"><strong>Source:</strong> {selectedBooking.source}</p>
+              <p className="text-sm"><strong>Destination:</strong> {selectedBooking.destination}</p>
+              <p className="text-sm"><strong>Fare:</strong> ₹{selectedBooking.fare}</p>
+              <p className="text-sm"><strong>Cab Model:</strong> {selectedBooking.cabModel}</p>
+              <p className="text-sm"><strong>Driver Name:</strong> {selectedBooking.driverName}</p>
+              <p className="text-sm"><strong>Date:</strong> {selectedBooking.date}</p>
+              <p className="text-sm"><strong>Time:</strong> {selectedBooking.time}</p>
             </>
           )}
         </DialogContent>
@@ -752,6 +755,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-    
-

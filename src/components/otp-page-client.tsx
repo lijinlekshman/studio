@@ -71,19 +71,25 @@ const OTPPageClient: React.FC = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-cover bg-center">
             {/* Background image is now applied via globals.css to the body */}
-            <main className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center">
+            <main className="flex flex-col items-center justify-center w-full flex-1 px-4 text-center">
                 <Link href="/">
-                  <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="max-w-[90%] sm:max-w-[350px] h-auto mb-6" />
+                  <Image 
+                    src="/Images/logo.png" 
+                    width={400} 
+                    height={100} 
+                    alt="Let'sGo Rides" 
+                    data-ai-hint="logo" 
+                    className="max-w-[200px] h-auto sm:max-w-[250px] md:max-w-[300px] mb-6" />
                 </Link>
-                <Card className="w-full max-w-md mt-10">
+                <Card className="w-full max-w-sm mt-8 sm:mt-10">
                     <CardHeader>
-                        <CardTitle>Verify OTP</CardTitle>
+                        <CardTitle className="text-xl sm:text-2xl">Verify OTP</CardTitle>
                         <CardDescription>
                             Enter the OTP sent to your mobile number {clientMobileNumber || '...'}. (Demo OTP: 123456)
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
-                        <div className="grid gap-2">
+                        <div className="grid gap-2 text-left">
                             <label htmlFor="otp">OTP</label>
                             <Input
                                 type="text"
@@ -92,9 +98,10 @@ const OTPPageClient: React.FC = () => {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
+                                className="text-sm"
                             />
                         </div>
-                        <Button onClick={verifyOTPAndProceed} disabled={!otp || !clientMobileNumber}>
+                        <Button onClick={verifyOTPAndProceed} disabled={!otp || !clientMobileNumber} className="w-full">
                             Verify OTP & Proceed
                         </Button>
                          <Link href="/" className="mt-4 text-sm text-muted-foreground hover:text-foreground">

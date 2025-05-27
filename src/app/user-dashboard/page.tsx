@@ -2,16 +2,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // useSearchParams removed as not directly used here
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Image from 'next/image';
+// import Image from 'next/image'; // Image not used directly here
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Edit, Save, ArrowLeft, Calendar, Menu, LogOut } from 'lucide-react';
+import { Edit, Save, ArrowLeft, Calendar, LogOut, Menu } from 'lucide-react'; // Menu for mobile
 import { useToast } from "@/hooks/use-toast";
 import {
     Table,
@@ -21,12 +21,13 @@ import {
     TableHead,
     TableCell,
 } from "@/components/ui/table";
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // For mobile sidebar
 
 interface LoggedInUser {
     email: string;
     name: string;
-    mobile?: string; // mobile might be optional if not always present
-    address?: string; // address might be set by user
+    mobile?: string; 
+    address?: string; 
 }
 
 const UserDashboardPage: React.FC = () => {
@@ -34,7 +35,7 @@ const UserDashboardPage: React.FC = () => {
     const { toast } = useToast();
     
     const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(null);
-    const [bookingDetails, setBookingDetails] = useState<any>(null); // For the most recent booking after OTP
+    const [bookingDetails, setBookingDetails] = useState<any>(null); 
     const [showMap, setShowMap] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [userDetails, setUserDetails] = useState<LoggedInUser>({
@@ -49,89 +50,84 @@ const UserDashboardPage: React.FC = () => {
     const [activeMenu, setActiveMenu] = useState('my-profile');
     const [bookingHistory, setBookingHistory] = useState<any[]>([]);
     const [isClient, setIsClient] = useState(false);
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
     useEffect(() => {
         setIsClient(true);
         if (typeof window !== 'undefined') {
             const storedUser = localStorage.getItem('loggedInUser');
             if (storedUser) {
-                const parsedUser: LoggedInUser = JSON.parse(storedUser);
-                setLoggedInUser(parsedUser);
-                setUserDetails({
-                    name: parsedUser.name || '',
-                    email: parsedUser.email || '',
-                    mobile: parsedUser.mobile || '',
-                    address: localStorage.getItem(`userAddress_${parsedUser.email}`) || parsedUser.address || '',
-                });
-                setTempDetails({
-                    name: parsedUser.name || '',
-                    email: parsedUser.email || '',
-                    mobile: parsedUser.mobile || '',
-                    address: localStorage.getItem(`userAddress_${parsedUser.email}`) || parsedUser.address || '',
-                });
+                try {
+                    const parsedUser: LoggedInUser = JSON.parse(storedUser);
+                    setLoggedInUser(parsedUser);
+                    const initialUserDetails = {
+                        name: parsedUser.name || '',
+                        email: parsedUser.email || '',
+                        mobile: parsedUser.mobile || '',
+                        address: localStorage.getItem(`userAddress_${parsedUser.email}`) || parsedUser.address || '',
+                    };
+                    setUserDetails(initialUserDetails);
+                    setTempDetails(initialUserDetails); // Initialize tempDetails
 
-                // Load profile image for the logged-in user
-                const storedImg = localStorage.getItem(`profileImage_${parsedUser.email}`);
-                if (storedImg) setProfileImage(storedImg);
+                    const storedImg = localStorage.getItem(`profileImage_${parsedUser.email}`);
+                    if (storedImg) setProfileImage(storedImg);
 
-                // Load all bookings and filter by logged-in user's email
-                const allBookingsString = localStorage.getItem('bookings');
-                if (allBookingsString) {
-                    const allBookings = JSON.parse(allBookingsString);
-                    const userBookings = allBookings.filter((booking: any) => booking.email === parsedUser.email);
-                    setBookingHistory(userBookings);
-                }
-                 // Load the most recent booking details (typically after OTP flow)
-                const recentBooking = localStorage.getItem('bookingDetails');
-                if(recentBooking) {
-                    const parsedRecentBooking = JSON.parse(recentBooking);
-                    // Check if this booking belongs to the logged-in user
-                    if(parsedRecentBooking.email === parsedUser.email) {
-                        setBookingDetails(parsedRecentBooking);
+                    const allBookingsString = localStorage.getItem('bookings');
+                    if (allBookingsString) {
+                        const allBookings = JSON.parse(allBookingsString);
+                        const userBookings = allBookings.filter((booking: any) => booking.email === parsedUser.email);
+                        setBookingHistory(userBookings);
                     }
+                    const recentBooking = localStorage.getItem('bookingDetails');
+                    if(recentBooking) {
+                        const parsedRecentBooking = JSON.parse(recentBooking);
+                        if(parsedRecentBooking.email === parsedUser.email) {
+                            setBookingDetails(parsedRecentBooking);
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error parsing user data from localStorage", error);
+                    toast({ title: "Error", description: "Could not load user data.", variant: "destructive" });
+                    router.push('/user-login');
                 }
-
-
             } else {
-                // No logged-in user found, redirect to user login
                 router.push('/user-login');
             }
         }
-    }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [router, toast]); // toast was missing
 
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('loggedInUser');
-            // Optionally remove other user-specific data like profile image and address
             if (loggedInUser) {
                 localStorage.removeItem(`profileImage_${loggedInUser.email}`);
                 localStorage.removeItem(`userAddress_${loggedInUser.email}`);
+                 localStorage.removeItem('bookingDetails'); // Clear recent booking on logout
             }
         }
         toast({ title: "Logged Out", description: "You have been successfully logged out." });
         router.push('/user-login');
     };
-
+    
     useEffect(() => {
-        // Update tempDetails when userDetails change (e.g., after initial load)
         setTempDetails({ ...userDetails });
     }, [userDetails]);
 
 
     if (!isClient || !loggedInUser) {
-        return <div>Loading...</div>; // Or a more sophisticated loading state
+        return <div className="flex items-center justify-center min-h-screen"><p>Loading dashboard...</p></div>;
     }
-
 
     const toggleMap = () => setShowMap(!showMap);
     const handleEditClick = () => setIsEditing(true);
 
     const handleCancelClick = () => {
         setIsEditing(false);
-        setTempDetails({ ...userDetails }); // Reset tempDetails to current userDetails
-        setNewProfileImageFile(null); // Reset new image file
-        if (loggedInUser) { // Reload original profile image
+        setTempDetails({ ...userDetails }); 
+        setNewProfileImageFile(null); 
+        if (loggedInUser) { 
              const storedImg = localStorage.getItem(`profileImage_${loggedInUser.email}`);
              if (storedImg) setProfileImage(storedImg);
              else setProfileImage(null);
@@ -143,22 +139,18 @@ const UserDashboardPage: React.FC = () => {
         setIsEditing(false);
 
         if (typeof window !== 'undefined' && loggedInUser) {
-            // Save updated name and email to loggedInUser in localStorage
             const updatedLoggedInUser = { ...loggedInUser, name: tempDetails.name, email: tempDetails.email, mobile: tempDetails.mobile, address: tempDetails.address };
             localStorage.setItem('loggedInUser', JSON.stringify(updatedLoggedInUser));
-            setLoggedInUser(updatedLoggedInUser); // Update state
+            setLoggedInUser(updatedLoggedInUser); 
 
-            // Save address separately if you want it more persistent per user email
             localStorage.setItem(`userAddress_${loggedInUser.email}`, tempDetails.address || '');
 
-
-            // Handle profile image upload
             if (newProfileImageFile) {
                 const reader = new FileReader();
                 reader.onloadend = () => {
                     const newImageBase64 = reader.result as string;
                     localStorage.setItem(`profileImage_${loggedInUser.email}`, newImageBase64);
-                    setProfileImage(newImageBase64); // Update displayed image
+                    setProfileImage(newImageBase64); 
                     toast({ title: "Profile Image Updated" });
                 };
                 reader.readAsDataURL(newProfileImageFile);
@@ -177,14 +169,29 @@ const UserDashboardPage: React.FC = () => {
         const file = e.target.files?.[0];
         if (file) {
             setNewProfileImageFile(file);
-            // Preview image
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProfileImage(reader.result as string); // Temporarily update profileImage for preview
+                setProfileImage(reader.result as string); 
             };
             reader.readAsDataURL(file);
         }
     };
+
+    const renderSidebarContent = () => (
+        <nav className="flex flex-col h-full">
+            <Link href="/" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-300 text-gray-700 text-sm">
+                <ArrowLeft className="mr-2 inline-block h-4 w-4" /> Back to Home
+            </Link>
+            <hr className="my-2" />
+            <ul className="space-y-1">
+                <li><Button onClick={() => { setActiveMenu('my-profile'); setIsMobileSidebarOpen(false); }} variant={activeMenu === 'my-profile' ? 'secondary' : 'ghost'} className="w-full justify-start text-sm">My Profile</Button></li>
+                <li><Button onClick={() => { setActiveMenu('booking-history'); setIsMobileSidebarOpen(false); }} variant={activeMenu === 'booking-history' ? 'secondary' : 'ghost'} className="w-full justify-start text-sm">Booking History <Calendar className="ml-auto h-4 w-4" /></Button></li>
+            </ul>
+            <Button onClick={handleLogout} variant="outline" className="w-full mt-auto text-sm">
+                <LogOut className="mr-2 h-4 w-4" /> Logout
+            </Button>
+        </nav>
+    );
 
 
     const renderContent = () => {
@@ -195,54 +202,56 @@ const UserDashboardPage: React.FC = () => {
                 return (
                     <Card>
                         <CardHeader>
-                            <CardTitle>User Profile</CardTitle>
+                            <CardTitle className="text-xl">User Profile</CardTitle>
                             <CardDescription>Manage your profile details.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="mb-4">
-                                <Avatar className="w-24 h-24">
+                            <div className="mb-4 flex flex-col items-center sm:items-start">
+                                <Avatar className="w-20 h-20 sm:w-24 sm:h-24 mb-2">
                                     {profileImage ? (
                                         <AvatarImage src={profileImage} alt={userDetails.name} />
                                     ) : (
-                                        <AvatarFallback>{userDetails.name?.charAt(0).toUpperCase()}{userDetails.name?.split(' ')[1]?.charAt(0).toUpperCase() || ''}</AvatarFallback>
+                                        <AvatarFallback className="text-2xl sm:text-3xl">{userDetails.name?.charAt(0).toUpperCase()}{(userDetails.name?.split(' ')[1]?.charAt(0) || '').toUpperCase()}</AvatarFallback>
                                     )}
                                 </Avatar>
+                                 {isEditing && (
+                                     <Label htmlFor="image" className="text-sm text-primary cursor-pointer hover:underline">Change Photo
+                                        <Input type="file" id="image" accept="image/*" onChange={handleImageChange} className="hidden" />
+                                     </Label>
+                                 )}
                             </div>
 
                             {isEditing ? (
                                 <div className="grid gap-4">
-                                    <div>
-                                        <Label htmlFor="name">Name</Label>
-                                        <Input type="text" id="name" name="name" value={tempDetails.name} onChange={handleInputChange} required />
+                                    <div className="grid gap-1">
+                                        <Label htmlFor="name" className="text-sm">Name</Label>
+                                        <Input type="text" id="name" name="name" value={tempDetails.name} onChange={handleInputChange} required className="text-sm"/>
                                     </div>
-                                    <div>
-                                        <Label htmlFor="email">Email</Label>
-                                        <Input type="email" id="email" name="email" value={tempDetails.email} onChange={handleInputChange} required />
+                                    <div className="grid gap-1">
+                                        <Label htmlFor="email" className="text-sm">Email</Label>
+                                        <Input type="email" id="email" name="email" value={tempDetails.email} onChange={handleInputChange} required className="text-sm"/>
                                     </div>
-                                     <div>
-                                        <Label htmlFor="mobile">Mobile</Label>
-                                        <Input type="tel" id="mobile" name="mobile" value={tempDetails.mobile} onChange={handleInputChange} />
+                                     <div className="grid gap-1">
+                                        <Label htmlFor="mobile" className="text-sm">Mobile</Label>
+                                        <Input type="tel" id="mobile" name="mobile" value={tempDetails.mobile} onChange={handleInputChange} className="text-sm"/>
                                     </div>
-                                    <div>
-                                        <Label htmlFor="address">Address</Label>
-                                        <Input type="text" id="address" name="address" value={tempDetails.address || ''} onChange={handleInputChange} />
+                                    <div className="grid gap-1">
+                                        <Label htmlFor="address" className="text-sm">Address</Label>
+                                        <Input type="text" id="address" name="address" value={tempDetails.address || ''} onChange={handleInputChange} className="text-sm"/>
                                     </div>
-                                    <div>
-                                        <Label htmlFor="image">Upload New Profile Image</Label>
-                                        <Input type="file" id="image" accept="image/*" onChange={handleImageChange} />
-                                    </div>
-                                    <div className="flex justify-end gap-2">
-                                        <Button variant="secondary" onClick={handleCancelClick}>Cancel</Button>
-                                        <Button onClick={handleSaveClick}><Save className="mr-2 h-4 w-4" /> Save</Button>
+                                   
+                                    <div className="flex justify-end gap-2 mt-2">
+                                        <Button variant="outline" onClick={handleCancelClick} size="sm">Cancel</Button>
+                                        <Button onClick={handleSaveClick} size="sm"><Save className="mr-1.5 h-4 w-4" /> Save</Button>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="grid gap-4">
-                                    <div><Label>Name:</Label> <p>{userDetails.name}</p></div>
-                                    <div><Label>Email:</Label> <p>{userDetails.email}</p></div>
-                                    <div><Label>Mobile:</Label> <p>{userDetails.mobile || 'N/A'}</p></div>
-                                    <div><Label>Address:</Label> <p>{userDetails.address || 'N/A'}</p></div>
-                                    <Button onClick={handleEditClick}><Edit className="mr-2 h-4 w-4" /> Edit Profile</Button>
+                                <div className="grid gap-3 text-sm">
+                                    <div><Label className="font-semibold">Name:</Label> <p className="inline">{userDetails.name}</p></div>
+                                    <div><Label className="font-semibold">Email:</Label> <p className="inline">{userDetails.email}</p></div>
+                                    <div><Label className="font-semibold">Mobile:</Label> <p className="inline">{userDetails.mobile || 'N/A'}</p></div>
+                                    <div><Label className="font-semibold">Address:</Label> <p className="inline">{userDetails.address || 'N/A'}</p></div>
+                                    <Button onClick={handleEditClick} size="sm" className="mt-2 w-full sm:w-auto"><Edit className="mr-1.5 h-4 w-4" /> Edit Profile</Button>
                                 </div>
                             )}
                         </CardContent>
@@ -252,82 +261,83 @@ const UserDashboardPage: React.FC = () => {
                 return (
                     <Card>
                         <CardHeader>
-                            <CardTitle>Booking History</CardTitle>
+                            <CardTitle className="text-xl">Booking History</CardTitle>
                             <CardDescription>Here are your past and upcoming bookings.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             {bookingHistory.length > 0 ? (
-                                <ScrollArea className="w-full max-h-[400px]">
+                                <ScrollArea className="w-full max-h-[300px] sm:max-h-[400px]">
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>Date</TableHead>
-                                                <TableHead>Time</TableHead>
-                                                <TableHead>Source</TableHead>
-                                                <TableHead>Destination</TableHead>
-                                                <TableHead>Cab</TableHead>
-                                                <TableHead>Fare</TableHead>
-                                                <TableHead>Status</TableHead>
+                                                <TableHead className="text-xs">Date</TableHead>
+                                                <TableHead className="text-xs">Time</TableHead>
+                                                <TableHead className="text-xs">Source</TableHead>
+                                                <TableHead className="text-xs">Destination</TableHead>
+                                                <TableHead className="text-xs">Cab</TableHead>
+                                                <TableHead className="text-xs">Fare</TableHead>
+                                                <TableHead className="text-xs">Status</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {bookingHistory.map((booking) => (
+                                            {bookingHistory.sort((a, b) => new Date(b.date + ' ' + b.time).getTime() - new Date(a.date + ' ' + a.time).getTime()).map((booking) => (
                                                 <TableRow key={booking.id}>
-                                                    <TableCell>{booking.date}</TableCell>
-                                                    <TableCell>{booking.time}</TableCell>
-                                                    <TableCell>{booking.source}</TableCell>
-                                                    <TableCell>{booking.destination}</TableCell>
-                                                    <TableCell>{booking.cabModel}</TableCell>
-                                                    <TableCell>₹{booking.fare}</TableCell>
-                                                    <TableCell>{booking.status}</TableCell>
+                                                    <TableCell className="text-xs">{booking.date}</TableCell>
+                                                    <TableCell className="text-xs">{booking.time}</TableCell>
+                                                    <TableCell className="text-xs">{booking.source}</TableCell>
+                                                    <TableCell className="text-xs">{booking.destination}</TableCell>
+                                                    <TableCell className="text-xs">{booking.cabModel}</TableCell>
+                                                    <TableCell className="text-xs">₹{booking.fare}</TableCell>
+                                                    <TableCell className="text-xs">{booking.status}</TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
                                     </Table>
                                 </ScrollArea>
                             ) : (
-                                <p>No booking history found.</p>
+                                <p className="text-sm">No booking history found.</p>
                             )}
                         </CardContent>
                     </Card>
                 );
-            // Add other cases for 'payment-methods', 'settings' if needed
             default:
-                return <p>Select a menu option.</p>;
+                return <p className="text-sm">Select a menu option.</p>;
         }
     };
 
     return (
-        <div className="flex h-screen bg-gray-100">
-            <div className="w-64 bg-gray-200 p-4 flex flex-col justify-between">
-                <nav>
-                    <Link href="/" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-300 text-gray-700">
-                        <ArrowLeft className="mr-2 inline-block h-5 w-5" /> Back to Home
-                    </Link>
-                    <hr className="my-4" />
-                    <ul className="space-y-2">
-                        <li><Button onClick={() => setActiveMenu('my-profile')} variant={activeMenu === 'my-profile' ? 'default' : 'ghost'} className="w-full justify-start">My Profile</Button></li>
-                        <li><Button onClick={() => setActiveMenu('booking-history')} variant={activeMenu === 'booking-history' ? 'default' : 'ghost'} className="w-full justify-start">Booking History <Calendar className="ml-auto h-4 w-4" /></Button></li>
-                        {/* Add other menu items here if needed */}
-                    </ul>
-                </nav>
-                <Button onClick={handleLogout} variant="outline" className="w-full mt-auto">
-                    <LogOut className="mr-2 h-4 w-4" /> Logout
-                </Button>
-            </div>
+        <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+            {/* Mobile Header with Menu Button */}
+            <header className="md:hidden p-4 bg-gray-200 border-b border-gray-300 flex items-center justify-between">
+                <h1 className="text-lg font-semibold">User Dashboard</h1>
+                 <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <Menu className="h-6 w-6" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-64 p-0 bg-gray-200">
+                        {renderSidebarContent()}
+                    </SheetContent>
+                </Sheet>
+            </header>
 
-            <main className="flex-1 p-6 overflow-auto">
+            {/* Desktop Sidebar */}
+            <aside className="hidden md:flex w-60 bg-gray-200 p-4 flex-col justify-between border-r border-gray-300">
+                {renderSidebarContent()}
+            </aside>
+
+            <main className="flex-1 p-4 sm:p-6 overflow-auto">
                 <div className="max-w-4xl mx-auto">
                     {renderContent()}
 
-                    {/* Display most recent booking details if available */}
                     {bookingDetails && activeMenu !== 'booking-history' && (
                          <Card className="mt-6">
                             <CardHeader>
-                                <CardTitle>Your Recent Booking Confirmed!</CardTitle>
-                                <CardDescription>Mobile: {bookingDetails.mobileNumber}</CardDescription>
+                                <CardTitle className="text-lg sm:text-xl">Your Recent Booking Confirmed!</CardTitle>
+                                <CardDescription className="text-sm">Mobile: {bookingDetails.mobileNumber}</CardDescription>
                             </CardHeader>
-                            <CardContent className="grid gap-2">
+                            <CardContent className="grid gap-1 sm:gap-2 text-xs sm:text-sm">
                                 <p><strong>User:</strong> {bookingDetails.userName}</p>
                                 <p><strong>Email:</strong> {bookingDetails.email}</p>
                                 <p><strong>Source:</strong> {bookingDetails.source}</p>
@@ -337,11 +347,11 @@ const UserDashboardPage: React.FC = () => {
                                 <p><strong>Fare:</strong> ₹{bookingDetails.fare}</p>
                                 <p><strong>Date:</strong> {bookingDetails.date} @ {bookingDetails.time}</p>
                                 <p><strong>Status:</strong> {bookingDetails.status}</p>
-                                <Button onClick={toggleMap} className="mt-2">
+                                <Button onClick={toggleMap} size="sm" className="mt-2 w-full sm:w-auto">
                                     {showMap ? 'Hide Map' : 'Track Cab (Simulation)'}
                                 </Button>
                                 {showMap && (
-                                    <div className="mt-4 border rounded-lg overflow-hidden" style={{ height: '300px', width: '100%' }}>
+                                    <div className="mt-4 border rounded-lg overflow-hidden h-[250px] sm:h-[300px] w-full">
                                         <ScrollArea className="h-full w-full">
                                         <iframe
                                             src={`https://www.google.com/maps/embed/v1/directions?key=YOUR_GOOGLE_MAPS_API_KEY&origin=${encodeURIComponent(bookingDetails.source)}&destination=${encodeURIComponent(bookingDetails.destination)}`}
@@ -351,9 +361,10 @@ const UserDashboardPage: React.FC = () => {
                                             allowFullScreen={true}
                                             loading="lazy"
                                             referrerPolicy="no-referrer-when-downgrade"
+                                            title="Cab Route Map"
                                         ></iframe>
                                         </ScrollArea>
-                                        <div className="p-2 text-sm bg-gray-50">
+                                        <div className="p-2 text-xs bg-gray-50">
                                             <p>Cab Location: Simulating route...</p>
                                             <p>Vehicle Number: {bookingDetails.cabModel === 'Sedan' ? 'KL01AB1234' : 'KL02CD5678'}</p>
                                             <p>Driver Name: {bookingDetails.driverName}</p>
