@@ -313,7 +313,7 @@ export default function BookRidePage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
             <div className="absolute top-4 left-4">
-                <Button variant="ghost" onClick={() => router.back()}>
+                <Button variant="ghost" onClick={() => router.push('/')}>
                     <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
             </div>
