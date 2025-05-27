@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit, Trash, Map, Plus, Car, User, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input';
 import { toast } from "@/hooks/use-toast";
 import {
   Table,
@@ -656,12 +656,16 @@ export default function AdminDashboard() {
                             <SelectContent>
                                 <SelectGroup>
                                     <SelectLabel>Available Cab Models</SelectLabel>
-                                    {uniqueCabModels.map((model) => (
+                                    {uniqueCabModels
+                                        .filter(model => model && model.trim() !== "")
+                                        .map((model) => (
                                         <SelectItem key={model} value={model}>
                                             {model}
                                         </SelectItem>
                                     ))}
-                                    {uniqueCabModels.length === 0 && <SelectItem value="" disabled>No cab models available</SelectItem>}
+                                    {uniqueCabModels.filter(model => model && model.trim() !== "").length === 0 && 
+                                        <SelectItem value="--no-cab-models--" disabled>No cab models available</SelectItem>
+                                    }
                                 </SelectGroup>
                             </SelectContent>
                         </Select>

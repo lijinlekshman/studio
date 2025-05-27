@@ -42,30 +42,38 @@ export default function BookRidePage() {
             const token = localStorage.getItem('authToken');
             setIsAuthenticated(!!token);
 
-            const storedCabs = localStorage.getItem('cabs');
-            if (storedCabs) {
-                try {
+            try {
+                const storedCabs = localStorage.getItem('cabs');
+                if (storedCabs) {
                     setAvailableCabs(JSON.parse(storedCabs));
-                } catch (error) {
-                    console.error("Failed to parse availableCabs from localStorage", error);
-                    setAvailableCabs([]); // Fallback to empty array on error
+                } else {
+                    setAvailableCabs([]); 
                 }
+            } catch (error) {
+                console.error("Failed to parse availableCabs from localStorage", error);
+                setAvailableCabs([]);
             }
-            const storedFares = localStorage.getItem('fares');
-            if (storedFares) {
-                try {
+            try {
+                const storedFares = localStorage.getItem('fares');
+                if (storedFares) {
                     const parsedFares = JSON.parse(storedFares);
                     setCurrentFares(parsedFares);
                     if (!vehicleType && parsedFares.length > 0) {
-                        setVehicleType(parsedFares[0].vehicleType);
+                        // Ensure a valid default vehicle type if available
+                        const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
+                        if (firstValidFare) {
+                            setVehicleType(firstValidFare.vehicleType);
+                        }
                     }
-                } catch (error) {
-                    console.error("Failed to parse currentFares from localStorage", error);
-                    setCurrentFares([]); // Fallback to empty array on error
+                } else {
+                    setCurrentFares([]);
                 }
+            } catch (error) {
+                console.error("Failed to parse currentFares from localStorage", error);
+                setCurrentFares([]);
             }
         }
-    }, [vehicleType]);
+    }, [vehicleType]); // Keep vehicleType dependency to re-evaluate default if it changes externally
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -172,11 +180,13 @@ export default function BookRidePage() {
                         setFare(calculatedFare);
                     } else {
                         setFare(null); 
-                        toast({
-                            title: "Fare Calculation Error",
-                            description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
-                            variant: "destructive",
-                        });
+                        if(vehicleType){ // Only toast if a vehicle type was actually selected but no rule found
+                           toast({
+                                title: "Fare Calculation Error",
+                                description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
+                                variant: "destructive",
+                            });
+                        }
                     }
 
                 } catch (error: any) {
@@ -266,7 +276,7 @@ export default function BookRidePage() {
                     existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
                 } catch (error) {
                     console.error("Error parsing existing bookings from localStorage", error);
-                    existingBookings = []; // Fallback to empty array on error
+                    existingBookings = []; 
                 }
                 existingBookings.push(newBooking);
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
@@ -407,12 +417,16 @@ export default function BookRidePage() {
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Type</SelectLabel>
-                                        {currentFares.map((fareRule) => (
+                                        {currentFares
+                                            .filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "")
+                                            .map((fareRule) => (
                                             <SelectItem key={fareRule.id} value={fareRule.vehicleType}>
                                                 {fareRule.vehicleType}
                                             </SelectItem>
                                         ))}
-                                        {currentFares.length === 0 && <SelectItem value="" disabled>No vehicle types available</SelectItem>}
+                                        {currentFares.filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "").length === 0 && 
+                                            <SelectItem value="--no-vehicle-types--" disabled>No vehicle types available</SelectItem>
+                                        }
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -446,3 +460,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
