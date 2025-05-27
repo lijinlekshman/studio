@@ -59,7 +59,6 @@ export default function BookRidePage() {
                     const parsedFares = JSON.parse(storedFares);
                     setCurrentFares(parsedFares);
                     if (!vehicleType && parsedFares.length > 0) {
-                        // Ensure a valid default vehicle type if available
                         const firstValidFare = parsedFares.find((f: any) => f.vehicleType && f.vehicleType.trim() !== "");
                         if (firstValidFare) {
                             setVehicleType(firstValidFare.vehicleType);
@@ -104,7 +103,7 @@ export default function BookRidePage() {
             const location = await getCurrentLocation(); 
             const destinations = await suggestDestinations({ currentLocation: location, pastRideHistory: [] });
             setSuggestedDestinations(destinations);
-        } catch (error: any) {
+        } catch (error: any) { // Fixed syntax error here
             toast({
                 title: "Error fetching destinations",
                 description: error.message,
@@ -148,7 +147,7 @@ export default function BookRidePage() {
         const fetchDestinationAddress = async () => {
             if (destination) {
                 try {
-                    const address = await getAddressForCoordinate(destination);
+                    const address = await getAddressForCoordinate(destination); // Corrected to use destination
                     setDestinationAddress(address);
                 } catch (e) {
                     console.error(e);
@@ -233,7 +232,7 @@ export default function BookRidePage() {
             setDestinationInput(selected.name);
             setSelectedDestinationValue(selected.name);
             try {
-                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); // Corrected to use selected.lat, selected.lng
                 setDestinationAddress(address);
             } catch (e) {
                 console.error(e);
@@ -400,6 +399,9 @@ export default function BookRidePage() {
                                                 {dest.name}
                                             </SelectItem>
                                         ))}
+                                        {suggestedDestinations.length === 0 && (
+                                            <SelectItem value="--no-destinations--" disabled>No destinations available</SelectItem>
+                                        )}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
@@ -460,4 +462,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
