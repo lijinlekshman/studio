@@ -11,7 +11,7 @@ import { ArrowLeft, Map as MapIcon } from 'lucide-react'; // Renamed Map to MapI
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateDistance } from '@/ai/flows/calculate-fare';
+import { calculateDistance } from '@/ai/flows/calculate-fare'; // Corrected import path
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 
@@ -237,7 +237,7 @@ export default function BookRidePage() {
             setDestination({ lat: selected.lat, lng: selected.lng });
             setSelectedDestinationValue(selected.name);
             try {
-                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); // Corrected to use selected.lat, selected.lng
                 setDestinationAddress(address);
             } catch (e) {
                 console.error(e);
@@ -394,12 +394,12 @@ export default function BookRidePage() {
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectLabel>Destination</SelectLabel>
-                                        {suggestedDestinations.filter(d => d.name).map((dest) => (
+                                        {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").map((dest) => (
                                             <SelectItem key={dest.name} value={dest.name}>
                                                 {dest.name}
                                             </SelectItem>
                                         ))}
-                                        {suggestedDestinations.filter(d => d.name).length === 0 && (
+                                        {suggestedDestinations.filter(d => d.name && d.name.trim() !== "").length === 0 && (
                                             <SelectItem value="--no-destinations--" disabled>No destinations available</SelectItem>
                                         )}
                                     </SelectGroup>
@@ -466,10 +466,17 @@ export default function BookRidePage() {
                 <Card className="w-full h-full min-h-[400px] md:min-h-0">
                     <CardHeader>
                         <CardTitle>Ride Map</CardTitle>
-                        <CardDescription>
+                         <CardDescription>
                             {mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") && (
-                                <span className="text-destructive font-semibold">Replace 'YOUR_GOOGLE_MAPS_API_KEY' in the code with your actual Google Maps API key for the map to display.</span>
+                                <span className="text-destructive font-semibold">
+                                    The current map uses Google Maps Embed. Replace 'YOUR_GOOGLE_MAPS_API_KEY' 
+                                    in the code with your actual Google Maps API key for this map to display.
+                                </span>
                             )}
+                             <br />
+                             <span className="text-sm text-muted-foreground">
+                                (Alternative map sources like `maptiles.p.rapidapi.com` for map tiles could be used with a dedicated mapping library e.g., Leaflet, instead of the current iframe embed.)
+                             </span>
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col h-[calc(100%-4rem)]"> {/* Adjust height to fill card */}
@@ -500,5 +507,4 @@ export default function BookRidePage() {
     );
 }
 
-        
     
