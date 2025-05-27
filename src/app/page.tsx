@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Map, User } from 'lucide-react';
+import { Map, User, Bot } from 'lucide-react'; // Added Bot
 import Link from "next/link";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -13,27 +13,31 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"; // Removed AvatarImage import
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 
 export default function Home() {
     const router = useRouter();
-    const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false); // Renamed for clarity
+    const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
 
     useEffect(() => {
-        // Check if the admin is authenticated
         if (typeof window !== 'undefined') {
-            const adminToken = localStorage.getItem('authToken'); // Admin token
+            const adminToken = localStorage.getItem('authToken');
             setIsAdminAuthenticated(!!adminToken);
         }
     }, []);
 
     const handleAdminLogout = () => {
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('authToken'); // Admin token
+            localStorage.removeItem('authToken');
         }
         setIsAdminAuthenticated(false);
-        router.push('/'); // Redirect to home after admin logout
+        router.push('/');
+    };
+
+    const handleChatbotClick = () => {
+        alert("Chatbot clicked! Chat interface coming soon.");
+        // Here you would typically open a chat dialog or interface
     };
 
     return (
@@ -43,7 +47,6 @@ export default function Home() {
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="rounded-full h-10 w-10 p-0 hover:bg-accent">
                             <Avatar className="h-9 w-9">
-                                {/* AvatarImage removed to show User icon from Fallback */}
                                 <AvatarFallback>
                                     <User className="h-5 w-5" />
                                 </AvatarFallback>
@@ -67,13 +70,12 @@ export default function Home() {
                 </DropdownMenu>
             </div>
 
-            {/* Landing Page Section */}
             <div
                 className="relative w-full h-screen flex items-center justify-center bg-cover bg-center"
-                // The body style from globals.css should handle the main background image
+                // Background image is handled by globals.css
             >
                 <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay */}
-                <div className="relative z-10 text-center p-6 bg-white/20 rounded-lg shadow-md max-w-xl mx-auto"> {/* Added bg-white/20, rounded-lg, shadow-md, p-6 and max-w-xl */}
+                <div className="relative z-10 text-center p-6 bg-white/20 rounded-lg shadow-md max-w-xl mx-auto">
                     <Link href="/">
                         <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="mx-auto max-w-[90%] sm:max-w-[300px] h-auto mb-4" />
                     </Link>
@@ -90,6 +92,19 @@ export default function Home() {
                         </Button>
                     </Link>
                 </div>
+            </div>
+
+            {/* Floating Chatbot Head */}
+            <div className="fixed bottom-6 right-6 z-30">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full w-14 h-14 shadow-lg bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={handleChatbotClick}
+                    aria-label="Open Chatbot"
+                >
+                    <Bot className="h-7 w-7" />
+                </Button>
             </div>
         </div>
     );
