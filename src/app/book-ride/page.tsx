@@ -7,7 +7,7 @@ import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Map as MapIcon, Bot, ArrowLeft } from 'lucide-react'; // Added ArrowLeft
+import { Map as MapIcon, Bot, ArrowLeft } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
@@ -82,7 +82,8 @@ export default function BookRidePage() {
                     if (chatbotData.email) setEmail(chatbotData.email);
                     if (chatbotData.mobileNumber) setMobileNumber(chatbotData.mobileNumber);
                     if (chatbotData.vehiclePreference) {
-                        const validVehicle = currentFares.find(f => f.vehicleType.toLowerCase() === chatbotData.vehiclePreference?.toLowerCase());
+                        // Check against the currentFares loaded from localStorage
+                        const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === chatbotData.vehiclePreference?.toLowerCase());
                         if (validVehicle) {
                             setVehicleType(validVehicle.vehicleType);
                         } else if (chatbotData.vehiclePreference) {
@@ -95,7 +96,7 @@ export default function BookRidePage() {
                     if (chatbotData.destinationName) {
                          toast({ title: "AI Assistant", description: `Destination set to: ${chatbotData.destinationName}. Please verify from dropdown.`, variant: "default" });
                     }
-                    localStorage.removeItem('chatbotBookingRequest');
+                    localStorage.removeItem('chatbotBookingRequest'); // Clear after use
                     toast({title: "AI Assistant", description: "Form pre-filled with your request. Please review and complete."});
                 } catch (e) {
                     console.error("Error parsing chatbotBookingRequest from localStorage", e);
@@ -103,7 +104,8 @@ export default function BookRidePage() {
                 }
             }
         }
-    }, [currentFares, toast, vehicleType]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Changed dependency array to [] to run once on mount
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -206,7 +208,7 @@ export default function BookRidePage() {
                         setFare(calculatedFare);
                     } else {
                         setFare(null);
-                        if (vehicleType) {
+                        if (vehicleType) { // Only toast if a vehicle type was actually selected
                             toast({
                                 title: "Fare Calculation Error",
                                 description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
@@ -334,7 +336,7 @@ export default function BookRidePage() {
             if (parsedData.email) setEmail(parsedData.email);
             if (parsedData.mobileNumber) setMobileNumber(parsedData.mobileNumber);
             if (parsedData.vehiclePreference) {
-                const validVehicle = currentFares.find(f => f.vehicleType.toLowerCase() === parsedData.vehiclePreference?.toLowerCase());
+                const validVehicle = currentFares.find(f => f.vehicleType && f.vehicleType.toLowerCase() === parsedData.vehiclePreference?.toLowerCase());
                 if (validVehicle) {
                     setVehicleType(validVehicle.vehicleType);
                 } else if (parsedData.vehiclePreference) {
