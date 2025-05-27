@@ -7,14 +7,17 @@ import { getCurrentLocation, getAddressForCoordinate } from '@/services/map';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Map as MapIcon, Brain } from 'lucide-react'; // Renamed Map to MapIcon to avoid conflict
+import { ArrowLeft, Map as MapIcon, Brain, Bot, MessageSquare } from 'lucide-react'; // Added Bot
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateDistance } from '@/ai/flows/calculate-fare'; 
+import { calculateDistance } from '@/ai/flows/calculate-fare';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 import { parseBookingRequest, type ParseBookingRequestOutput } from '@/ai/flows/parse-booking-request';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 
 export default function BookRidePage() {
@@ -42,6 +45,7 @@ export default function BookRidePage() {
 
     const [aiRequestText, setAiRequestText] = useState('');
     const [isParsing, setIsParsing] = useState(false);
+    const [isAiHelperDialogOpen, setIsAiHelperDialogOpen] = useState(false);
 
 
     useEffect(() => {
@@ -71,7 +75,7 @@ export default function BookRidePage() {
                 setCurrentFares([]);
             }
         }
-    }, []); 
+    }, [vehicleType]);
 
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -178,8 +182,8 @@ export default function BookRidePage() {
                         setFare(calculatedFare);
                     } else {
                         setFare(null);
-                        if(vehicleType){
-                           toast({
+                        if (vehicleType) {
+                            toast({
                                 title: "Fare Calculation Error",
                                 description: `No fare rule found for ${vehicleType}. Please check admin settings.`,
                                 variant: "destructive",
@@ -206,8 +210,8 @@ export default function BookRidePage() {
         estimateFare();
     }, [source, destination, vehicleType, currentFares, toast]);
 
-     useEffect(() => {
-        const apiKey = "YOUR_GOOGLE_MAPS_API_KEY"; 
+    useEffect(() => {
+        const apiKey = "YOUR_GOOGLE_MAPS_API_KEY";
         if (source && destination) {
             setMapUrl(`https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${source.lat},${source.lng}&destination=${destination.lat},${destination.lng}&mode=driving`);
         } else if (source) {
@@ -235,12 +239,12 @@ export default function BookRidePage() {
     };
 
     const handleDestinationSelect = async (selectedDestinationName: string) => {
-         const selected = suggestedDestinations.find(dest => dest.name === selectedDestinationName);
+        const selected = suggestedDestinations.find(dest => dest.name === selectedDestinationName);
         if (selected) {
             setDestination({ lat: selected.lat, lng: selected.lng });
             setSelectedDestinationValue(selected.name);
             try {
-                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng }); 
+                const address = await getAddressForCoordinate({ lat: selected.lat, lng: selected.lng });
                 setDestinationAddress(address);
             } catch (e) {
                 console.error(e);
@@ -296,7 +300,7 @@ export default function BookRidePage() {
                 }
                 existingBookings.push(newBooking);
                 localStorage.setItem('bookings', JSON.stringify(existingBookings));
-                localStorage.setItem('bookingDetails', JSON.stringify(newBooking)); 
+                localStorage.setItem('bookingDetails', JSON.stringify(newBooking));
             }
 
             router.push(`/otp?mobileNumber=${mobileNumber}`);
@@ -327,7 +331,7 @@ export default function BookRidePage() {
                 if (validVehicle) {
                     setVehicleType(validVehicle.vehicleType);
                 } else if (parsedData.vehiclePreference) {
-                     toast({ title: "AI Helper", description: `Vehicle type "${parsedData.vehiclePreference}" not found or not available. Please select manually.`, variant: "default" });
+                    toast({ title: "AI Helper", description: `Vehicle type "${parsedData.vehiclePreference}" not found or not available. Please select manually.`, variant: "default" });
                 }
             }
 
@@ -345,10 +349,11 @@ export default function BookRidePage() {
                 if (matchedDestination) {
                     await handleDestinationSelect(matchedDestination.name);
                 } else {
-                     toast({ title: "AI Helper", description: `Destination "${parsedData.destinationName}" not found in suggestions. Please select manually.`, variant: "default" });
+                    toast({ title: "AI Helper", description: `Destination "${parsedData.destinationName}" not found in suggestions. Please select manually.`, variant: "default" });
                 }
             }
-             toast({ title: "AI Helper", description: "Form fields updated based on your request. Please review and complete.", variant: "default" });
+            toast({ title: "AI Helper", description: "Form fields updated based on your request. Please review and complete.", variant: "default" });
+            setIsAiHelperDialogOpen(false); // Close dialog after parsing
 
         } catch (error: any) {
             toast({ title: "AI Parsing Error", description: error.message || "Could not parse the request.", variant: "destructive" });
@@ -371,24 +376,10 @@ export default function BookRidePage() {
                 <Card className="w-full">
                     <CardHeader>
                         <CardTitle>Book a Ride</CardTitle>
-                        <CardDescription>Enter your ride details below, or use our AI Helper!</CardDescription>
+                        <CardDescription>Enter your ride details below, or use our AI Assistant!</CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-4">
-                        <div className="grid gap-2 border p-4 rounded-md shadow-sm">
-                            <label htmlFor="aiRequest" className="text-left font-medium text-primary">AI Booking Helper</label>
-                            <Input
-                                type="text"
-                                id="aiRequest"
-                                placeholder="e.g., Book cab from Punalur to Kollam for Anoop, email@example.com, 9876543210, SUV"
-                                value={aiRequestText}
-                                onChange={(e) => setAiRequestText(e.target.value)}
-                            />
-                            <Button onClick={handleParseWithAI} disabled={isParsing} className="w-full mt-2">
-                                <Brain className="mr-2 h-5 w-5" /> {isParsing ? "Parsing..." : "AI Fill Form"}
-                            </Button>
-                        </div>
-
-                         <div className="grid gap-2">
+                        <div className="grid gap-2">
                             <label htmlFor="user" className="text-left font-medium">User Name</label>
                             <Input
                                 type="text"
@@ -399,7 +390,7 @@ export default function BookRidePage() {
                                 required
                             />
                         </div>
-                         <div className="grid gap-2">
+                        <div className="grid gap-2">
                             <label htmlFor="email" className="text-left font-medium">Email</label>
                             <Input
                                 type="email"
@@ -486,10 +477,10 @@ export default function BookRidePage() {
                                         {currentFares
                                             .filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "")
                                             .map((fareRule) => (
-                                            <SelectItem key={fareRule.id} value={fareRule.vehicleType}>
-                                                {fareRule.vehicleType}
-                                            </SelectItem>
-                                        ))}
+                                                <SelectItem key={fareRule.id} value={fareRule.vehicleType}>
+                                                    {fareRule.vehicleType}
+                                                </SelectItem>
+                                            ))}
                                         {currentFares.filter(fareRule => fareRule.vehicleType && fareRule.vehicleType.trim() !== "").length === 0 &&
                                             <SelectItem value="--no-vehicle-types--" disabled>No vehicle types available</SelectItem>
                                         }
@@ -523,6 +514,45 @@ export default function BookRidePage() {
                         <Button onClick={bookCab} disabled={!source || !destination || !mobileNumber || !user || !email || !vehicleType || fare === null} className="w-full">
                             Book Cab <MapIcon className="ml-2 h-5 w-5" />
                         </Button>
+
+                        <div className="mt-4 flex justify-center">
+                             <Dialog open={isAiHelperDialogOpen} onOpenChange={setIsAiHelperDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" size="icon" className="rounded-full w-12 h-12">
+                                        <Bot className="h-6 w-6" />
+                                        <span className="sr-only">AI Booking Assistant</span>
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle>AI Booking Assistant</DialogTitle>
+                                        <DialogDescription>
+                                            Type your booking request below, and the AI will try to fill the form for you.
+                                            e.g., "Book a cab from Punalur to Kollam for Anoop, email@example.com, 9876543210, SUV"
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-1 items-center gap-4">
+                                            <Label htmlFor="aiRequestText" className="sr-only">
+                                                Booking Request
+                                            </Label>
+                                            <Textarea
+                                                id="aiRequestText"
+                                                value={aiRequestText}
+                                                onChange={(e) => setAiRequestText(e.target.value)}
+                                                placeholder="Enter your booking request..."
+                                                rows={4}
+                                            />
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button onClick={handleParseWithAI} disabled={isParsing}>
+                                            {isParsing ? "Processing..." : "Process Request"}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -530,30 +560,30 @@ export default function BookRidePage() {
                 <Card className="w-full h-full min-h-[400px] md:min-h-0">
                     <CardHeader>
                         <CardTitle>Ride Map</CardTitle>
-                         <CardDescription>
+                        <CardDescription>
                             {mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") && (
                                 <span className="text-destructive font-semibold">
-                                    The current map uses Google Maps Embed. Replace 'YOUR_GOOGLE_MAPS_API_KEY' 
+                                    The current map uses Google Maps Embed. Replace 'YOUR_GOOGLE_MAPS_API_KEY'
                                     in the code with your actual Google Maps API key for this map to display.
                                 </span>
                             )}
-                             <br />
-                             <span className="text-sm text-muted-foreground">
+                            <br />
+                            <span className="text-sm text-muted-foreground">
                                 (Alternative map sources like `maptiles.p.rapidapi.com` for map tiles could be used with a dedicated mapping library e.g., Leaflet, instead of the current iframe embed.)
-                             </span>
+                            </span>
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="flex flex-col h-[calc(100%-4rem)]"> 
+                    <CardContent className="flex flex-col h-[calc(100%-4rem)]">
                         {mapUrl && !mapUrl.includes("YOUR_GOOGLE_MAPS_API_KEY") ? (
                             <iframe
                                 src={mapUrl}
                                 width="100%"
-                                height="100%" 
+                                height="100%"
                                 style={{ border: 0 }}
                                 allowFullScreen={true}
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
-                                className="flex-grow rounded-md" 
+                                className="flex-grow rounded-md"
                             ></iframe>
                         ) : (
                             <div className="flex items-center justify-center h-full text-muted-foreground">
@@ -570,4 +600,3 @@ export default function BookRidePage() {
         </div>
     );
 }
-
