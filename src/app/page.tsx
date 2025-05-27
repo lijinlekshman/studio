@@ -73,9 +73,9 @@ export default function Home() {
                 // The body style from globals.css should handle the main background image
             >
                 <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay */}
-                <div className="relative z-10 text-center p-4">
+                <div className="relative z-10 text-center p-6 bg-white/20 rounded-lg shadow-md max-w-xl mx-auto"> {/* Added bg-white/20, rounded-lg, shadow-md, p-6 and max-w-xl */}
                     <Link href="/">
-                        <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="mx-auto max-w-[90%] sm:max-w-[400px] h-auto" />
+                        <Image src="/Images/logo.png" width={400} height={100} alt="Let'sGo Rides" data-ai-hint="logo" className="mx-auto max-w-[90%] sm:max-w-[300px] h-auto mb-4" />
                     </Link>
                     <h1 className="text-3xl md:text-5xl font-bold text-white mt-4">
                         Book a Ride with Let'sGo
