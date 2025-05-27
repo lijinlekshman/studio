@@ -11,7 +11,7 @@ import { ArrowLeft, Map } from 'lucide-react';
 import { suggestDestinations } from '@/ai/flows/suggest-destinations';
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { calculateFare } from '@/ai/flows/calculate-fare';
+import { calculateDistance } from '@/ai/flows/calculate-fare'; // Changed import
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from 'next/navigation';
 
@@ -148,7 +148,7 @@ export default function BookRidePage() {
         const fetchDestinationAddress = async () => {
             if (destination) {
                 try {
-                    const address = await getAddressForCoordinate(destination);
+                    const address = await getAddressForCoordinate(destination); // Corrected to use destination coordinates
                     setDestinationAddress(address);
                 } catch (e) {
                     console.error(e);
@@ -164,7 +164,7 @@ export default function BookRidePage() {
         const estimateFare = async () => {
             if (source && destination && vehicleType && currentFares.length > 0) {
                 try {
-                    const distanceResult = await calculateFare({
+                    const distanceResult = await calculateDistance({ // Changed function call
                         sourceLat: source.lat,
                         sourceLng: source.lng,
                         destinationLat: destination.lat,
@@ -314,11 +314,9 @@ export default function BookRidePage() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
             <div className="w-full max-w-md p-4">
-                <Link href="/" passHref>
-                    <Button variant="outline" className="mb-4">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
-                    </Button>
-                </Link>
+                <Button variant="outline" className="mb-4" onClick={() => router.push('/')}>
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Home
+                </Button>
             </div>
 
             <main id="booking-section" className="flex flex-col items-center justify-center w-full flex-1 px-4 md:px-20 text-center relative">
@@ -466,3 +464,4 @@ export default function BookRidePage() {
         </div>
     );
 }
+
