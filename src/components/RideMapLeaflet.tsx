@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect } from 'react'; // Removed useRef
+import { useEffect, useState } from 'react'; // Added useState
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L, { LatLngExpression, LatLngBoundsExpression } from 'leaflet';
@@ -41,10 +41,15 @@ const ChangeView = ({ bounds }: { bounds: LatLngBoundsExpression | null }) => {
 
 
 const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) => {
-  // const mapRef = useRef<L.Map | null>(null); // Removed mapRef and whenCreated
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const tileLayerUrl = "https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=YOUR-X-RapidAPI-KEY";
   // IMPORTANT: Replace YOUR-X-RapidAPI-KEY with your actual RapidAPI key for maptiles.p.rapidapi.com
+  // Using a placeholder key will result in map tiles not loading.
 
   const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Maptiles API';
 
@@ -62,6 +67,10 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
     bounds = L.latLngBounds(markers);
   }
 
+  if (!isClient) {
+    // This message might be briefly visible or superseded by the dynamic import's loading prop.
+    return <p>Initializing map...</p>;
+  }
 
   return (
     <MapContainer
@@ -69,7 +78,6 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
       zoom={source || destination ? 13 : 7}
       scrollWheelZoom={true}
       style={{ height: '100%', width: '100%', borderRadius: '0.375rem' }} //  rounded-md
-      // whenCreated={(mapInstance) => { mapRef.current = mapInstance; }} // Removed
     >
       <TileLayer
         attribution={attribution}
