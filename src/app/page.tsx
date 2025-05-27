@@ -60,12 +60,17 @@ export default function Home() {
     const handleUserLogout = () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('loggedInUser');
-             // Optionally clear other user-specific data
             const recentBooking = localStorage.getItem('bookingDetails');
             if (recentBooking) {
-                const parsedRecentBooking = JSON.parse(recentBooking);
-                localStorage.removeItem(`profileImage_${parsedRecentBooking.email}`);
-                localStorage.removeItem(`userAddress_${parsedRecentBooking.email}`);
+                try {
+                    const parsedRecentBooking = JSON.parse(recentBooking);
+                    if (parsedRecentBooking.email) {
+                        localStorage.removeItem(`profileImage_${parsedRecentBooking.email}`);
+                        localStorage.removeItem(`userAddress_${parsedRecentBooking.email}`);
+                    }
+                } catch (e) {
+                    console.error("Error parsing bookingDetails for logout cleanup", e);
+                }
             }
             localStorage.removeItem('bookingDetails');
         }
@@ -86,8 +91,8 @@ export default function Home() {
                 localStorage.setItem('chatbotBookingRequest', JSON.stringify(parsedData));
             }
             toast({ title: "AI Assistant", description: "Request processed. Redirecting to booking page..." });
-            setIsSheetOpen(false); // Close the sheet
-            setAiRequestText(''); // Clear textarea
+            setIsSheetOpen(false); 
+            setAiRequestText(''); 
             router.push('/book-ride');
         } catch (error: any) {
             toast({ title: "AI Processing Error", description: error.message || "Could not process the request.", variant: "destructive" });
@@ -135,6 +140,7 @@ export default function Home() {
 
             <div
                 className="relative w-full h-screen flex items-center justify-center bg-cover bg-center"
+                // style={{ backgroundImage: "url('/Images/taxi-bg.jpg')" }} // Background applied via globals.css
             >
                 <div className="absolute inset-0 bg-black opacity-40"></div>
                 <div className="relative z-10 text-center p-6 bg-white/20 rounded-lg shadow-md max-w-xl mx-auto">
@@ -156,7 +162,6 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* Floating Chatbot Button opening a Sheet */}
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                 <SheetTrigger asChild>
                     <Button
@@ -168,7 +173,7 @@ export default function Home() {
                         <Bot className="h-7 w-7" />
                     </Button>
                 </SheetTrigger>
-                <SheetContent>
+                <SheetContent className="flex flex-col"> {/* Make sheet content a flex column */}
                     <SheetHeader>
                         <SheetTitle>AI Booking Assistant</SheetTitle>
                         <SheetDescription>
@@ -176,21 +181,21 @@ export default function Home() {
                             For example: "Book a cab from Punalur to Kollam for Anoop, email@example.com, 9876543210, SUV preferred"
                         </SheetDescription>
                     </SheetHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid w-full gap-1.5">
-                            <Label htmlFor="ai-request-text">Your Request</Label>
+                    <div className="flex-grow py-4"> {/* This div will expand */}
+                        <div className="grid w-full gap-1.5 h-full">
+                            <Label htmlFor="ai-request-text" className="sr-only">Your Request</Label> {/* sr-only as placeholder is descriptive */}
                             <Textarea
                                 placeholder="Type your booking request here..."
                                 id="ai-request-text"
                                 value={aiRequestText}
                                 onChange={(e) => setAiRequestText(e.target.value)}
-                                rows={6}
+                                className="h-full resize-none" // Make textarea take full height of its container and non-resizable
                             />
                         </div>
                     </div>
                     <SheetFooter>
                         <SheetClose asChild>
-                             <Button type="button" variant="outline" onClick={() => setAiRequestText('')}>Cancel</Button>
+                             <Button type="button" variant="outline" onClick={() => { setAiRequestText(''); setIsSheetOpen(false); }}>Cancel</Button>
                         </SheetClose>
                         <Button type="button" onClick={handleProcessAiRequest} disabled={isParsingAi}>
                             {isParsingAi ? "Processing..." : "Process Request"}
