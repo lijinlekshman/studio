@@ -29,19 +29,21 @@ interface RideMapLeafletProps {
 const ChangeView = ({ bounds }: { bounds: LatLngBoundsExpression | null }) => {
   const map = useMap();
   useEffect(() => {
-    if (map && map.getContainer()) { // Check if map container is available
+    // Ensure map and its container are fully available
+    if (map && map.getContainer()) {
         if (bounds) {
           try {
             map.fitBounds(bounds, { padding: [50, 50] });
           } catch (e) {
             console.error("Error fitting bounds:", e);
+            // Fallback or error handling if fitBounds fails
           }
         } else {
           // Only set view if no bounds and map instance exists
           map.setView([10.8505, 76.2711], 7); // Default to Kerala
         }
     }
-  }, [map, bounds]);
+  }, [map, bounds]); // map and bounds are dependencies
   return null;
 };
 
@@ -50,7 +52,7 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setIsClient(true); // Set to true only after component mounts on the client
   }, []);
 
   const styleMemo = useMemo(() => ({
@@ -59,10 +61,8 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
     borderRadius: '0.375rem' // Tailwind rounded-md
   }), []);
 
-  const tileLayerUrl = "https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=YOUR-X-RapidAPI-KEY";
   // IMPORTANT: Replace YOUR-X-RapidAPI-KEY with your actual RapidAPI key for maptiles.p.rapidapi.com
-  // Using a placeholder key will result in map tiles not loading.
-
+  const tileLayerUrl = "https://maptiles.p.rapidapi.com/en/map/v1/{z}/{x}/{y}.png?rapidapi-key=YOUR-X-RapidAPI-KEY";
   const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors & Maptiles API';
 
   const bounds = useMemo<LatLngBoundsExpression | null>(() => {
@@ -80,26 +80,29 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
   }, [source, destination]);
 
   const centerPosition = useMemo<LatLngExpression>(() => {
+    // Default to a central point in Kerala if no source or destination
     return source ? [source.lat, source.lng] : (destination ? [destination.lat, destination.lng] : [10.8505, 76.2711]);
   }, [source, destination]);
 
   const zoomLevel = useMemo<number>(() => {
+    // Zoom in if source or destination is set, otherwise show a broader view
     return source || destination ? 13 : 7;
   }, [source, destination]);
 
-  // Create a key that changes when source or destination changes
+  // Create a key that changes when source or destination changes, forcing React to re-create the MapContainer
   const mapKey = useMemo(() => {
     return `map-${source?.lat}-${source?.lng}-${destination?.lat}-${destination?.lng}`;
   }, [source, destination]);
 
 
   if (!isClient) {
+    // If not on the client yet, render a placeholder or nothing
     return <p>Initializing map...</p>;
   }
 
   return (
     <MapContainer
-      key={mapKey} // Add key here
+      key={mapKey} // Crucial for forcing React to unmount/remount on significant changes
       center={centerPosition}
       zoom={zoomLevel}
       scrollWheelZoom={true}
@@ -129,7 +132,7 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
           transform: 'translateX(-50%)',
           backgroundColor: 'yellow',
           padding: '5px 10px',
-          zIndex: 1000,
+          zIndex: 1000, // Ensure it's on top
           border: '1px solid orange',
           borderRadius: '4px',
           fontSize: '12px',
@@ -143,4 +146,3 @@ const RideMapLeaflet: React.FC<RideMapLeafletProps> = ({ source, destination }) 
 };
 
 export default RideMapLeaflet;
-
